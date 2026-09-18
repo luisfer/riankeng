@@ -1,4 +1,9 @@
-import { GATE_COOKIE, gateToken } from '../src/gate-token'
+const GATE_COOKIE = 'rk_gate'
+
+async function gateToken(secret: string): Promise<string> {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(secret))
+  return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('')
+}
 
 export async function POST(request: Request): Promise<Response> {
   const secret = process.env.SITE_PASSWORD

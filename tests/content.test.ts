@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { ENTRIES, LEVELS, SCRIPT_LEVELS, entriesForLevel, getEntry } from '../content/index'
 import { validateEntries } from '../content/validate'
+import { CONSONANTS, DIGITS, OTHER_SIGNS, TONE_MARKS, VOWELS } from '../content/script/alphabet'
 import { gradeThai } from '../src/engine/grader-thai'
 import { gradeEnglish } from '../src/engine/grader-en'
 import { expandAlternatives } from '../src/engine/normalize'
@@ -42,8 +43,8 @@ describe('content', () => {
     }
   })
 
-  it('script levels 0–19 are authored, มา is one id, and tone marks are not cards', () => {
-    expect(SCRIPT_LEVELS).toHaveLength(20)
+  it('script levels 0–27 are authored, มา is one id, and tone marks are not cards', () => {
+    expect(SCRIPT_LEVELS).toHaveLength(28)
     for (const lvl of SCRIPT_LEVELS) {
       expect(entriesForLevel(lvl.n, 'script').length, `script ${lvl.n}`).toBeGreaterThanOrEqual(lvl.min)
     }
@@ -53,5 +54,41 @@ describe('content', () => {
     expect(getEntry('s:mâi too')).toBeUndefined()
     expect(getEntry('s:mâi èek')).toBeUndefined()
     expect(getEntry('s:máa')?.compose).toEqual(['ม', '้', 'า'])
+    const cards = ENTRIES.filter((e) => e.track === 'script' && e.tags.includes('letter'))
+    for (const mark of TONE_MARKS) expect(cards.some((c) => c.thai === mark), `tone mark ${mark}`).toBe(false)
+  })
+
+  it('script teaches every consonant, vowel sign, other sign and digit', () => {
+    const script = ENTRIES.filter((e) => e.track === 'script')
+    const cards = new Set(script.filter((e) => e.tags.includes('letter')).map((e) => e.thai))
+    for (const c of CONSONANTS) expect(cards.has(c.char), `consonant ${c.char} (${c.name})`).toBe(true)
+    for (const v of VOWELS) expect(cards.has(v.char), `vowel ${v.char}`).toBe(true)
+    for (const s of OTHER_SIGNS) expect(cards.has(s.char), `sign ${s.char}`).toBe(true)
+    for (const d of DIGITS) expect(cards.has(d), `digit ${d}`).toBe(true)
+    expect(CONSONANTS).toHaveLength(44)
+    // Every letter card is taught before it is used in a bridge word's parts.
+    const taughtAt = new Map<string, number>()
+    for (const e of script) if (e.tags.includes('letter')) taughtAt.set(e.thai, Math.min(e.level, taughtAt.get(e.thai) ?? Infinity))
+    const toneMarks = new Set<string>(TONE_MARKS)
+    for (const e of script) {
+      for (const part of e.compose ?? []) {
+        if (toneMarks.has(part)) continue
+        const at = taughtAt.get(part)
+        expect(at, `${e.id} uses ${part} which has no card`).toBeDefined()
+        expect(at!, `${e.id} at ${e.level} uses ${part} taught at ${at}`).toBeLessThanOrEqual(e.level)
+      }
+    }
+  })
+
+  it('every script bridge points at a voice word and spells it the same', () => {
+    for (const e of ENTRIES.filter((e) => e.track === 'script')) {
+      const link = e.tags.find((t) => t.startsWith('voice:'))
+      if (!link) continue
+      const target = getEntry(link.slice('voice:'.length))
+      expect(target, `${e.id} -> ${link}`).toBeDefined()
+      expect(target!.track ?? 'voice').toBe('voice')
+      if (e.compose) expect(e.compose.join(''), `${e.id} parts`).toBe(e.thai)
+      if (!e.tags.includes('digit')) expect(target!.thai, `${e.id} thai`).toBe(e.thai)
+    }
   })
 })

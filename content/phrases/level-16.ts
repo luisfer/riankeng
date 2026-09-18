@@ -14,7 +14,7 @@ export default phrases(16, [
   ['cháa gwàa dəən', 'ช้ากว่าเดิน', ['slower than walking']],
   ['nɔ́ɔi gwàa tîi kít', 'น้อยกว่าที่คิด', ['less than I thought']],
   ['mâak gwàa mụ̂a-waan', 'มากกว่าเมื่อวาน', ['more than yesterday']],
-  ['dìi tîi-sùt nai mụang', 'ดีที่สุดในเมือง', ['the best in town']],
+  ['dii tîi-sùt nai mụang', 'ดีที่สุดในเมือง', ['the best in town']],
   ['lék gwàa an gɔ̀ɔn', 'เล็กกว่าอันก่อน', ['smaller than the last one']],
   ['tùuk gwàa', 'ถูกกว่า', ['cheaper', 'it is cheaper']],
 ])

@@ -18,6 +18,7 @@ import { entryOrThrow, pickChoices } from '@/engine/scheduler'
 import { speakThai } from '@/audio/tts'
 import { RomanInput } from '@/input/RomanInput'
 import { Commit, TextBtn } from './bits'
+import { showThai } from './thai'
 
 const TONE_ORDER: Tone[] = TONES
 
@@ -118,7 +119,7 @@ export function SessionView(props: {
       setAck({ ok: true, text: 'Right.' })
     } else {
       props.onSession(markMissMove(props.session))
-      setAck({ ok: false, text: `That one is ${entry.thai}.` })
+      setAck({ ok: false, text: `That one is ${showThai(entry.thai)}.` })
     }
   }
 
@@ -150,7 +151,7 @@ export function SessionView(props: {
     if (!right) return null
     if (item.modality === 'th-en') return cleanGloss(entry.en[0] ?? '')
     if (item.modality === 'en-th' || item.modality === 'listen' || item.modality === 'tone') return entry.rom
-    if (item.modality === 'pick') return entry.thai
+    if (item.modality === 'pick') return showThai(entry.thai)
     return null
   })()
 
@@ -172,7 +173,7 @@ export function SessionView(props: {
       )
     }
     if (item.modality === 'en-th') return <p className="prompt-en">{cleanGloss(entry.en[0] ?? '')}</p>
-    if (item.modality === 'th-en' && script) return <p className="prompt-thai thai">{entry.thai}</p>
+    if (item.modality === 'th-en' && script) return <p className="prompt-thai thai">{showThai(entry.thai)}</p>
     if (item.modality === 'th-en') {
       return (
         <p className="prompt-rom rom">
@@ -193,7 +194,7 @@ export function SessionView(props: {
     <div className="glyph-picks">
       {pickChoices(entry).map((thai, i) => (
         <button key={`${thai}-${i}`} type="button" className="glyph-pick thai" onClick={() => submitPick(thai)}>
-          {thai}
+          {showThai(thai)}
         </button>
       ))}
     </div>

@@ -14,7 +14,7 @@ export default phrases(1, [
   ['pûut cháa cháa nɔ̀i', 'พูดช้าๆหน่อย', ['speak slowly please', 'please speak slowly', 'slower please', 'can you speak slowly']],
   ['pûut ìik tii dâi mái', 'พูดอีกทีได้ไหม', ['can you say it again', 'say it again please', 'could you repeat that', 'one more time please']],
   ['pǒm pûut tai dâi nít-nɔ̀i', 'ผมพูดไทยได้นิดหน่อย', ['I speak a little Thai', 'I can speak a little Thai', 'I speak Thai a little']],
-  ['kun pûut paasǎa ang-grìt dâi mái', 'คุณพูดภาษาอังกฤษได้ไหม', ['can you speak English', 'do you speak English']],
+  ['kun pûut paa-sǎa ang-grìt dâi mái', 'คุณพูดภาษาอังกฤษได้ไหม', ['can you speak English', 'do you speak English']],
   ['mâi rúu kráp/kâ', 'ไม่รู้ครับ/ค่ะ', ['I do not know', 'no idea']],
   ['dâi kráp/kâ', 'ได้ครับ/ค่ะ', ['yes', 'sure', 'ok', 'can do', 'yes I can', 'that works']],
   ['mâi dâi kráp/kâ', 'ไม่ได้ครับ/ค่ะ', ['no', 'I cannot', 'that is not possible', 'not possible']],

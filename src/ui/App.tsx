@@ -8,6 +8,7 @@ import { onVoices } from '@/audio/tts'
 import { go, parseHash, type Route } from './hash'
 import { applyTheme, resolvedTheme } from './theme'
 import { Account } from './Account'
+import { Alphabet } from './Alphabet'
 import { Glyphs } from './Glyphs'
 import { Journey } from './Journey'
 import { ReviewPage } from './AlreadyYours'
@@ -113,7 +114,7 @@ export function App() {
   const inIntro = route.name === 'intro'
   const trailTrack = inSession && session ? (session.track ?? 'voice') : inIntro && route.name === 'intro' ? route.track : undefined
   const trailLevel = inSession && session ? session.level : inIntro && route.name === 'intro' ? route.n : undefined
-  const trailPlace = route.name === 'review' ? 'Already yours' : undefined
+  const trailPlace = route.name === 'review' ? 'Already yours' : route.name === 'alphabet' ? 'The whole script' : undefined
 
   return (
     <div className={`app${inSession ? ' in-session' : ''}`}>
@@ -141,9 +142,11 @@ export function App() {
               go({ name: 'intro', n, track })
             }}
             onReview={() => go({ name: 'review' })}
+            onAlphabet={() => go({ name: 'alphabet' })}
           />
         )}
         {route.name === 'review' && <ReviewPage pool={yours} />}
+        {route.name === 'alphabet' && <Alphabet doc={doc} onOpen={(n) => go({ name: 'intro', n, track: 'script' })} />}
         {route.name === 'intro' && (
           <LevelIntro
             n={route.n}

@@ -16,10 +16,9 @@ export default words(19, [
   ['lâo', 'เล่า', ['tell a story', 'narrate'], 'v', ['mind']],
   ['rụ̂ang', 'เรื่อง', ['story', 'matter', 'about'], 'n', ['mind']],
   ['kít tǔng', 'คิดถึง', ['miss', 'think of'], 'v', ['mind']],
-  ['dtèet', 'เท็จ', ['false', 'untrue'], 'adj', ['mind']],
-  ['kɔ̂ɔ-kít', 'ความคิด', ['idea', 'thought'], 'n', ['mind']],
-  ['kɔ̂ɔ-hěn', 'ความเห็น', ['opinion'], 'n', ['mind']],
+  ['tét', 'เท็จ', ['false', 'untrue'], 'adj', ['mind']],
+  ['kwaam kít', 'ความคิด', ['idea', 'thought'], 'n', ['mind']],
+  ['kwaam hěn', 'ความเห็น', ['opinion'], 'n', ['mind']],
   ['sà-rúp', 'สรุป', ['in sum', 'to conclude'], 'v', ['mind']],
   ['dtɔ̀ɔ bpai', 'ต่อไป', ['next', 'from now on'], 'adv', ['mind']],
-  ['dtɔɔn nán#2', 'ตอนนั้น', ['at that time'], 'adv', ['mind']],
 ])

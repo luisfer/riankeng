@@ -50,6 +50,7 @@ export function Journey(props: {
   script: LevelStatus[]
   onOpen: (track: TrackId, n: number) => void
   onReview: () => void
+  onAlphabet: () => void
 }) {
   return (
     <main className="page journey">
@@ -79,6 +80,16 @@ export function Journey(props: {
         track="script"
         onOpen={props.onOpen}
       />
+      <section className="track-block">
+        <button type="button" className="contents-row yours-link" onClick={props.onAlphabet}>
+          <span className="contents-n" />
+          <span>
+            <span className="contents-title">The whole script</span>
+            <span className="contents-rom rom">every letter, and where it is taught</span>
+          </span>
+          <span className="contents-meta">open</span>
+        </button>
+      </section>
     </main>
   )
 }

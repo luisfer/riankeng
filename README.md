@@ -28,7 +28,7 @@ Voice unlocks the next level when the previous one is mastered. Script unlocks w
 ## Tracks
 
 - Voice 0–21: tones, survival, verbs, food, time, the city, particles, heart words.
-- Script 0–19: seats through leftover letters, vowels by position, live and dead syllables, clusters. Each letter sits on a Voice word.
+- Script 0–27: the whole script. All 44 consonants (including the two retired ones), every vowel sign, the short mark, the silent mark, ๆ, ฯ and the Thai digits. Each letter is taught before any word that uses it, and each bridge word is a Voice word. `content/script/alphabet.ts` is the checklist; tests hold the levels to it. `#/alphabet` shows the whole chart with where each letter is taught.
 
 Romanization follows the textbook system in `content/system.ts` (à â á ǎ, g/bp/dt, ε ɔ ə ụ).
 

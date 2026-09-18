@@ -32,7 +32,7 @@ export default words(6, [
   ['bpai tîi-nǎi', 'ไปที่ไหน', ['where to', 'go where'], 'expr', ['travel']],
   ['long', 'ลง', ['get off', 'go down', 'descend'], 'v', ['travel']],
   ['kụ̂n', 'ขึ้น', ['get on', 'go up', 'ascend'], 'v', ['travel']],
-  ['pìan', 'เปลี่ยน', ['change', 'to change'], 'v', ['travel']],
+  ['bplìan', 'เปลี่ยน', ['change', 'to change'], 'v', ['travel']],
   ['reo', 'เร็ว', ['fast', 'quick'], 'adj', []],
   ['tàang ɔ̀ɔk', 'ทางออก', ['exit', 'way out'], 'n', ['travel']],
   ['tàang kâo', 'ทางเข้า', ['entrance', 'way in'], 'n', ['travel']],

@@ -16,7 +16,7 @@ export default words(8, [
   ['dtɔ̂ng gaan mái', 'ต้องการไหม', ['do you need it', 'do you want it']],
   ['à-nú-yâat', 'อนุญาต', ['allow', 'permission', 'permit'], 'v', ['modal']],
   ['hâam', 'ห้าม', ['forbidden', 'do not', 'must not'], 'v', ['modal']],
-  ['wáng', 'หวัง', ['hope', 'to hope'], 'v', ['modal']],
+  ['wǎng', 'หวัง', ['hope', 'to hope'], 'v', ['modal']],
   ['dtâng jai', 'ตั้งใจ', ['intend', 'mean to', 'pay attention'], 'v', ['modal']],
   ['pɔɔ', 'พอ', ['enough', 'sufficient'], 'adj', ['modal']],
   ['mâi pɔɔ', 'ไม่พอ', ['not enough'], 'expr', ['modal']],

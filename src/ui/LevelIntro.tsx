@@ -2,6 +2,7 @@ import { entriesForLevel, levelsFor } from '@content/index'
 import type { TrackId } from '@content/types'
 import { Commit } from './bits'
 import { ToneCharts } from './ToneCharts'
+import { showParts, showThai } from './thai'
 
 const THAI = /[\u0E00-\u0E7F]/
 const PHONETIC = /[àâáǎèêéěìîíǐòôóǒùûúǔÀÂÁǍεɔəụ]/
@@ -54,7 +55,7 @@ export function LevelIntro(props: { n: number; track: TrackId; locked?: boolean;
             const cls = leadClass(lead, Boolean(note))
             return (
               <li key={f}>
-                <span className={cls}>{lead}</span>
+                <span className={cls}>{showThai(lead)}</span>
                 {note && <span className="note">{note}</span>}
               </li>
             )
@@ -69,7 +70,7 @@ export function LevelIntro(props: { n: number; track: TrackId; locked?: boolean;
               .filter((e) => e.compose?.length)
               .map((e) => (
                 <li key={`compose-${e.id}`}>
-                  <span className="thai compose-parts">{e.compose!.join(' + ')}</span>
+                  <span className="thai compose-parts">{showParts(e.compose!)}</span>
                   <span className="compose-then">then</span>
                   <span className="thai compose-word">{e.thai}</span>
                 </li>
@@ -83,7 +84,7 @@ export function LevelIntro(props: { n: number; track: TrackId; locked?: boolean;
           <ul className="preview">
             {preview.map((e) => (
               <li key={e.id} className="quiet-row">
-                {script && <span className="thai preview-thai">{e.thai}</span>}
+                {script && <span className="thai preview-thai">{showThai(e.thai)}</span>}
                 <span className="rom">{e.rom}</span>
                 <span>{e.en[0]}</span>
               </li>

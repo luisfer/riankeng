@@ -58,6 +58,7 @@ export default words(4, [
   ['hǐu náam', 'หิวน้ำ', ['thirsty'], 'adj', ['feeling'], 'Literally "hungry for water".'],
   // ordering
   ['sàng', 'สั่ง', ['order', 'to order'], 'v', ['ordering']],
+  ['tá-naa-kaan', 'ธนาคาร', ['bank'], 'n', ['money']],
   ['gèp dtang', 'เก็บตัง', ['the bill please', 'check please', 'collect the money', 'bill please'], 'expr', ['ordering'], 'Literally "collect money". Also chék bin.'],
   ['chék bin', 'เช็คบิล', ['the bill please', 'check bill', 'bill please'], 'expr', ['ordering'], 'From "check bill". Same as gèp dtang.'],
   ['mee-nuu', 'เมนู', ['menu'], 'n', ['ordering']],

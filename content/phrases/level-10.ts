@@ -15,5 +15,5 @@ export default phrases(10, [
   ['kụ̂n bâan', 'ขึ้นบ้าน', ['come in', 'come up to the house']],
   ['tɔ̀ɔt rɔɔng táo', 'ถอดรองเท้า', ['take off your shoes']],
   ['sài rɔɔng táo', 'ใส่รองเท้า', ['put on your shoes', 'wear shoes']],
-  ['prεεng fan gɔ̀ɔn nɔɔn', 'แปรงฟันก่อนนอน', ['brush your teeth before bed']],
+  ['bprεεng fan gɔ̀ɔn nɔɔn', 'แปรงฟันก่อนนอน', ['brush your teeth before bed']],
 ])

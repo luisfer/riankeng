@@ -7,7 +7,7 @@ export default phrases(2, [
   ['kun mii rót mái', 'คุณมีรถไหม', ['do you have a car']],
   ['pǒm mii pụ̂an kon tai', 'ผมมีเพื่อนคนไทย', ['I have a Thai friend', 'I have Thai friends']],
   ['rao bpai gin kâao gan', 'เราไปกินข้าวกัน', ['let us go eat together', 'we go eat together', 'let us go and eat', 'shall we go eat']],
-  ['pǒm rian paasǎa tai', 'ผมเรียนภาษาไทย', ['I study Thai', 'I am learning Thai', 'I learn Thai']],
+  ['pǒm rian paa-sǎa tai', 'ผมเรียนภาษาไทย', ['I study Thai', 'I am learning Thai', 'I learn Thai']],
   ['kǎo tam-ngaan tîi grung-têep', 'เขาทำงานที่กรุงเทพ', ['he works in Bangkok', 'she works in Bangkok', 'they work in Bangkok']],
   ['pǒm yùu tîi grung-têep', 'ผมอยู่ที่กรุงเทพ', ['I live in Bangkok', 'I am in Bangkok', 'I stay in Bangkok']],
   ['kun kâo jai mái', 'คุณเข้าใจไหม', ['do you understand']],

@@ -33,7 +33,7 @@ export default words(9, [
   ['nâa glua', 'น่ากลัว', ['scary', 'frightening'], 'adj', ['describe']],
   ['kε̌ng', 'แข็ง', ['hard', 'strong', 'tough'], 'adj', ['describe']],
   ['ɔ̀ɔn', 'อ่อน', ['soft', 'weak', 'young (of age)'], 'adj', ['describe']],
-  ['sùk', 'สุข', ['happy', 'happiness'], 'n', ['describe']],
+  ['mii kwaam sùk', 'มีความสุข', ['happy', 'be happy', 'content'], 'adj', ['describe'], 'Literally "have happiness". The everyday way to say happy.'],
   ['sòk-gà-bpròk', 'สกปรก', ['dirty'], 'adj', ['describe']],
   ['chà-làat', 'ฉลาด', ['clever', 'smart'], 'adj', ['describe']],
   ['ngôo', 'โง่', ['stupid', 'foolish'], 'adj', ['describe']],

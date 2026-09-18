@@ -18,7 +18,7 @@ export default phrases(19, [
   ['sùt táai gɔ̂ dii', 'สุดท้ายก็ดี', ['in the end it was fine']],
   ['pǒm kít tǔng bâan', 'ผมคิดถึงบ้าน', ['I miss home']],
   ['nîi jing mái', 'นี่จริงไหม', ['is this true']],
-  ['kɔ̂ɔ-hěn pǒm', 'ความเห็นผม', ['my opinion']],
+  ['kwaam hěn pǒm', 'ความเห็นผม', ['my opinion']],
   ['sà-rúp lέεo', 'สรุปแล้ว', ['in conclusion', 'to sum up']],
   ['dtɔ̀ɔ bpai yang-ngai', 'ต่อไปยังไง', ['what next', 'what now']],
   ['lâo mâi sèt', 'เล่าไม่เสร็จ', ['I have not finished the story']],
@@ -26,5 +26,5 @@ export default phrases(19, [
   ['hěn dûai mâak', 'เห็นด้วยมาก', ['I agree a lot']],
   ['mâi chụ̂a dtὲε fang', 'ไม่เชื่อแต่ฟัง', ['I do not believe it but I listen']],
   ['rụ̂ang níi yaao', 'เรื่องนี้ยาว', ['this is a long story']],
-  ['kɔ̂ɔ-kít dii', 'ความคิดดี', ['a good idea']],
+  ['kwaam kít dii', 'ความคิดดี', ['a good idea']],
 ])

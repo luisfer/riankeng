@@ -10,7 +10,7 @@ export default words(16, [
   ['dtàang', 'ต่าง', ['different'], 'adj', ['compare']],
   ['dtàang gan', 'ต่างกัน', ['different from each other'], 'adj', ['compare']],
   ['gəən bpai', 'เกินไป', ['too much', 'excessively'], 'adv', ['compare']],
-  ['dìi gwàa', 'ดีกว่า', ['better'], 'adj', ['compare']],
+  ['dii gwàa', 'ดีกว่า', ['better'], 'adj', ['compare']],
   ['yε̂ε gwàa', 'แย่กว่า', ['worse'], 'adj', ['compare']],
   ['yài gwàa', 'ใหญ่กว่า', ['bigger'], 'adj', ['compare']],
   ['lék gwàa', 'เล็กกว่า', ['smaller'], 'adj', ['compare']],
@@ -19,6 +19,6 @@ export default words(16, [
   ['mâak gwàa', 'มากกว่า', ['more'], 'adv', ['compare']],
   ['nɔ́ɔi gwàa', 'น้อยกว่า', ['less'], 'adv', ['compare']],
   ['nɔ́ɔi', 'น้อย', ['few', 'little', 'less'], 'adj', ['compare']],
-  ['dìi tîi-sùt', 'ดีที่สุด', ['the best'], 'adj', ['compare']],
+  ['dii tîi-sùt', 'ดีที่สุด', ['the best'], 'adj', ['compare']],
   ['yài tîi-sùt', 'ใหญ่ที่สุด', ['the biggest'], 'adj', ['compare']],
 ])

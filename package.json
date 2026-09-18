@@ -1,0 +1,38 @@
+{
+  "name": "riankeng",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "riian gèng — learn spoken Thai through phonetic romanization. A local-first journey app.",
+  "author": {
+    "name": "Luisfer Romero Calero",
+    "url": "https://romerocalero.carrd.co"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -p tsconfig.json --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "validate": "tsx scripts/validate-content.ts",
+    "ground": "python3 scripts/gen-ground.py",
+    "audio": "python3 scripts/gen-audio.py"
+  },
+  "dependencies": {
+    "idb-keyval": "^6.3.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.3",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^4.7.0",
+    "happy-dom": "^20.14.5",
+    "tsx": "^4.23.13",
+    "typescript": "^5.9.3",
+    "vite": "^6.4.3",
+    "vitest": "^3.2.7"
+  }
+}

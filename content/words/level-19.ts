@@ -1,0 +1,25 @@
+import { words } from '../build'
+
+export default words(19, [
+  ['kít wâa', 'คิดว่า', ['I think', 'to think that'], 'v', ['mind']],
+  ['rúu-sụ̀k wâa', 'รู้สึกว่า', ['I feel that'], 'v', ['mind']],
+  ['hěn dûai', 'เห็นด้วย', ['agree', 'I agree'], 'v', ['mind']],
+  ['mâi hěn dûai', 'ไม่เห็นด้วย', ['disagree'], 'v', ['mind']],
+  ['chụ̂a', 'เชื่อ', ['believe', 'to believe'], 'v', ['mind']],
+  ['mâi chụ̂a', 'ไม่เชื่อ', ['do not believe'], 'v', ['mind']],
+  ['sǒng-sǎi', 'สงสัย', ['suspect', 'wonder'], 'v', ['mind']],
+  ['nε̂ε jai', 'แน่ใจ', ['sure', 'be sure'], 'adj', ['mind']],
+  ['mâi nε̂ε jai', 'ไม่แน่ใจ', ['not sure'], 'adj', ['mind']],
+  ['yɔɔm-ráp', 'ยอมรับ', ['accept', 'admit'], 'v', ['mind']],
+  ['bpà-dtì-sèet', 'ปฏิเสธ', ['refuse', 'deny'], 'v', ['mind']],
+  ['lâo', 'เล่า', ['tell a story', 'narrate'], 'v', ['mind']],
+  ['rụ̂ang', 'เรื่อง', ['story', 'matter', 'about'], 'n', ['mind']],
+  ['kít tǔng', 'คิดถึง', ['miss', 'think of'], 'v', ['mind']],
+  ['jìng', 'จริง', ['true', 'real'], 'adj', ['mind']],
+  ['dtèet', 'เท็จ', ['false', 'untrue'], 'adj', ['mind']],
+  ['kɔ̂ɔ-kít', 'ความคิด', ['idea', 'thought'], 'n', ['mind']],
+  ['kɔ̂ɔ-hěn', 'ความเห็น', ['opinion'], 'n', ['mind']],
+  ['sà-rúp', 'สรุป', ['in sum', 'to conclude'], 'v', ['mind']],
+  ['dtɔ̀ɔ bpai', 'ต่อไป', ['next', 'from now on'], 'adv', ['mind']],
+  ['dtɔɔn nán#2', 'ตอนนั้น', ['at that time'], 'adv', ['mind']],
+])

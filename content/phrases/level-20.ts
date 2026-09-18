@@ -1,0 +1,25 @@
+import { phrases } from '../build'
+
+export default phrases(20, [
+  ['jai yen nɔ̀i', 'ใจเย็นหน่อย', ['calm down a bit', 'be patient']],
+  ['yàa grεεng jai', 'อย่าเกรงใจ', ['do not be shy about asking', 'no need to hesitate']],
+  ['kun mii nám jai', 'คุณมีน้ำใจ', ['you are kind']],
+  ['wan nîi bpai tam bun', 'วันนี้ไปทำบุญ', ['today I go to make merit']],
+  ['mâi sà-baai jai', 'ไม่สบายใจ', ['I am uneasy']],
+  ['wái jai pǒm dâi', 'ไว้ใจผมได้', ['you can trust me']],
+  ['dtàk jai ləəi', 'ตกใจเลย', ['I was so startled']],
+  ['dtàt sǐn jai lέεo', 'ตัดสินใจแล้ว', ['I have decided']],
+  ['yàak pìian jai', 'อยากเปลี่ยนใจ', ['I want to change my mind']],
+  ['rụ̂ang sàm-khan', 'เรื่องสำคัญ', ['an important matter']],
+  ['jai kwâang ná', 'ใจกว้างนะ', ['be generous, yeah']],
+  ['yàa jai dàm', 'อย่าใจดำ', ['do not be cruel']],
+  ['sǐa náam-jai pǒm', 'เสียน้ำใจผม', ['you hurt my feelings']],
+  ['wǎang jai dâi', 'วางใจได้', ['you can rest easy']],
+  ['jàp jai mâak', 'จับใจมาก', ['very touching']],
+  ['plɔ̀ɔp jai kun', 'ปลอบใจคุณ', ['I will comfort you']],
+  ['tam bun lέεo dii jai', 'ทำบุญแล้วดีใจ', ['I made merit and I am glad']],
+  ['grεεng jai kun', 'เกรงใจคุณ', ['I do not want to impose on you']],
+  ['jai yen jai yen', 'ใจเย็นใจเย็น', ['calm, calm']],
+  ['nám jai mâak', 'น้ำใจมาก', ['so much kindness']],
+  ['táng jai tam', 'ทั้งใจทำ', ['do it with all your heart']],
+])

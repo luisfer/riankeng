@@ -1,0 +1,28 @@
+import { words } from '../build'
+
+export default words(17, [
+  ['ná', 'นะ', ['softener', 'you know', 'right (soft)'], 'particle', ['particle']],
+  ['sì', 'สิ', ['insist', 'do it'], 'particle', ['particle']],
+  ['rə̌ə', 'เหรอ', ['oh really', 'is that so'], 'particle', ['particle']],
+  ['rɔ̀k', 'หรอก', ['not at all', 'no way (soft)'], 'particle', ['particle']],
+  ['já', 'จ้ะ', ['close polite (female)', 'affectionate ending'], 'particle', ['particle']],
+  ['jâ', 'จ้า', ['warm ending'], 'particle', ['particle']],
+  ['wá', 'วะ', ['rough ending', 'buddy (rough)'], 'particle', ['particle']],
+  ['hâ', 'ฮะ', ['casual male ending'], 'particle', ['particle']],
+  ['ná há', 'นะฮะ', ['polite casual'], 'particle', ['particle']],
+  ['chee', 'เชีย', ['emphatic', 'indeed'], 'particle', ['particle']],
+  ['naa', 'นา', ['see?', 'as I said'], 'particle', ['particle']],
+  ['də̀ə', 'ด่ะ', ['female casual'], 'particle', ['particle']],
+  ['pà', 'ปะ', ['right? (casual)'], 'particle', ['particle']],
+  ['sì ná', 'สินะ', ['see?', 'I told you'], 'particle', ['particle']],
+  ['ná sì', 'นะสิ', ['see? of course'], 'particle', ['particle']],
+  ['ləəi ná', 'เลยนะ', ['really, you know'], 'particle', ['particle']],
+  ['mâi rɔ̀k', 'ไม่หรอก', ['no, not at all'], 'expr', ['particle']],
+  ['châi rɔ̀k', 'ใช่หรอก', ['as if', 'hardly'], 'expr', ['particle']],
+  ['ao sì', 'เอาสิ', ['go on then', 'do it then'], 'expr', ['particle']],
+  ['bpai sì', 'ไปสิ', ['go on', 'go then'], 'expr', ['particle']],
+  ['maa ná', 'มานะ', ['come, will you'], 'expr', ['particle']],
+  ['dii ná', 'ดีนะ', ['good, you know', 'that is good']],
+  ['mâi bpen rai ná', 'ไม่เป็นไรนะ', ['it is okay, really']],
+  ['jing ná', 'จริงนะ', ['really', 'I mean it']],
+])

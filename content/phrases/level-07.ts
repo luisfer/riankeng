@@ -1,0 +1,17 @@
+import { phrases } from '../build'
+
+export default phrases(7, [
+  ['gin lέεo rụ̌ụ yang', 'กินแล้วหรือยัง', ['have you eaten yet', 'eaten yet']],
+  ['yang mâi sèt', 'ยังไม่เสร็จ', ['not finished yet', 'I am not done yet']],
+  ['pǒm gam-lang rian', 'ผมกำลังเรียน', ['I am studying', 'I am in the middle of studying']],
+  ['jà bpai prung-níi', 'จะไปพรุ่งนี้', ['I will go tomorrow', 'going tomorrow']],
+  ['kun kəəi bpai chiang-mài mái', 'คุณเคยไปเชียงใหม่ไหม', ['have you ever been to Chiang Mai', 'have you been to Chiang Mai']],
+  ['gɔ̀ɔn gin kâao', 'ก่อนกินข้าว', ['before eating', 'before the meal']],
+  ['lǎng jàak ngaan', 'หลังจากงาน', ['after work']],
+  ['dtɔɔn nîi wâang', 'ตอนนี้ว่าง', ['I am free now', 'free right now']],
+  ['kəəi tam mái', 'เคยทำไหม', ['have you ever done it', 'have you done this before']],
+  ['mâi kəəi', 'ไม่เคย', ['never', 'I have never']],
+  ['sèt náan lέεo', 'เสร็จนานแล้ว', ['finished a long time ago', 'done long ago']],
+  ['diao maa', 'เดี๋ยวมา', ['coming in a moment', 'just a moment']],
+  ['tûk wan bpai tam-ngaan', 'ทุกวันไปทำงาน', ['I go to work every day']],
+])

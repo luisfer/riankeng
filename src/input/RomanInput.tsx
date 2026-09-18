@@ -60,6 +60,7 @@ export function RomanInput(props: {
   value: string
   onChange: (v: string) => void
   onSubmit: () => void
+  onPasteBlock?: () => void
   disabled?: boolean
   placeholder?: string
   autoFocus?: boolean
@@ -131,7 +132,10 @@ export function RomanInput(props: {
     insert(ch)
   }
 
-  const blockPaste = (e: ClipboardEvent) => e.preventDefault()
+  const blockPaste = (e: ClipboardEvent) => {
+    e.preventDefault()
+    props.onPasteBlock?.()
+  }
 
   return (
     <div className="roman">

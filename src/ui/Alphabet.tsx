@@ -78,12 +78,31 @@ export function Alphabet(props: { doc: ProgressDoc; onOpen: (n: number) => void 
         />
       ))}
       <Grid title="Vowels" cells={VOWELS.map((v) => cell(props.doc, v.char, v.reads))} onOpen={props.onOpen} />
-      <Grid
-        title="Tone marks"
-        note="Learned on words, never as cards. On a mid-class letter: ◌่ low, ◌้ falling, ◌๊ high, ◌๋ rising."
-        cells={[]}
-        onOpen={props.onOpen}
-      />
+      <section className="alpha-block">
+        <h2 className="quiet">Tone marks</h2>
+        <p className="lede alpha-note thai-inline">
+          Learned on words, never as cards. On a mid-class letter: {showThai('่')} low, {showThai('้')} falling,{' '}
+          {showThai('๊')} high, {showThai('๋')} rising.
+        </p>
+        <ul className="tone-mark-row">
+          <li>
+            <span className="thai">{showThai('ก่า')}</span>
+            <span className="rom">low</span>
+          </li>
+          <li>
+            <span className="thai">{showThai('ก้า')}</span>
+            <span className="rom">falling</span>
+          </li>
+          <li>
+            <span className="thai">{showThai('ก๊า')}</span>
+            <span className="rom">high</span>
+          </li>
+          <li>
+            <span className="thai">{showThai('ก๋า')}</span>
+            <span className="rom">rising</span>
+          </li>
+        </ul>
+      </section>
       <Grid title="Other marks" cells={OTHER_SIGNS.map((s) => cell(props.doc, s.char, s.reads))} onOpen={props.onOpen} />
       <Grid title="Digits" cells={DIGITS.map((d, i) => cell(props.doc, d, String(i)))} onOpen={props.onOpen} />
     </main>

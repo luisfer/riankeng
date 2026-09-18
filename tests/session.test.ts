@@ -1,14 +1,19 @@
 import { describe, expect, it } from 'vitest'
+import { entriesForLevel, getEntry } from '../content/index'
 import {
   afterHold,
+  canContinue,
   currentItem,
   markCorrect,
   markMissMove,
   markMissStay,
   requeueCurrent,
+  SESSION_SIZE,
   startSession,
 } from '../src/engine/session'
+import { chooseModality } from '../src/engine/scheduler'
 import { emptyDoc } from '../src/storage/progress-schema'
+import { newItemProgress, type ItemProgress } from '../src/engine/srs'
 
 describe('session transitions', () => {
   it('markCorrect advances and scores', () => {
@@ -53,5 +58,54 @@ describe('session transitions', () => {
     expect(missed.answered).toBe(1)
     const next = requeueCurrent(missed)
     expect(next.queue.at(-1)?.id).toBe(id)
+  })
+})
+
+function dueItem(id: string, now: number): ItemProgress {
+  return { ...newItemProgress(id), reps: 3, lastSeen: now - 1, due: now - 1, stage: 2 }
+}
+
+describe('startSession belongs to the opened level', () => {
+  it('keeps level-4 cards when sixteen earlier dues are waiting', () => {
+    const now = 1_700_000_000_000
+    const doc = emptyDoc(now)
+    const early = entriesForLevel(0, 'voice')
+      .concat(entriesForLevel(1, 'voice'), entriesForLevel(2, 'voice'), entriesForLevel(3, 'voice'))
+      .slice(0, 16)
+    expect(early.length).toBe(16)
+    for (const e of early) doc.items[e.id] = dueItem(e.id, now)
+    const s = startSession(doc, now, 4, 'voice')
+    const level4 = new Set(entriesForLevel(4, 'voice').map((e) => e.id))
+    expect(s.queue.some((q) => level4.has(q.id))).toBe(true)
+    expect(s.queue.filter((q) => level4.has(q.id)).length).toBeGreaterThan(0)
+    expect(s.level).toBe(4)
+    expect(s.queue.length).toBeLessThanOrEqual(SESSION_SIZE)
+  })
+
+  it('honors newPerSession for fresh cards on the opened level', () => {
+    const now = 2
+    const doc = emptyDoc(now)
+    doc.settings.newPerSession = 3
+    const s = startSession(doc, now, 0, 'voice')
+    const fresh = s.queue.filter((q) => (doc.items[q.id]?.reps ?? 0) === 0)
+    expect(fresh.length).toBeLessThanOrEqual(3)
+  })
+
+  it('offers Continue for the same track and level', () => {
+    const s = startSession(emptyDoc(), 3, 0, 'voice')
+    expect(canContinue(s, 'voice', 0)).toBe(true)
+    expect(canContinue(s, 'voice', 4)).toBe(false)
+    expect(canContinue(markCorrect({ ...s, queue: s.queue.slice(0, 1) }), 'voice', 0)).toBe(false)
+  })
+})
+
+describe('Voice 0 can listen and name tone', () => {
+  it('returns listen or tone for some Voice 0 salts', () => {
+    const entry = getEntry('w:maa')!
+    const seen = new Set<string>()
+    for (let i = 0; i < 200; i++) seen.add(chooseModality(entry, newItemProgress(entry.id), String(i)))
+    expect(seen.has('listen')).toBe(true)
+    expect(seen.has('tone')).toBe(true)
+    expect(seen.has('th-en')).toBe(true)
   })
 })

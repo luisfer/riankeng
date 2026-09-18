@@ -9,7 +9,7 @@ export default words(13, [
   ['naai jâang', 'นายจ้าง', ['boss', 'employer'], 'n', ['work']],
   ['lûuk nɔ́ɔng', 'ลูกน้อง', ['subordinate', 'staff'], 'n', ['work']],
   ['lûuk kâa', 'ลูกค้า', ['customer', 'client'], 'n', ['work']],
-  ['ii-meeo', 'อีเมล', ['email'], 'n', ['work']],
+  ['ii-meen', 'อีเมล', ['email'], 'n', ['work']],
   ['in-təə-nét', 'อินเทอร์เน็ต', ['internet'], 'n', ['work']],
   ['wép', 'เว็บ', ['web', 'website'], 'n', ['work']],
   ['kom-piw-dtəə', 'คอมพิวเตอร์', ['computer'], 'n', ['work']],

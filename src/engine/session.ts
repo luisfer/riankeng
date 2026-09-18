@@ -1,12 +1,12 @@
-import { entriesForLevel } from '@content/index'
+import { entriesForLevel, getEntry } from '@content/index'
 import type { TrackId } from '@content/types'
 import type { ProgressDoc } from '@/storage/progress-schema'
-import { chooseModality, currentLevel, dueIds, entryOrThrow, hash, progressFor } from './scheduler'
-import type { Modality } from './srs'
+import { chooseModality, currentLevel, dueIds, entryOrThrow, progressFor } from './scheduler'
+import { isDue } from './srs'
 
 export interface QueueItem {
   id: string
-  modality: Modality
+  modality: ReturnType<typeof chooseModality>
   salt: string
 }
 
@@ -28,18 +28,16 @@ export interface LiveSession {
   hold: Hold | null
 }
 
-const SESSION_SIZE = 16
-
-function translationOnly(m: Modality, salt: string): Modality {
-  if (m === 'listen' || m === 'tone') return hash(salt) < 0.5 ? 'en-th' : 'th-en'
-  return m
-}
+export const SESSION_SIZE = 16
+/** Earlier-level dues that may trail a sitting, after the opened level is filled. */
+export const REVIEW_TAIL = 4
 
 export function startSession(doc: ProgressDoc, now = Date.now(), level?: number, track: TrackId = 'voice'): LiveSession {
   const target = level ?? currentLevel(doc, now, track)
   const salt = String(now)
   const queue: QueueItem[] = []
   const seen = new Set<string>()
+  const newCap = Math.max(0, doc.settings.newPerSession)
 
   const push = (id: string) => {
     if (seen.has(id) || queue.length >= SESSION_SIZE) return
@@ -48,13 +46,23 @@ export function startSession(doc: ProgressDoc, now = Date.now(), level?: number,
     queue.push({ id, modality: chooseModality(entry, progressFor(doc, id), salt), salt })
   }
 
-  for (const id of dueIds(doc, now, track)) push(id)
+  const onLevel = entriesForLevel(target, track)
+  const fresh = onLevel.filter((e) => progressFor(doc, e.id).reps === 0)
+  const dueHere = onLevel.filter((e) => isDue(progressFor(doc, e.id), now))
+  const leftover = onLevel.filter((e) => progressFor(doc, e.id).reps > 0)
 
-  if (queue.length < SESSION_SIZE) {
-    const entries = entriesForLevel(target, track)
-    const fresh = entries.filter((e) => progressFor(doc, e.id).reps === 0)
-    const leftover = entries.filter((e) => progressFor(doc, e.id).reps > 0)
-    for (const e of [...fresh, ...leftover]) push(e.id)
+  for (const e of fresh.slice(0, newCap)) push(e.id)
+  for (const e of dueHere) push(e.id)
+  for (const e of leftover) push(e.id)
+
+  let tail = 0
+  for (const id of dueIds(doc, now, track)) {
+    if (tail >= REVIEW_TAIL) break
+    const entry = getEntry(id)
+    if (!entry || entry.level >= target) continue
+    if (seen.has(id)) continue
+    push(id)
+    tail++
   }
 
   return {
@@ -70,15 +78,23 @@ export function startSession(doc: ProgressDoc, now = Date.now(), level?: number,
 }
 
 export function normalizeSession(session: LiveSession): LiveSession {
-  const track = session.track ?? 'voice'
   return {
     ...session,
-    track,
-    queue: session.queue.map((q) => ({
-      ...q,
-      modality: track === 'voice' ? translationOnly(q.modality, q.salt) : q.modality,
-    })),
+    track: session.track ?? 'voice',
   }
+}
+
+/** Unfinished sitting for this track and level, with every card still in the catalog. */
+export function canContinue(session: LiveSession | null, track: TrackId, level: number): session is LiveSession {
+  if (!session) return false
+  if ((session.track ?? 'voice') !== track || session.level !== level) return false
+  if (session.queue.length === 0 || session.cursor >= session.queue.length) return false
+  return session.queue.every((q) => Boolean(getEntry(q.id)))
+}
+
+export function sessionStillValid(session: LiveSession, resetAt: number): boolean {
+  if (session.startedAt < resetAt) return false
+  return session.queue.every((q) => Boolean(getEntry(q.id)))
 }
 
 export function currentItem(session: LiveSession): QueueItem | null {

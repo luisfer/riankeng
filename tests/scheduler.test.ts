@@ -9,12 +9,22 @@ function withReps(id: string, reps = 1): ItemProgress {
 }
 
 describe('chooseModality', () => {
-  it('keeps Voice on translation', () => {
+  it('lets Voice 0 listen and name tone', () => {
     const entry = getEntry('w:maa')!
     const p = newItemProgress(entry.id)
-    for (let i = 0; i < 20; i++) {
+    const seen = new Set<string>()
+    for (let i = 0; i < 30; i++) {
       const m = chooseModality(entry, { ...p, stage: i % 5 }, String(i))
-      expect(['en-th', 'th-en']).toContain(m)
+      expect(['en-th', 'th-en', 'listen', 'tone']).toContain(m)
+      seen.add(m)
+    }
+    expect(seen.has('listen') || seen.has('tone')).toBe(true)
+  })
+
+  it('keeps Script silk ไหม on pick', () => {
+    const entry = getEntry('s:mǎi')!
+    for (let i = 0; i < 12; i++) {
+      expect(chooseModality(entry, { ...newItemProgress(entry.id), stage: i % 4 }, String(i))).toBe('pick')
     }
   })
 

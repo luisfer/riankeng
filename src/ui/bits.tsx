@@ -53,6 +53,7 @@ export function Trail(props: {
   onPause?: () => void
   themeLabel?: string
   onTheme?: () => void
+  hideTheme?: boolean
   place?: string
 }) {
   const place =
@@ -89,7 +90,14 @@ export function Trail(props: {
         )}
       </span>
       <div className="trail-end">
-        {props.onTheme && <TextBtn onClick={props.onTheme}>{props.themeLabel}</TextBtn>}
+        {props.onTheme && !props.hideTheme && (
+          <TextBtn onClick={props.onTheme}>{props.themeLabel}</TextBtn>
+        )}
+        {props.onTheme && props.hideTheme && (
+          <span className="trail-theme-sit">
+            <TextBtn onClick={props.onTheme}>{props.themeLabel}</TextBtn>
+          </span>
+        )}
         {props.onPause && <TextBtn onClick={props.onPause}>Pause</TextBtn>}
         {props.onAccount && !props.onPause && <TextBtn onClick={props.onAccount}>{props.accountLabel || 'Account'}</TextBtn>}
       </div>

@@ -28,7 +28,7 @@ Voice unlocks the next level when the previous one is mastered. Script unlocks w
 ## Tracks
 
 - Voice 0–21: tones, survival, verbs, food, time, the city, particles, heart words.
-- Script 0–8: seats, ม/มา, the mark on ม้า, ก, ไม่, คน/ไข่, ไป/ยา, ตา/ข้าว, ห on หมา. Level 9 is still empty.
+- Script 0–19: seats through leftover letters, vowels by position, live and dead syllables, clusters. Each letter sits on a Voice word.
 
 Romanization follows the textbook system in `content/system.ts` (à â á ǎ, g/bp/dt, ε ɔ ə ụ).
 

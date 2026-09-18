@@ -1,11 +1,9 @@
 import { words } from '../build'
 
 export default words(18, [
-  ['tîao', 'เที่ยว', ['go out', 'travel', 'trip'], 'v', ['city']],
   ['nát', 'นัด', ['appointment', 'to make a date'], 'n', ['city']],
   ['kui', 'คุย', ['chat', 'to chat', 'talk'], 'v', ['city']],
-  ['rúu-jàk', 'รู้จัก', ['know a person', 'be acquainted'], 'v', ['city']],
-  ['dtòk lǒng', 'ตกลง', ['agree', 'deal'], 'v', ['city']],
+  ['dtòk long', 'ตกลง', ['agree', 'deal'], 'v', ['city']],
   ['nát jəə', 'นัดเจอ', ['make a plan to meet'], 'v', ['city']],
   ['sà-tǎan-tîi', 'สถานที่', ['place', 'venue'], 'n', ['city']],
   ['bàa', 'บาร์', ['bar'], 'n', ['city']],
@@ -20,8 +18,8 @@ export default words(18, [
   ['dtlàat nát', 'ตลาดนัด', ['weekend market'], 'n', ['city']],
   ['kui lên', 'คุยเล่น', ['chat for fun'], 'v', ['city']],
   ['dtlàat náam', 'ตลาดน้ำ', ['floating market'], 'n', ['city']],
-  ['tîao glang kụụn', 'เที่ยวกลางคืน', ['go out at night'], 'v', ['city']],
-  ['nát welaa', 'นัดเวลา', ['set a time'], 'v', ['city']],
+  ['tîao glaang kụụn', 'เที่ยวกลางคืน', ['go out at night'], 'v', ['city']],
+  ['nát wee-laa', 'นัดเวลา', ['set a time'], 'v', ['city']],
   ['yìam', 'เยี่ยม', ['visit', 'great'], 'v', ['city']],
   ['chom', 'ชม', ['appreciate', 'watch', 'praise'], 'v', ['city']],
   ['hǔa-rɔ́', 'หัวเราะ', ['laugh'], 'v', ['city']],

@@ -31,7 +31,7 @@ export default phrases(17, [
   ['lɔɔng sì', 'ลองสิ', ['just try it']],
   ['rɔɔ ná', 'รอนะ', ['wait, okay?']],
   ['maa sì', 'มาสิ', ['come on then']],
-  ['jing jing ná', 'จริงๆนะ', ['really, I mean it']],
+  ['jing jing ná', 'จริงจริงนะ', ['really, I mean it']],
   ['mâi wâang rɔ̀k', 'ไม่ว่างหรอก', ['I am not free, no']],
   ['ao ná', 'เอานะ', ['take it, okay?']],
   ['bpai ləəi ná', 'ไปเลยนะ', ['just go, you know']],

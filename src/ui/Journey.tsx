@@ -1,7 +1,6 @@
 import { LEVELS, SCRIPT_LEVELS } from '@content/index'
-import type { Entry, TrackId } from '@content/types'
+import type { TrackId } from '@content/types'
 import type { LevelStatus } from '@/engine/scheduler'
-import { AlreadyYours } from './AlreadyYours'
 
 function TrackList(props: {
   title: string
@@ -49,13 +48,21 @@ function TrackList(props: {
 export function Journey(props: {
   voice: LevelStatus[]
   script: LevelStatus[]
-  yours: Entry[]
   onOpen: (track: TrackId, n: number) => void
   onReview: () => void
 }) {
   return (
     <main className="page journey">
-      <AlreadyYours pool={props.yours} take={8} onMore={props.onReview} />
+      <section className="track-block">
+        <button type="button" className="contents-row yours-link" onClick={props.onReview}>
+          <span className="contents-n" />
+          <span>
+            <span className="contents-title">Already yours</span>
+            <span className="contents-rom rom">words you have seen</span>
+          </span>
+          <span className="contents-meta">open</span>
+        </button>
+      </section>
       <TrackList
         title="Voice"
         lede="Spoken Thai, written so you can hear it. Translation only for now."

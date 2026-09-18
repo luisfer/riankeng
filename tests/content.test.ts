@@ -42,13 +42,13 @@ describe('content', () => {
     }
   })
 
-  it('script levels 0–8 are authored, มา is one id, and tone marks are not cards', () => {
-    for (const n of [0, 1, 2, 3, 4, 5, 6, 7, 8]) {
-      expect(entriesForLevel(n, 'script').length, `script ${n}`).toBeGreaterThanOrEqual(SCRIPT_LEVELS[n]!.min)
+  it('script levels 0–19 are authored, มา is one id, and tone marks are not cards', () => {
+    expect(SCRIPT_LEVELS).toHaveLength(20)
+    for (const lvl of SCRIPT_LEVELS) {
+      expect(entriesForLevel(lvl.n, 'script').length, `script ${lvl.n}`).toBeGreaterThanOrEqual(lvl.min)
     }
-    expect(entriesForLevel(9, 'script')).toHaveLength(0)
     expect(getEntry('s:maa')?.level).toBe(1)
-    expect(getEntry('s:maa#2')).toBeUndefined()
+    expect(getEntry('s:maa#2')?.level).toBe(17)
     expect(getEntry('s:mɔɔ-máa')).toBeUndefined()
     expect(getEntry('s:mâi too')).toBeUndefined()
     expect(getEntry('s:mâi èek')).toBeUndefined()

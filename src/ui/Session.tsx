@@ -84,22 +84,16 @@ export function SessionView(props: {
   }
 
   const submitEn = () => {
-    if (hold?.kind === 'retype-en') {
-      const g = gradeEnglish([hold.target], answer)
-      if (g.correct) goNext()
-      else setAck({ ok: false, text: `Type: ${hold.target}` })
-      return
-    }
+    if (ack) return
     const g = gradeEnglish(entry.en, answer)
     if (g.correct) {
       record(true, 'en-ok')
       setAck({ ok: true, text: 'Right.' })
     } else {
+      // Show the meaning and move on; the card comes back later in the sitting.
       record(false, 'en-wrong')
-      const shown = cleanGloss(g.closest)
-      props.onSession(markMissStay(props.session, { kind: 'retype-en', id: entry.id, target: shown }))
+      props.onSession(markMissMove(props.session))
       setAck({ ok: false, text: g.message })
-      setAnswer('')
     }
   }
 
@@ -129,35 +123,43 @@ export function SessionView(props: {
   }
 
   const writeRom = script && (item.modality === 'th-en' || item.modality === 'en-th' || item.modality === 'listen')
-  const voiceEn = !script && (item.modality === 'th-en' || hold?.kind === 'retype-en')
+  const voiceEn = !script && item.modality === 'th-en'
   const fromVoice = script && entry.tags.some((t) => t.startsWith('voice:w:'))
   const waitingNext = Boolean(ack && (ack.ok || !hold))
+  const right = Boolean(ack?.ok)
 
   const prompt =
     hold?.kind === 'retype-th'
       ? 'Retype the romanization.'
-      : hold?.kind === 'retype-en'
-        ? 'Retype the English.'
-        : item.modality === 'pick'
-          ? 'Which one is this?'
-          : item.modality === 'en-th'
+      : item.modality === 'pick'
+        ? 'Which one is this?'
+        : item.modality === 'en-th'
+          ? script
+            ? 'Write it in romanization.'
+            : 'Say this in Thai.'
+          : item.modality === 'th-en'
             ? script
-              ? 'Write it in romanization.'
-              : 'Say this in Thai.'
-            : item.modality === 'th-en'
-              ? script
-                ? 'Write this the way you already say it.'
-                : 'What does this mean?'
-              : item.modality === 'listen'
-                ? 'Write what you would say.'
-                : 'What tone is the first syllable?'
+              ? 'Write this the way you already say it.'
+              : 'What does this mean?'
+            : item.modality === 'listen'
+              ? 'Write what you would say.'
+              : 'What tone is the first syllable?'
+
+  /** The other half of the card, shown in lacquer once the answer is right. */
+  const pairLine = (() => {
+    if (!right) return null
+    if (item.modality === 'th-en') return cleanGloss(entry.en[0] ?? '')
+    if (item.modality === 'en-th' || item.modality === 'listen' || item.modality === 'tone') return entry.rom
+    if (item.modality === 'pick') return entry.thai
+    return null
+  })()
 
   const stimulus = (() => {
     if (hold) {
       return (
         <p className="reveal rom">
           {hold.target}
-          {props.doc.settings.thaiScript && hold.kind === 'retype-th' && <span className="thai"> {entry.thai}</span>}
+          {props.doc.settings.thaiScript && <span className="thai"> {entry.thai}</span>}
         </p>
       )
     }
@@ -261,9 +263,18 @@ export function SessionView(props: {
             {fromVoice && <span className="from-voice">You know this from Voice</span>}
           </span>
         </p>
-        <div className="session-stimulus">{stimulus}</div>
+        <div className={`session-stimulus${right ? ' right' : ''}`}>
+          {stimulus}
+          {pairLine && (
+            <p className={`pair-line${item.modality === 'pick' ? ' thai' : item.modality === 'th-en' ? '' : ' rom'}`}>
+              {pairLine}
+            </p>
+          )}
+        </div>
         <div className="session-desk">{desk}</div>
-        <p className={`feedback session-feedback${ack ? (ack.ok ? ' ok' : ' miss') : ''}`}>{ack?.text ?? ''}</p>
+        <p className={`feedback session-feedback${ack ? (ack.ok ? ' ok' : ' miss') : ''}`} role="status">
+          {ack?.text ?? ''}
+        </p>
       </div>
     </main>
   )

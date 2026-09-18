@@ -14,10 +14,10 @@ export default words(8, [
   ['nε̂ε', 'แน่', ['sure', 'certain', 'for sure'], 'adj', ['modal']],
   ['nε̂ε nɔɔn', 'แน่นอน', ['of course', 'certainly', 'definitely'], 'adv', ['modal']],
   ['dtɔ̂ng gaan mái', 'ต้องการไหม', ['do you need it', 'do you want it']],
-  ['anù-yâat', 'อนุญาต', ['allow', 'permission', 'permit'], 'v', ['modal']],
+  ['à-nú-yâat', 'อนุญาต', ['allow', 'permission', 'permit'], 'v', ['modal']],
   ['hâam', 'ห้าม', ['forbidden', 'do not', 'must not'], 'v', ['modal']],
   ['wáng', 'หวัง', ['hope', 'to hope'], 'v', ['modal']],
-  ['tang jai', 'ตั้งใจ', ['intend', 'mean to', 'pay attention'], 'v', ['modal']],
+  ['dtâng jai', 'ตั้งใจ', ['intend', 'mean to', 'pay attention'], 'v', ['modal']],
   ['pɔɔ', 'พอ', ['enough', 'sufficient'], 'adj', ['modal']],
   ['mâi pɔɔ', 'ไม่พอ', ['not enough'], 'expr', ['modal']],
   ['sǎa-mâat', 'สามารถ', ['can', 'be able to', 'capable'], 'v', ['modal']],
@@ -27,4 +27,5 @@ export default words(8, [
   ['yàak bpai', 'อยากไป', ['want to go'], 'v', ['modal']],
   ['dtɔ̂ng rîip', 'ต้องรีบ', ['must hurry', 'have to rush'], 'expr', ['modal']],
   ['rîip', 'รีบ', ['hurry', 'to hurry', 'in a rush'], 'v', ['modal']],
+  ['tîao', 'เที่ยว', ['go out', 'travel', 'trip'], 'v', ['modal']],
 ])

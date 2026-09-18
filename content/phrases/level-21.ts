@@ -10,7 +10,7 @@ export default phrases(21, [
   ['bpai dtàang prà-têet', 'ไปต่างประเทศ', ['go abroad']],
   ['rian paasǎa glang', 'เรียนภาษากลาง', ['study central Thai']],
   ['kam níi yâak', 'คำนี้ยาก', ['this word is hard']],
-  ['bɔ̀ɔk pen prà-yòok', 'บอกเป็นประโยค', ['say it as a sentence']],
+  ['bɔ̀ɔk bpen prà-yòok', 'บอกเป็นประโยค', ['say it as a sentence']],
   ['pûut reo pǒm mâi than', 'พูดเร็วผมไม่ทัน', ['you speak fast I cannot keep up']],
   ['dâi yin kam níi', 'ได้ยินคำนี้', ['I have heard this word']],
   ['kít bpen paasǎa tai', 'คิดเป็นภาษาไทย', ['think in Thai']],
@@ -20,6 +20,6 @@ export default phrases(21, [
   ['prà-yòok sɔ̌ɔng prà-yòok', 'ประโยคสองประโยค', ['two sentences']],
   ['kâo jai táng prà-yòok', 'เข้าใจทั้งประโยค', ['I understand the whole sentence']],
   ['sǔan nɔ́ɔi tîi pìt', 'ส่วนน้อยที่ผิด', ['only a little is wrong']],
-  ['wan nîi pûut dâi mâak gwàa', 'วันนี้พูดได้มากกว่า', ['today I can say more']],
-  ['gèng kûn lέεo', 'เก่งขึ้นแล้ว', ['better already', 'improved']],
+  ['wan níi pûut dâi mâak gwàa', 'วันนี้พูดได้มากกว่า', ['today I can say more']],
+  ['gèng kụ̂n lέεo', 'เก่งขึ้นแล้ว', ['better already', 'improved']],
 ])

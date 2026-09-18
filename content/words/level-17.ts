@@ -1,7 +1,6 @@
 import { words } from '../build'
 
 export default words(17, [
-  ['ná', 'นะ', ['softener', 'you know', 'right (soft)'], 'particle', ['particle']],
   ['sì', 'สิ', ['insist', 'do it'], 'particle', ['particle']],
   ['rə̌ə', 'เหรอ', ['oh really', 'is that so'], 'particle', ['particle']],
   ['rɔ̀k', 'หรอก', ['not at all', 'no way (soft)'], 'particle', ['particle']],
@@ -25,4 +24,5 @@ export default words(17, [
   ['dii ná', 'ดีนะ', ['good, you know', 'that is good']],
   ['mâi bpen rai ná', 'ไม่เป็นไรนะ', ['it is okay, really']],
   ['jing ná', 'จริงนะ', ['really', 'I mean it']],
+  ['jing', 'จริง', ['true', 'real', 'really'], 'adj', ['particle']],
 ])

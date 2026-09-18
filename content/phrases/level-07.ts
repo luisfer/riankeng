@@ -12,6 +12,6 @@ export default phrases(7, [
   ['kəəi tam mái', 'เคยทำไหม', ['have you ever done it', 'have you done this before']],
   ['mâi kəəi', 'ไม่เคย', ['never', 'I have never']],
   ['sèt náan lέεo', 'เสร็จนานแล้ว', ['finished a long time ago', 'done long ago']],
-  ['diao maa', 'เดี๋ยวมา', ['coming in a moment', 'just a moment']],
-  ['tûk wan bpai tam-ngaan', 'ทุกวันไปทำงาน', ['I go to work every day']],
+  ['dǐao maa', 'เดี๋ยวมา', ['coming in a moment', 'just a moment']],
+  ['túk wan bpai tam-ngaan', 'ทุกวันไปทำงาน', ['I go to work every day']],
 ])

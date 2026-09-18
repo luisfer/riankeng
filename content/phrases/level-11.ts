@@ -15,7 +15,6 @@ export default phrases(11, [
   ['ao sɔ̌ɔng kûu', 'เอาสองคู่', ['I will take two pairs']],
   ['sǐi nǎi sǔai', 'สีไหนสวย', ['which colour is nice', 'which color is pretty']],
   ['chút níi tâo-rài', 'ชุดนี้เท่าไร', ['how much is this outfit']],
-  ['tùuk gwàa', 'ถูกกว่า', ['cheaper', 'it is cheaper']],
   ['ao an níi', 'เอาอันนี้', ['I will take this one']],
   ['mâi ao an nán', 'ไม่เอาอันนั้น', ['I do not want that one']],
 ])

@@ -10,9 +10,12 @@ export interface QueueItem {
   salt: string
 }
 
-export type Hold =
-  | { kind: 'retype-th'; id: string; target: string }
-  | { kind: 'retype-en'; id: string; target: string }
+/**
+ * A miss on a typed Thai card holds the learner on the card until the rom is
+ * retyped. English misses do not hold: copying "dog" under "dog" teaches
+ * nothing, so they show the meaning and requeue like pick and tone misses.
+ */
+export type Hold = { kind: 'retype-th'; id: string; target: string }
 
 export interface LiveSession {
   startedAt: number

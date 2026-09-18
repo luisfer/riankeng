@@ -1,13 +1,13 @@
 import { phrases } from '../build'
 
 export default phrases(13, [
-  ['mii bprà-chum wan nîi', 'มีประชุมวันนี้', ['there is a meeting today']],
+  ['mii bprà-chum wan níi', 'มีประชุมวันนี้', ['there is a meeting today']],
   ['pǒm tam-ngaan tîi bâan', 'ผมทำงานที่บ้าน', ['I work at home', 'I work from home']],
   ['sòng îi-meen nɔ̀i', 'ส่งอีเมลหน่อย', ['please send an email']],
   ['in-təə-nét dtòk', 'อินเทอร์เน็ตตก', ['the internet is down']],
   ['pǒm bpen nák-rian', 'ผมเป็นนักเรียน', ['I am a student']],
   ['kǎo bpen krùu', 'เขาเป็นครู', ['he is a teacher', 'she is a teacher']],
-  ['rɔɔng-rian yùu glâi', 'โรงเรียนอยู่ใกล้', ['the school is nearby']],
+  ['roong-rian yùu glâi', 'โรงเรียนอยู่ใกล้', ['the school is nearby']],
   ['jà sɔ̌ɔp prung-níi', 'จะสอบพรุ่งนี้', ['I have an exam tomorrow']],
   ['pàan lέεo', 'ผ่านแล้ว', ['I passed', 'passed already']],
   ['dtòk sɔ̌ɔp', 'ตกสอบ', ['I failed the exam']],

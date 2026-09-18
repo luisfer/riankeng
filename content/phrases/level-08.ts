@@ -15,4 +15,6 @@ export default phrases(8, [
   ['pɔɔ lέεo', 'พอแล้ว', ['enough already', 'that is enough']],
   ['yàak rúu mâak', 'อยากรู้มาก', ['I really want to know', 'so curious']],
   ['rîip nɔ̀i', 'รีบหน่อย', ['hurry a bit', 'please hurry']],
+  ['mâi dtɔ̂ng tɔɔn', 'ไม่ต้องทอน', ['keep the change', 'no change needed'], 'Literally "no need to give change".'],
+  ['dtɔ̂ng gaan ngən tâo-rài', 'ต้องการเงินเท่าไร', ['how much money do you need', 'how much do you need']],
 ])

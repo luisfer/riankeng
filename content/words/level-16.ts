@@ -9,7 +9,6 @@ export default words(16, [
   ['mụ̌an gan', 'เหมือนกัน', ['the same', 'alike'], 'adj', ['compare']],
   ['dtàang', 'ต่าง', ['different'], 'adj', ['compare']],
   ['dtàang gan', 'ต่างกัน', ['different from each other'], 'adj', ['compare']],
-  ['gəən', 'เกิน', ['too much', 'exceed'], 'v', ['compare']],
   ['gəən bpai', 'เกินไป', ['too much', 'excessively'], 'adv', ['compare']],
   ['dìi gwàa', 'ดีกว่า', ['better'], 'adj', ['compare']],
   ['yε̂ε gwàa', 'แย่กว่า', ['worse'], 'adj', ['compare']],

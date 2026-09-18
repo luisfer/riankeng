@@ -12,7 +12,6 @@ export default words(11, [
   ['sǐi dam', 'สีดำ', ['black'], 'adj', ['colour']],
   ['sǐi kǎao', 'สีขาว', ['white'], 'adj', ['colour']],
   ['sǐi chom-puu', 'สีชมพู', ['pink'], 'adj', ['colour']],
-  ['yài', 'ใหญ่', ['big', 'large'], 'adj', ['size']],
   ['lék', 'เล็ก', ['small'], 'adj', ['size']],
   ['yaao', 'ยาว', ['long'], 'adj', ['size']],
   ['sân', 'สั้น', ['short (length)'], 'adj', ['size']],
@@ -34,4 +33,6 @@ export default words(11, [
   ['lɔɔng sài', 'ลองใส่', ['try on'], 'v', ['shop']],
   ['pεεng bpai', 'แพงไป', ['too expensive'], 'expr', ['shop']],
   ['tùuk', 'ถูก', ['cheap', 'correct'], 'adj', ['shop']],
+  ['ụ̂ụn', 'อื่น', ['other', 'another'], 'adj', ['shop']],
+  ['sǐi fáa', 'สีฟ้า', ['sky blue', 'light blue'], 'adj', ['colour']],
 ])

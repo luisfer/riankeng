@@ -357,9 +357,30 @@ li.quiet-row { cursor: default; }
 .session-stimulus {
   grid-row: 2;
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 6px;
   min-height: 0;
 }
+/* A right answer: one lacquer stroke under the card, and its other half beneath. */
+.session-stimulus.right > .prompt-en,
+.session-stimulus.right > .prompt-rom,
+.session-stimulus.right > .prompt-thai {
+  text-decoration: underline;
+  text-decoration-color: var(--lacquer);
+  text-decoration-thickness: 3px;
+  text-underline-offset: 0.16em;
+}
+.pair-line {
+  margin: 0;
+  color: var(--lacquer);
+  font-size: 26px;
+  font-weight: 300;
+  line-height: 1.2;
+}
+.pair-line.rom { font-family: var(--phonetic); }
+.pair-line.thai { font-size: 32px; }
 .session-desk {
   grid-row: 3;
   align-self: end;
@@ -483,6 +504,15 @@ li.quiet-row { cursor: default; }
 .feedback { margin-top: 24px; color: var(--ink-2); }
 .session-feedback { margin-top: 0; }
 .session-feedback.ok { color: var(--ink); }
+.session-feedback.ok::before {
+  content: '';
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 10px;
+  background: var(--lacquer);
+  vertical-align: 0.1em;
+}
 .session-feedback.miss { color: var(--lacquer); }
 .hear-warn { color: var(--lacquer); font-size: 15px; }
 

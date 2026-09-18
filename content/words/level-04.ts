@@ -69,4 +69,6 @@ export default words(4, [
   ['mâi sài', 'ไม่ใส่', ['without', 'do not add', 'no (ingredient)', 'do not put'], 'expr', ['ordering'], 'mâi sài prík = no chilli.'],
   ['ao glàp bâan', 'เอากลับบ้าน', ['take away', 'takeaway', 'to go', 'take home', 'I will take it home'], 'expr', ['ordering'], 'Literally "take back home".'],
   ['tîi nîi', 'ที่นี่', ['here', 'eat here', 'at this place'], 'expr', ['ordering'], 'gin tîi nîi = eat here.'],
+  ['yang', 'ยัง', ['yet', 'still', 'not yet'], 'adv', [], 'gin kâao rụ̌ụ yang: have you eaten yet. The second greeting.'],
+  ['gəən', 'เกิน', ['too', 'over', 'exceed'], 'v', [], 'wǎan gəən bpai: too sweet.'],
 ])

@@ -4,7 +4,7 @@ export default words(3, [
   ['à-rai', 'อะไร', ['what'], 'q', ['question']],
   ['tîi-nǎi', 'ที่ไหน', ['where'], 'q', ['question']],
   ['nǎi', 'ไหน', ['which', 'where (casual)', 'where'], 'q', ['question'], 'bpai nǎi = where to. an nǎi = which one.'],
-  ['mụ̂a-rài', 'เมื่อไร', ['when'], 'q', ['question']],
+  ['mụ̂a-rai', 'เมื่อไร', ['when'], 'q', ['question']],
   ['tam-mai', 'ทำไม', ['why'], 'q', ['question']],
   ['krai', 'ใคร', ['who', 'whom'], 'q', ['question']],
   ['yang-ngai', 'ยังไง', ['how', 'in what way'], 'q', ['question'], 'Spoken form of yàang-rai.'],
@@ -24,7 +24,7 @@ export default words(3, [
   ['kon sà-bpeen', 'คนสเปน', ['Spanish person', 'Spaniard', 'Spanish'], 'n', ['people']],
   ['aa-yú', 'อายุ', ['age'], 'n', []],
   ['bpii', 'ปี', ['year', 'years'], 'n', ['time']],
-  ['rɔɔng-rεεm', 'โรงแรม', ['hotel'], 'n', ['place']],
+  ['roong-rεεm', 'โรงแรม', ['hotel'], 'n', ['place']],
   ['dtà-làat', 'ตลาด', ['market'], 'n', ['place']],
   ['ráan', 'ร้าน', ['shop', 'store', 'stall'], 'n', ['place']],
   ['ráan aa-hǎan', 'ร้านอาหาร', ['restaurant', 'food shop', 'eatery'], 'n', ['place']],
@@ -32,4 +32,5 @@ export default words(3, [
   ['bàat', 'บาท', ['baht'], 'n', ['money']],
   ['kɔ̌ɔng kun', 'ของคุณ', ['your', 'yours'], 'pron', ['pronoun']],
   ['kɔ̌ɔng pǒm', 'ของผม', ['my', 'mine', 'my (male speaker)'], 'pron', ['pronoun']],
+  ['wâa', 'ว่า', ['that (complementizer)', 'that'], 'conj', [], 'mâi rúu wâa krai. Also "say that".'],
 ])

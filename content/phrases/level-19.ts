@@ -13,7 +13,7 @@ export default phrases(19, [
   ['yɔɔm-ráp wâa pìt', 'ยอมรับว่าผิด', ['I admit I was wrong']],
   ['lâo rụ̂ang nɔ̀i', 'เล่าเรื่องหน่อย', ['tell the story', 'tell me about it']],
   ['rụ̂ang tîi kəəi', 'เรื่องที่เคย', ['the story from before']],
-  ['dtɔɔn rɔ̂ɔk pǒm ngûng', 'ตอนแรกผมงง', ['at first I was confused']],
+  ['dtɔɔn rε̂εk pǒm ngong', 'ตอนแรกผมงง', ['at first I was confused']],
   ['jàak nán kâo jai', 'จากนั้นเข้าใจ', ['after that I understood']],
   ['sùt táai gɔ̂ dii', 'สุดท้ายก็ดี', ['in the end it was fine']],
   ['pǒm kít tǔng bâan', 'ผมคิดถึงบ้าน', ['I miss home']],

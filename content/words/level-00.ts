@@ -12,8 +12,8 @@ const rows = words(0, [
   ['mǎa', 'หมา', ['dog'], 'n', ['tone-rising', 'pair-maa']],
   ['mâi', 'ไม่', ['not', 'no'], 'adv', ['tone-falling', 'pair-mai']],
   ['mài', 'ใหม่', ['new'], 'adj', ['tone-low', 'pair-mai']],
-  ['mái', 'ไหม', ['question particle', '(yes/no) question word', 'right?'], 'particle', ['tone-high', 'pair-mai'], 'Turns a statement into a yes/no question. Spelled with a rising tone, said high in Bangkok.'],
-  ['mǎi', 'ไหม', ['silk'], 'n', ['tone-rising', 'pair-mai']],
+  ['mái', 'ไหม', ['question particle', '(yes/no) question word', 'right?'], 'particle', ['tone-high', 'pair-mai', 'homograph'], 'Turns a statement into a yes/no question. Spelled with a rising tone, said high in Bangkok.'],
+  ['mǎi', 'ไหม', ['silk'], 'n', ['tone-rising', 'pair-mai', 'homograph']],
   // ── kao family: tone and length
   ['kâo', 'เข้า', ['enter', 'to enter', 'go in', 'come in'], 'v', ['tone-falling', 'pair-kao', 'length']],
   ['kǎo', 'เขา', ['he', 'she', 'they', 'him', 'her', 'he/she'], 'pron', ['tone-rising', 'pair-kao', 'length'], 'Said káo (high) in everyday speech.'],
@@ -66,7 +66,7 @@ const rows = words(0, [
   ['ngǔu', 'งู', ['snake'], 'n', ['ng-onset']],
   // ── long vs short with same tone (pure length pairs)
   ['ao', 'เอา', ['take', 'to take', 'want', "I'll have"], 'v', ['length']],
-  ['aao', 'อาว', ['uncle', '(younger paternal) uncle'], 'n', ['length'], 'Rare word, kept as the clean length twin of ao.'],
+  ['aa#2', 'อา', ['uncle', "(father's younger) brother"], 'n', ['length'], 'The length twin of ao. Also the letter อ plus า.'],
 ])
 
 // Link minimal pairs by shared "pair-*" tag.

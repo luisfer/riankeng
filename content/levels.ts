@@ -52,7 +52,7 @@ export const LEVELS: LevelMeta[] = [
     focus: [
       '… mái? A yes or no question.',
       '… rụ̌ụ bplào? Or not.',
-      'à-rai, tîi-nǎi, mụ̂a-rài, tam-mai, krai, yang-ngai, tâo-rài, gìi. Question words sit where the answer would sit.',
+      'à-rai, tîi-nǎi, mụ̂a-rai, tam-mai, krai, yang-ngai, tâo-rài, gìi. Question words sit where the answer would sit.',
     ],
     min: 40,
   },
@@ -270,7 +270,7 @@ export const LEVELS: LevelMeta[] = [
     focus: [
       'kít wâa, rúu-sụ̀k wâa. I think, I feel.',
       'hěn dûai. I agree.',
-      'dtɔɔn rɔ̂ɔk, jàak nán, sùt táai. At first, after that, in the end.',
+      'dtɔɔn rε̂εk, jàak nán, sùt táai. At first, after that, in the end.',
     ],
     min: 46,
   },

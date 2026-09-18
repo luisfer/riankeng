@@ -21,7 +21,7 @@ export default phrases(2, [
   ['pǒm hǎa hɔ̂ng náam', 'ผมหาห้องน้ำ', ['I am looking for the toilet', 'I am looking for the bathroom']],
   ['kun pûut tai gèng', 'คุณพูดไทยเก่ง', ['you speak Thai well', 'your Thai is good', 'you are good at Thai'], 'What every Thai says after your first sà-wàt-dii.'],
   ['rian gèng', 'เรียนเก่ง', ['good at studying', 'a good learner', 'good student', 'studies well'], 'The name of this app.'],
-  ['nîi à-rai', 'นี่อะไร', ['what is this']],
+  ['yin-dii tîi dâi rúu-jàk kráp/kâ', 'ยินดีที่ได้รู้จักครับ/ค่ะ', ['nice to meet you', 'pleased to meet you']],
   ['nân kɔ̌ɔng pǒm', 'นั่นของผม', ['that is mine', 'that is my thing', 'that belongs to me']],
   ['pǒm rák kun', 'ผมรักคุณ', ['I love you']],
   ['kǎo bɔ̀ɔk pǒm', 'เขาบอกผม', ['he told me', 'she told me', 'they told me', 'he tells me']],

@@ -113,6 +113,7 @@ export function App() {
   const inIntro = route.name === 'intro'
   const trailTrack = inSession && session ? (session.track ?? 'voice') : inIntro && route.name === 'intro' ? route.track : undefined
   const trailLevel = inSession && session ? session.level : inIntro && route.name === 'intro' ? route.n : undefined
+  const trailPlace = route.name === 'review' ? 'Already yours' : undefined
 
   return (
     <div className={`app${inSession ? ' in-session' : ''}`}>
@@ -128,12 +129,12 @@ export function App() {
           onPause={inSession || inIntro ? () => go({ name: 'journey' }) : undefined}
           themeLabel={resolved === 'dark' ? 'Day' : 'Night'}
           onTheme={flipTheme}
+          place={trailPlace}
         />
         {route.name === 'journey' && (
           <Journey
             voice={voiceStatuses}
             script={scriptStatuses}
-            yours={yours}
             onOpen={(track, n) => {
               const list = track === 'script' ? scriptStatuses : voiceStatuses
               if (list[n] && list[n].total > 0 && !list[n].unlocked) return

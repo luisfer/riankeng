@@ -3,6 +3,7 @@ import { LEVELS } from './levels'
 import type { Entry, LevelMeta, TrackId } from './types'
 import { analyseRom } from '../src/engine/normalize'
 import { parseGloss } from '../src/engine/grader-en'
+import { checkSequence } from './sequence'
 
 export interface Problem {
   id: string
@@ -21,7 +22,7 @@ export interface ValidationReport {
 export function validateEntries(
   entries: Entry[],
   strict: boolean,
-  opts: { levels?: LevelMeta[]; track?: TrackId } = {},
+  opts: { levels?: LevelMeta[]; track?: TrackId; sequence?: boolean } = {},
 ): ValidationReport {
   const levels = opts.levels ?? LEVELS
   const track = opts.track ?? 'voice'
@@ -76,6 +77,8 @@ export function validateEntries(
       problems.push({ id: `level-${lvl.n}`, message: `level ${lvl.n} has ${n} entries, needs ${lvl.min}` })
     }
   }
+
+  if (track === 'voice' && opts.sequence !== false) problems.push(...checkSequence(entries))
 
   return {
     problems,

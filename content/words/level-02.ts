@@ -70,4 +70,6 @@ export default words(2, [
   ['bia', 'เบียร์', ['beer'], 'n', ['food']],
   ['pụ̂an', 'เพื่อน', ['friend'], 'n', ['people']],
   ['grung-têep', 'กรุงเทพ', ['Bangkok'], 'n', ['place'], 'City of angels. Nobody in Bangkok says "Bangkok".'],
+  ['rúu-jàk', 'รู้จัก', ['know a person', 'be acquainted', 'to know (someone)'], 'v', ['verb'], 'People, not facts. Facts are rúu.'],
+  ['mâi rúu-jàk', 'ไม่รู้จัก', ['do not know (a person)', 'I do not know them'], 'v', ['verb']],
 ])

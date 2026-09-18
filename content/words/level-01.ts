@@ -57,4 +57,9 @@ export default words(1, [
   ['bpὲεt', 'แปด', ['eight', '8'], 'num', ['number']],
   ['gâo', 'เก้า', ['nine', '9'], 'num', ['number']],
   ['sìp', 'สิบ', ['ten', '10'], 'num', ['number']],
+  ['tai', 'ไทย', ['Thai'], 'adj', [], 'The country, the language, the people. kon tai, paasǎa tai.'],
+  ['dûai', 'ด้วย', ['too', 'as well', 'with'], 'adv', [], 'After the verb: chûai dûai.'],
+  ['rai', 'ไร', ['anything (in never mind)'], 'n', [], 'Almost only in mâi bpen rai.'],
+  ['ná', 'นะ', ['softener', 'you know'], 'particle', ['softener'], 'Softens a statement. bpai gɔ̀ɔn ná.'],
+  ['gɔ̀ɔn', 'ก่อน', ['first', 'before', 'ahead'], 'adv', [], 'bpai gɔ̀ɔn: I go first. The everyday goodbye.'],
 ])

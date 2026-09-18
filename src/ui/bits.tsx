@@ -53,13 +53,16 @@ export function Trail(props: {
   onPause?: () => void
   themeLabel?: string
   onTheme?: () => void
+  place?: string
 }) {
-  const place = [
-    props.track === 'script' ? 'Script' : props.track === 'voice' ? 'Voice' : '',
-    props.level !== undefined ? `Level ${props.level}` : '',
-  ]
-    .filter(Boolean)
-    .join(', ')
+  const place =
+    props.place ??
+    [
+      props.track === 'script' ? 'Script' : props.track === 'voice' ? 'Voice' : '',
+      props.level !== undefined ? `Level ${props.level}` : '',
+    ]
+      .filter(Boolean)
+      .join(', ')
   const inSitting = props.remaining !== undefined
   const ratio = inSitting ? sittingRatio(props.correct ?? 0, props.remaining ?? 0) : 0
   const cleared = Math.round(ratio * ((props.correct ?? 0) + (props.remaining ?? 0)))

@@ -23,8 +23,10 @@
         background: var(--paper);
       }
       main { max-width: 28em; margin: 20vh auto 0; padding: 0 24px; }
-      h1 { font-weight: 300; font-size: 32px; margin: 0 0 8px; }
-      .lede { color: var(--ink-2); margin: 0 0 32px; }
+      h1 { font-weight: 300; font-size: 32px; margin: 0 0 4px; }
+      .rom { color: var(--ink-2); font-style: italic; margin: 0 0 32px; }
+      .field { display: flex; flex-direction: column; gap: 8px; }
+      label { color: var(--ink-2); font-size: 15px; }
       form { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: end; }
       input {
         width: 100%;
@@ -55,9 +57,12 @@
   <body>
     <main>
       <h1>เรียนเก่ง</h1>
-      <p class="lede">A word, then the page.</p>
+      <p class="rom">riian gèng</p>
       <form id="gate">
-        <input type="password" name="password" autocomplete="current-password" autofocus />
+        <div class="field">
+          <label for="password">Password</label>
+          <input id="password" type="password" name="password" autocomplete="current-password" autofocus />
+        </div>
         <button type="submit">Enter</button>
       </form>
       <p class="miss" id="miss"></p>
@@ -77,7 +82,7 @@
           location.href = '/'
           return
         }
-        miss.textContent = res.status === 503 ? 'Gate is not configured.' : 'Not that word.'
+        miss.textContent = res.status === 503 ? 'Password is not set.' : 'Wrong password.'
       })
     </script>
   </body>

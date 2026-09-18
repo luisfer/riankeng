@@ -1,20 +1,20 @@
 import { phrases } from '../build'
 
 export default phrases(18, [
-  ['wan nîi bpai tîao', 'วันนี้ไปเที่ยว', ['today I am going out']],
+  ['wan níi bpai tîao', 'วันนี้ไปเที่ยว', ['today I am going out']],
   ['nát gan tîi nǎi', 'นัดกันที่ไหน', ['where shall we meet']],
   ['kui gan ná', 'คุยกันนะ', ['let us chat', 'talk soon']],
   ['kun rúu-jàk kǎo mái', 'คุณรู้จักเขาไหม', ['do you know him', 'do you know her']],
-  ['dtòk lǒng', 'ตกลง', ['agreed', 'deal']],
+  ['dtòk long', 'ตกลง', ['agreed', 'deal']],
   ['nát jəə wan sǎo', 'นัดเจอวันเสาร์', ['meet on Saturday']],
   ['bpai ráan gaa-fεε gan', 'ไปร้านกาแฟกัน', ['let us go to a cafe']],
   ['bpai duu nǎng', 'ไปดูหนัง', ['go see a film']],
   ['yùu tεεo sì-lǒm', 'อยู่แถวสีลม', ['around Silom']],
   ['bpai kâao sǎn mái', 'ไปข้าวสารไหม', ['shall we go to Khao San']],
   ['dtlàat nát wan sǎo', 'ตลาดนัดวันเสาร์', ['the weekend market on Saturday']],
-  ['pûak rao tîao glang kụụn', 'พวกเราเที่ยวกลางคืน', ['we go out at night']],
+  ['pûak rao tîao glaang kụụn', 'พวกเราเที่ยวกลางคืน', ['we go out at night']],
   ['mâi rúu-jàk', 'ไม่รู้จัก', ['I do not know them']],
-  ['nát welaa bàai sɔ̌ɔng', 'นัดเวลาบ่ายสอง', ['set the time for 2 p.m.']],
+  ['nát wee-laa bàai sɔ̌ɔng', 'นัดเวลาบ่ายสอง', ['set the time for 2 p.m.']],
   ['kui lên gàp pụ̂an', 'คุยเล่นกับเพื่อน', ['chat with friends']],
   ['sà-tǎan-tîi nǎi dii', 'สถานที่ไหนดี', ['which place is good']],
   ['bpai jà-dtù-jàk', 'ไปจตุจักร', ['go to Chatuchak']],
@@ -28,5 +28,5 @@ export default phrases(18, [
   ['kui too-rá-sàp', 'คุยโทรศัพท์', ['talk on the phone']],
   ['pûak kǎo maa tîao', 'พวกเขามาเที่ยว', ['they are here to visit']],
   ['tîao grung-têep', 'เที่ยวกรุงเทพ', ['tour Bangkok']],
-  ['nát tîi sá-taa-nii', 'นัดที่สถานี', ['meet at the station']],
+  ['nát tîi sà-tǎa-nii', 'นัดที่สถานี', ['meet at the station']],
 ])

@@ -80,6 +80,22 @@ describe('content', () => {
     }
   })
 
+  it('teaches กิน as live mid, อีเมล as ii-meen, and Script 0 as nâa', () => {
+    const gin = getEntry('s:gin#3')!
+    expect(gin.rom).toBe('gin')
+    expect(gin.note ?? '').toMatch(/live/i)
+    expect(gin.note ?? '').not.toMatch(/dead/i)
+    expect(gradeThai(gin.rom, 'gìn').verdict).not.toBe('exact')
+    expect(getEntry('w:ii-meen')?.thai).toBe('อีเมล')
+    expect(getEntry('p:sòng ii-meen nɔ̀i')).toBeDefined()
+    expect(getEntry('p:kǐan ii-meen')).toBeDefined()
+    expect(SCRIPT_LEVELS[0]!.rom).toBe('nâa')
+    expect(SCRIPT_LEVELS[0]!.thai).toBe('หน้า')
+    const pet = getEntry('p:pèt mâak')!
+    expect(pet.en[0]).toBe('very spicy')
+    expect(pet.en).not.toContain('too spicy')
+  })
+
   it('every script bridge points at a voice word and spells it the same', () => {
     for (const e of ENTRIES.filter((e) => e.track === 'script')) {
       const link = e.tags.find((t) => t.startsWith('voice:'))

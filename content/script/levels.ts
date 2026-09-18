@@ -4,7 +4,7 @@ export const SCRIPT_LEVELS: LevelMeta[] = [
   {
     n: 0,
     title: 'The page',
-    rom: 'nâang',
+    rom: 'nâa',
     thai: 'หน้า',
     blurb: 'A consonant is a seat. A vowel is a mark that sits on it. First, the empty seat and the long aa you already say in maa.',
     focus: ['อ. A silent seat.', 'า. Sits after, long aa.', 'อา. อ plus า.'],
@@ -159,8 +159,8 @@ export const SCRIPT_LEVELS: LevelMeta[] = [
     title: 'Live and dead',
     rom: 'maa mǎa',
     thai: 'มาหมา',
-    blurb: 'มา is live: mid. หมา is live with ห: rising. กิน is dead: the short vowel plus น keeps a low tone on ก.',
-    focus: ['มา. Live, mid.', 'หมา. ห changes the class.', 'กิน. Dead syllable, low.'],
+    blurb: 'มา is live: mid. หมา is live with ห: rising. กิน is live too: น keeps the syllable open, so mid-class ก with no mark is mid. ไก่ is dead: ก plus a short closed vowel is low.',
+    focus: ['มา. Live, mid.', 'หมา. ห changes the class.', 'กิน. Live, mid. น keeps it alive.', 'ไก่. Dead, low. Short closed.'],
     min: 5,
   },
   {

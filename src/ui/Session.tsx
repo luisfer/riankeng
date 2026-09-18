@@ -14,7 +14,7 @@ import {
 } from '@/engine/session'
 import { applyAttempt, type ItemProgress } from '@/engine/srs'
 import type { ProgressDoc } from '@/storage/progress-schema'
-import { entryOrThrow, pickChoices } from '@/engine/scheduler'
+import { entryOrThrow, pickChoices, sittingSense } from '@/engine/scheduler'
 import { speakThai } from '@/audio/tts'
 import { RomanInput } from '@/input/RomanInput'
 import { Commit, TextBtn } from './bits'
@@ -31,12 +31,14 @@ export function SessionView(props: {
   const item = currentItem(props.session)
   const [answer, setAnswer] = useState('')
   const [ack, setAck] = useState<{ ok: boolean; text: string } | null>(null)
+  const [heard, setHeard] = useState(false)
   const track = props.session.track ?? 'voice'
   const script = track === 'script'
 
   useEffect(() => {
     setAnswer('')
     setAck(null)
+    setHeard(false)
   }, [item?.id, item?.modality])
 
   if (!item) {
@@ -123,8 +125,11 @@ export function SessionView(props: {
     }
   }
 
-  const writeRom = script && (item.modality === 'th-en' || item.modality === 'en-th' || item.modality === 'listen')
+  const writeRom =
+    item.modality === 'listen' || (script && (item.modality === 'th-en' || item.modality === 'en-th'))
   const voiceEn = !script && item.modality === 'th-en'
+  const listenLocked = item.modality === 'listen' && !heard && !hold
+  const sense = sittingSense(entry, item.modality)
   const fromVoice = script && entry.tags.some((t) => t.startsWith('voice:w:'))
   const waitingNext = Boolean(ack && (ack.ok || !hold))
   const right = Boolean(ack?.ok)
@@ -172,6 +177,14 @@ export function SessionView(props: {
         </p>
       )
     }
+    if (item.modality === 'listen') return null
+    if (item.modality === 'tone') {
+      return props.doc.settings.thaiScript ? (
+        <p className="prompt-thai thai">{showThai(entry.thai)}</p>
+      ) : (
+        <p className="prompt-rom rom">{entry.rom}</p>
+      )
+    }
     if (item.modality === 'en-th') return <p className="prompt-en">{cleanGloss(entry.en[0] ?? '')}</p>
     if (item.modality === 'th-en' && script) return <p className="prompt-thai thai">{showThai(entry.thai)}</p>
     if (item.modality === 'th-en') {
@@ -184,6 +197,26 @@ export function SessionView(props: {
     }
     return null
   })()
+
+  const onPaste = () => {
+    if (!ack) setAck({ ok: false, text: 'Type it.' })
+  }
+
+  const trySubmitThai = () => {
+    if (listenLocked) {
+      setAck({ ok: false, text: 'Hear it first.' })
+      return
+    }
+    submitThai()
+  }
+
+  const trySubmitEn = () => {
+    if (listenLocked) {
+      setAck({ ok: false, text: 'Hear it first.' })
+      return
+    }
+    submitEn()
+  }
 
   const desk = waitingNext ? (
     <div className="answer-form">
@@ -220,7 +253,10 @@ export function SessionView(props: {
             className="roman-field en"
             value={answer}
             onChange={(e) => setAnswer(e.target.value)}
-            onPaste={(e) => e.preventDefault()}
+            onPaste={(e) => {
+              e.preventDefault()
+              onPaste()
+            }}
             autoFocus
             autoCapitalize="off"
             autoCorrect="off"
@@ -236,14 +272,15 @@ export function SessionView(props: {
       className="answer-form"
       onSubmit={(e) => {
         e.preventDefault()
-        if (writeRom || item.modality === 'en-th' || hold?.kind === 'retype-th') submitThai()
-        else submitEn()
+        if (writeRom || item.modality === 'en-th' || hold?.kind === 'retype-th') trySubmitThai()
+        else trySubmitEn()
       }}
     >
       <RomanInput
         value={answer}
         onChange={setAnswer}
-        onSubmit={writeRom || item.modality === 'en-th' || hold?.kind === 'retype-th' ? submitThai : submitEn}
+        onSubmit={writeRom || item.modality === 'en-th' || hold?.kind === 'retype-th' ? trySubmitThai : trySubmitEn}
+        onPasteBlock={onPaste}
         autoFocus
       />
       <Commit type="submit">Check</Commit>
@@ -257,7 +294,11 @@ export function SessionView(props: {
           {prompt}
           <span className="prompt-tools">
             <TextBtn
-              onClick={() => speakThai(entry.thai, entry.id, props.doc.settings.audioRate, { gesture: true })}
+              onClick={() => {
+                setHeard(true)
+                if (ack?.text === 'Hear it first.') setAck(null)
+                void speakThai(entry.thai, entry.id, props.doc.settings.audioRate, { gesture: true })
+              }}
             >
               Hear
             </TextBtn>
@@ -271,11 +312,14 @@ export function SessionView(props: {
               {pairLine}
             </p>
           )}
+          {sense && !right && (
+            <p className="sense-line">{sense}</p>
+          )}
         </div>
-        <div className="session-desk">{desk}</div>
         <p className={`feedback session-feedback${ack ? (ack.ok ? ' ok' : ' miss') : ''}`} role="status">
           {ack?.text ?? ''}
         </p>
+        <div className="session-desk">{desk}</div>
       </div>
     </main>
   )

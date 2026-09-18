@@ -8,7 +8,7 @@ export default phrases(4, [
   ['kɔ̌ɔ gaa-fεε yen nụ̀ng gε̂εo', 'ขอกาแฟเย็นหนึ่งแก้ว', ['one iced coffee please', 'an iced coffee please', 'can I have one iced coffee']],
   ['mâi pèt', 'ไม่เผ็ด', ['not spicy', 'no spice', 'make it not spicy']],
   ['pèt nít-nɔ̀i', 'เผ็ดนิดหน่อย', ['a little spicy', 'slightly spicy', 'a bit spicy']],
-  ['pèt mâak', 'เผ็ดมาก', ['very spicy', 'too spicy', 'really spicy']],
+  ['pèt mâak', 'เผ็ดมาก', ['very spicy', 'really spicy']],
   ['mâi sài prík', 'ไม่ใส่พริก', ['no chilli', 'without chilli', 'do not add chilli', 'no chili']],
   ['mâi sài náam dtaan', 'ไม่ใส่น้ำตาล', ['no sugar', 'without sugar', 'do not add sugar']],
   ['mâi sài náam kε̌ng', 'ไม่ใส่น้ำแข็ง', ['no ice', 'without ice']],

@@ -18,6 +18,7 @@ html[data-theme="dark"] {
   --ink-2: #c9bfae;
   --ink-3: #8a8074;
   --hair: rgba(242, 234, 216, 0.16);
+  color-scheme: dark;
 }
 
 /* Wordmark Thai only. Fahkwang OFL — BSRU Pro is commercial (YWFT) and is not bundled. */
@@ -59,12 +60,10 @@ button:disabled { cursor: default; opacity: 0.4; }
 
 .app { min-height: 100vh; padding: 32px 24px 80px; }
 .app.in-session {
-  height: 100dvh;
   min-height: 100dvh;
   padding: 28px 24px 36px;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
 }
 .shell { max-width: 640px; margin: 0 auto; }
 .app.in-session .shell {
@@ -154,11 +153,10 @@ button:disabled { cursor: default; opacity: 0.4; }
   flex-direction: column;
 }
 .session-stage {
-  flex: 1;
-  min-height: 0;
-  display: grid;
-  grid-template-rows: auto minmax(8.5rem, 1fr) 7.25rem 2.5rem;
-  grid-template-columns: minmax(0, 1fr);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
 }
 
 h1 {
@@ -177,7 +175,7 @@ h2 {
 .yours-list { margin: 0 0 16px; }
 .yours-row {
   display: grid;
-  grid-template-columns: minmax(6rem, 1fr) minmax(6rem, 1.4fr) auto;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) minmax(0, auto);
   justify-content: start;
   align-items: baseline;
 }
@@ -267,20 +265,23 @@ h2 {
   margin-top: 2px;
   color: var(--ink-2);
   font-size: 16px;
+  font-family: var(--thai), var(--display);
 }
 .preview li { padding: 8px 0; border-bottom: 1px solid var(--hair); color: var(--ink-2); }
 .quiet-row {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
   width: 100%;
-  gap: 16px;
+  gap: 12px 16px;
   text-align: left;
+  align-items: baseline;
 }
 .quiet-row:hover { color: var(--ink); }
 li.quiet-row { cursor: default; }
 .preview-thai { min-width: 2.5rem; font-size: 22px; color: var(--ink); }
 .warn { color: var(--lacquer); }
-.intro-actions { margin-top: 16px; }
+.intro-actions { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.tone-chart-aside { font-size: 12px; color: var(--ink-3); line-height: 1.2; }
 
 .tone-charts { margin: 0 0 32px; }
 .tone-charts figcaption {
@@ -339,9 +340,7 @@ li.quiet-row { cursor: default; }
   margin: 0 0 8px;
 }
 .session-prompt {
-  grid-row: 1;
   margin: 0;
-  align-self: end;
 }
 .prompt-tools {
   display: flex;
@@ -351,17 +350,22 @@ li.quiet-row { cursor: default; }
   margin-top: 4px;
 }
 .contents-row:disabled {
-  opacity: 0.45;
+  opacity: 1;
   cursor: default;
 }
+.contents-row:disabled .contents-title,
+.contents-row:disabled .contents-n {
+  color: var(--ink);
+}
+.contents-row:disabled .contents-meta {
+  color: var(--ink-3);
+}
 .session-stimulus {
-  grid-row: 2;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: flex-start;
   gap: 6px;
-  min-height: 0;
 }
 /* A right answer: one lacquer stroke under the card, and its other half beneath. */
 .session-stimulus.right > .prompt-en,
@@ -370,7 +374,7 @@ li.quiet-row { cursor: default; }
   text-decoration: underline;
   text-decoration-color: var(--lacquer);
   text-decoration-thickness: 3px;
-  text-underline-offset: 0.16em;
+  text-underline-offset: 0.28em;
 }
 .pair-line {
   margin: 0;
@@ -382,14 +386,16 @@ li.quiet-row { cursor: default; }
 .pair-line.rom { font-family: var(--phonetic); }
 .pair-line.thai { font-size: 32px; }
 .session-desk {
-  grid-row: 3;
-  align-self: end;
   width: 100%;
 }
 .session-feedback {
-  grid-row: 4;
   margin: 0;
   min-height: 1.5em;
+}
+.sense-line {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 16px;
 }
 .prompt-row {
   display: flex;
@@ -460,6 +466,15 @@ li.quiet-row { cursor: default; }
   line-height: 1.1;
   outline: none;
 }
+.roman-field:focus-visible,
+.text-btn:focus-visible,
+.btn.commit:focus-visible,
+.contents-row:focus-visible,
+.tone-word:focus-visible,
+.glyph-pick:focus-visible {
+  outline: 2px solid var(--lacquer);
+  outline-offset: 3px;
+}
 .roman-field.en { font-family: var(--display); font-size: 28px; font-weight: 300; }
 .roman-field:focus { border-bottom-color: var(--lacquer); }
 .roman-field::placeholder { color: var(--ink-3); }
@@ -523,9 +538,16 @@ li.quiet-row { cursor: default; }
 
 .heat {
   display: grid;
-  grid-template-columns: repeat(12, 1fr);
+  grid-template-rows: repeat(7, minmax(0, 1fr));
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
   gap: 6px;
+  margin: 0 0 8px;
+}
+.heat-legend {
   margin: 0 0 40px;
+  color: var(--ink-3);
+  font-size: 15px;
 }
 .heat-c {
   display: block;
@@ -533,8 +555,8 @@ li.quiet-row { cursor: default; }
   border-radius: 50%;
   background: var(--hair);
 }
-.heat-c.c1 { background: rgba(154, 43, 31, 0.35); }
-.heat-c.c2 { background: rgba(154, 43, 31, 0.65); }
+.heat-c.c1 { background: color-mix(in srgb, var(--lacquer) 35%, transparent); }
+.heat-c.c2 { background: color-mix(in srgb, var(--lacquer) 65%, transparent); }
 .heat-c.c3 { background: var(--lacquer); }
 
 .mini-index { list-style: none; padding: 0; margin: 0 0 40px; }
@@ -567,7 +589,7 @@ li.quiet-row { cursor: default; }
 .alpha-block h2.quiet { font-size: 16px; color: var(--ink-2); margin: 0 0 10px; }
 .alpha-note { margin: 0 0 16px; font-size: 15px; }
 /* Body copy that carries a dotted circle: let the Thai font draw it. */
-.thai-inline { font-family: var(--display), var(--thai); }
+.thai-inline { font-family: var(--thai), var(--display); }
 .alpha-grid {
   list-style: none;
   padding: 0;
@@ -596,6 +618,21 @@ li.quiet-row { cursor: default; }
 .alpha-cell.seen .alpha-char { color: var(--lacquer); }
 .alpha-cell.retired .alpha-char { text-decoration: line-through; text-decoration-thickness: 1px; }
 .alpha-char { font-size: 40px; line-height: 1; }
+.alpha-cell .alpha-char { overflow-wrap: anywhere; }
+.tone-mark-row {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+.tone-mark-row li {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.tone-mark-row .thai { font-size: 32px; line-height: 1.2; }
 .alpha-sub { font-size: 13px; line-height: 1.2; }
 .alpha-level {
   position: absolute;
@@ -617,4 +654,16 @@ li.quiet-row { cursor: default; }
   .tone-charts-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px 12px; }
   .tone-chart-name { font-size: 12px; }
   .tone-chart-rom { font-size: 15px; }
+  .trail {
+    grid-template-columns: auto 1fr;
+    row-gap: 8px;
+  }
+  .trail-end { justify-self: end; grid-column: 2; }
+  .app.in-session .trail-theme-sit { display: none; }
+  .quiet-row, .yours-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .alpha-grid { grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); }
+  .alpha-char { font-size: 28px; }
+  .tone-mark-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }

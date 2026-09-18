@@ -1,9 +1,27 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { allLevelStatus, seenEntries } from '@/engine/scheduler'
-import { isFinished, normalizeSession, remaining, startSession, type LiveSession } from '@/engine/session'
+import {
+  canContinue,
+  isFinished,
+  normalizeSession,
+  remaining,
+  sessionStillValid,
+  startSession,
+  type LiveSession,
+} from '@/engine/session'
 import type { TrackId } from '@content/types'
-import { loadDoc, loadSession, saveDoc, saveSession } from '@/storage/db'
+import {
+  fromMirror,
+  loadDoc,
+  loadSession,
+  MIRROR_KEY,
+  sameDocPayload,
+  saveDoc,
+  saveSession,
+  TAB_CHANNEL,
+} from '@/storage/db'
 import { emptyDoc, type ProgressDoc } from '@/storage/progress-schema'
+import { resetDoc } from '@/storage/import'
 import { onVoices } from '@/audio/tts'
 import { go, parseHash, type Route } from './hash'
 import { applyTheme, resolvedTheme } from './theme'
@@ -19,8 +37,13 @@ import { Trail } from './bits'
 export function App() {
   const [doc, setDoc] = useState<ProgressDoc>(() => emptyDoc())
   const [session, setSession] = useState<LiveSession | null>(null)
-  const [hydrated, setHydrated] = useState(false)
+  const [loadState, setLoadState] = useState<'pending' | 'ready' | 'failed'>('pending')
   const [route, setRoute] = useState<Route>(() => parseHash())
+  const persistOk = useRef(false)
+  const skipSave = useRef(false)
+  const hydratedSnapshot = useRef<ProgressDoc | null>(null)
+  const docRef = useRef(doc)
+  docRef.current = doc
 
   useEffect(() => {
     const onHash = () => setRoute(parseHash())
@@ -32,11 +55,29 @@ export function App() {
   useEffect(() => {
     let alive = true
     void (async () => {
-      const [d, s] = await Promise.all([loadDoc(), loadSession()])
+      const result = await loadDoc()
       if (!alive) return
-      setDoc(d)
-      setSession(s ? normalizeSession(s) : s)
-      setHydrated(true)
+      if (result.status === 'timeout' || result.status === 'failed') {
+        if (result.doc) {
+          setDoc(result.doc)
+          hydratedSnapshot.current = result.doc
+          persistOk.current = true
+          setLoadState('ready')
+        } else {
+          persistOk.current = false
+          setLoadState('failed')
+        }
+      } else {
+        setDoc(result.doc)
+        hydratedSnapshot.current = result.doc
+        persistOk.current = true
+        setLoadState('ready')
+      }
+      const s = await loadSession()
+      if (!alive) return
+      const live = s ? normalizeSession(s) : null
+      const base = result.doc ?? emptyDoc()
+      setSession(live && sessionStillValid(live, base.createdAt) ? live : null)
     })()
     return () => {
       alive = false
@@ -44,14 +85,57 @@ export function App() {
   }, [])
 
   useEffect(() => {
-    if (!hydrated) return
+    if (!persistOk.current || loadState !== 'ready') return
+    if (skipSave.current) {
+      skipSave.current = false
+      return
+    }
+    const snap = hydratedSnapshot.current
+    if (snap && sameDocPayload(snap, doc)) return
+    hydratedSnapshot.current = null
     void saveDoc(doc)
-  }, [doc, hydrated])
+  }, [doc, loadState])
 
   useEffect(() => {
-    if (!hydrated) return
+    if (loadState !== 'ready') return
     void saveSession(session)
-  }, [session, hydrated])
+  }, [session, loadState])
+
+  useEffect(() => {
+    const applyRemote = (incoming: ProgressDoc) => {
+      if (incoming.updatedAt <= docRef.current.updatedAt) return
+      skipSave.current = true
+      persistOk.current = true
+      setLoadState('ready')
+      setDoc(incoming)
+    }
+    let ch: BroadcastChannel | null = null
+    try {
+      ch = new BroadcastChannel(TAB_CHANNEL)
+      ch.onmessage = (ev: MessageEvent) => {
+        const at = (ev.data as { updatedAt?: number } | null)?.updatedAt
+        if (typeof at !== 'number' || at <= docRef.current.updatedAt) return
+        const mirrored = fromMirror()
+        if (mirrored) applyRemote(mirrored)
+      }
+    } catch {
+      /* unsupported */
+    }
+    const onStorage = (ev: StorageEvent) => {
+      if (ev.key !== MIRROR_KEY || !ev.newValue) return
+      try {
+        const parsed = JSON.parse(ev.newValue) as ProgressDoc
+        if (parsed.app === 'riankeng') applyRemote(parsed)
+      } catch {
+        /* ignore */
+      }
+    }
+    window.addEventListener('storage', onStorage)
+    return () => {
+      ch?.close()
+      window.removeEventListener('storage', onStorage)
+    }
+  }, [])
 
   useEffect(() => {
     applyTheme(doc.settings.theme)
@@ -110,6 +194,16 @@ export function App() {
     }))
   }
 
+  const eraseDevice = () => {
+    const next = resetDoc()
+    persistOk.current = true
+    setLoadState('ready')
+    setDoc(next)
+    setSession(null)
+    void saveSession(null)
+    go({ name: 'journey' })
+  }
+
   const inSession = route.name === 'session' && session && !isFinished(session)
   const inIntro = route.name === 'intro'
   const trailTrack = inSession && session ? (session.track ?? 'voice') : inIntro && route.name === 'intro' ? route.track : undefined
@@ -130,6 +224,7 @@ export function App() {
           onPause={inSession || inIntro ? () => go({ name: 'journey' }) : undefined}
           themeLabel={resolved === 'dark' ? 'Day' : 'Night'}
           onTheme={flipTheme}
+          hideTheme={Boolean(inSession)}
           place={trailPlace}
         />
         {route.name === 'journey' && (
@@ -155,7 +250,9 @@ export function App() {
               (route.track === 'script' ? scriptStatuses : voiceStatuses)[route.n] &&
                 !(route.track === 'script' ? scriptStatuses : voiceStatuses)[route.n]!.unlocked,
             )}
+            canContinue={canContinue(session, route.track, route.n)}
             onStart={() => beginLevel(route.n, route.track)}
+            onContinue={() => go({ name: 'session' })}
           />
         )}
         {route.name === 'session' && session && <SessionView doc={doc} session={session} onDoc={setDoc} onSession={onSession} />}
@@ -166,6 +263,7 @@ export function App() {
             script={scriptStatuses}
             onDoc={setDoc}
             onGlyphs={() => go({ name: 'glyphs' })}
+            onReset={eraseDevice}
           />
         )}
         {route.name === 'glyphs' && <Glyphs />}

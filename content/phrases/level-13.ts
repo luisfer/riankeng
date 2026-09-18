@@ -3,7 +3,7 @@ import { phrases } from '../build'
 export default phrases(13, [
   ['mii bprà-chum wan níi', 'มีประชุมวันนี้', ['there is a meeting today']],
   ['pǒm tam-ngaan tîi bâan', 'ผมทำงานที่บ้าน', ['I work at home', 'I work from home']],
-  ['sòng ii-meeo nɔ̀i', 'ส่งอีเมลหน่อย', ['please send an email']],
+  ['sòng ii-meen nɔ̀i', 'ส่งอีเมลหน่อย', ['please send an email']],
   ['in-təə-nét dtòk', 'อินเทอร์เน็ตตก', ['the internet is down']],
   ['pǒm bpen nák-rian', 'ผมเป็นนักเรียน', ['I am a student']],
   ['kǎo bpen krùu', 'เขาเป็นครู', ['he is a teacher', 'she is a teacher']],
@@ -19,6 +19,6 @@ export default phrases(13, [
   ['bɔɔ-rí-sàt yài', 'บริษัทใหญ่', ['a big company']],
   ['rian gàp krùu', 'เรียนกับครู', ['study with a teacher']],
   ['chái too-rá-sàp', 'ใช้โทรศัพท์', ['use the phone']],
-  ['kǐan ii-meeo', 'เขียนอีเมล', ['write an email']],
+  ['kǐan ii-meen', 'เขียนอีเมล', ['write an email']],
   ['dtɔ̂ng tam-ngaan náan', 'ต้องทำงานนาน', ['have to work a long time']],
 ])

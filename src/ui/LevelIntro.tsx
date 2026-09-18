@@ -25,7 +25,14 @@ function leadClass(lead: string, hasNote: boolean): string | undefined {
   return undefined
 }
 
-export function LevelIntro(props: { n: number; track: TrackId; locked?: boolean; onStart: () => void }) {
+export function LevelIntro(props: {
+  n: number
+  track: TrackId
+  locked?: boolean
+  canContinue?: boolean
+  onStart: () => void
+  onContinue?: () => void
+}) {
   const meta = levelsFor(props.track)[props.n]
   if (!meta) {
     return (
@@ -56,7 +63,7 @@ export function LevelIntro(props: { n: number; track: TrackId; locked?: boolean;
             return (
               <li key={f}>
                 <span className={cls}>{showThai(lead)}</span>
-                {note && <span className="note">{note}</span>}
+                {note && <span className="note thai-inline">{showThai(note)}</span>}
               </li>
             )
           })}
@@ -98,7 +105,10 @@ export function LevelIntro(props: { n: number; track: TrackId; locked?: boolean;
         ) : empty ? (
           <p className="warn">This level is not authored yet.</p>
         ) : (
-          <Commit onClick={props.onStart}>Begin</Commit>
+          <>
+            {props.canContinue && props.onContinue && <Commit onClick={props.onContinue}>Continue</Commit>}
+            <Commit onClick={props.onStart}>{props.canContinue ? 'Begin again' : 'Begin'}</Commit>
+          </>
         )}
       </div>
     </main>

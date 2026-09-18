@@ -66,7 +66,7 @@ export function Journey(props: {
       </section>
       <TrackList
         title="Voice"
-        lede="Spoken Thai, written so you can hear it. Translation only for now."
+        lede="Spoken Thai, written so you can hear it. Hear, say, and name the tone."
         levels={LEVELS}
         statuses={props.voice}
         track="voice"

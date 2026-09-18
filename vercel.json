@@ -1,4 +1,15 @@
 {
   "framework": "vite",
-  "rewrites": [{ "source": "/((?!api/|gate\\.html).*)", "destination": "/index.html" }]
+  "rewrites": [
+    {
+      "source": "/((?!api/|gate\\.html|sw\\.js|manifest\\.webmanifest|workbox-|icons/|fonts/|favicon\\.svg).*)",
+      "destination": "/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/index.html",
+      "headers": [{ "key": "X-Riankeng-Shell", "value": "1" }]
+    }
+  ]
 }

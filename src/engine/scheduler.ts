@@ -2,7 +2,7 @@ import { ENTRIES, entryTrack, entriesForLevel, getEntry, levelsFor } from '@cont
 import type { TrackId } from '@content/types'
 import type { Entry } from '@content/types'
 import type { ProgressDoc } from '@/storage/progress-schema'
-import { isDue, isMastered, newItemProgress, type ItemProgress, type Modality } from './srs'
+import { isoDay, isDue, isMastered, newItemProgress, type ItemProgress, type Modality } from './srs'
 
 export interface LevelStatus {
   n: number
@@ -103,31 +103,44 @@ export function shuffleSeen<T extends { id: string }>(items: T[], salt: string, 
   return [...items].sort((a, b) => hash(`${salt}:${a.id}`) - hash(`${salt}:${b.id}`)).slice(0, take)
 }
 
-/** Total items answered today and correct today. */
+/** Total items answered today and correct today. History for counts; `days` so a capped history cannot hide today. */
 export function todayStats(doc: ProgressDoc, now = Date.now()): { answered: number; correct: number } {
-  const d = new Date(now)
-  const start = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime()
+  const today = isoDay(now)
+  const start = new Date(now)
+  start.setHours(0, 0, 0, 0)
+  const startMs = start.getTime()
   let answered = 0
   let correct = 0
   for (const p of Object.values(doc.items)) {
+    let fromHistory = 0
     for (const h of p.history) {
-      if (h.t >= start) {
+      if (h.t >= startMs) {
         answered++
+        fromHistory++
         if (h.ok) correct++
       }
+    }
+    if (fromHistory === 0 && p.days.includes(today)) {
+      answered++
+      correct++
     }
   }
   return { answered, correct }
 }
 
-/** Days with at least one answer, as ISO strings, for the heatmap. */
+/** Days with at least one answer. Union durable `days` with history so the grid cannot forget a mastered day. */
 export function activeDays(doc: ProgressDoc): Map<string, number> {
   const m = new Map<string, number>()
   for (const p of Object.values(doc.items)) {
+    for (const key of p.days) {
+      if (!m.has(key)) m.set(key, 0)
+    }
     for (const h of p.history) {
-      const d = new Date(h.t)
-      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+      const key = isoDay(h.t)
       m.set(key, (m.get(key) ?? 0) + 1)
+    }
+    for (const key of p.days) {
+      if ((m.get(key) ?? 0) === 0) m.set(key, 1)
     }
   }
   return m
@@ -162,6 +175,19 @@ export function hash(s: string): number {
   return (h >>> 0) / 4294967296
 }
 
+/** Another catalog entry shares this romanization (Voice) or this Thai spelling (Script). */
+export function sittingSense(entry: Entry, modality: Modality): string | null {
+  if (modality !== 'th-en') return null
+  const track = entryTrack(entry)
+  if (track === 'script') {
+    const twin = ENTRIES.some((e) => entryTrack(e) === 'script' && e.id !== entry.id && e.thai === entry.thai)
+    return twin ? (entry.en[0] ?? null) : null
+  }
+  const twin = ENTRIES.some((e) => entryTrack(e) === 'voice' && e.id !== entry.id && e.rom === entry.rom)
+  if (!twin) return null
+  return entry.note || entry.thai
+}
+
 /**
  * Pick the exercise for an item given its stage. Seeds first meet the learner
  * in recognition, sprouts are forced to produce, flowers and ripe items get
@@ -170,12 +196,22 @@ export function hash(s: string): number {
 export function chooseModality(entry: Entry, p: ItemProgress, salt: string): Modality {
   const r = hash(entry.id + salt)
   if (entryTrack(entry) === 'script') {
+    if (entry.thai === 'ไหม' && /silk/i.test(entry.en[0] ?? '')) return 'pick'
     if (p.stage <= 0) return r < 0.55 ? 'pick' : 'th-en'
     if (r < 0.35) return 'pick'
     if (r < 0.7) return 'th-en'
     return 'en-th'
   }
-  return r < 0.5 ? 'th-en' : 'en-th'
+  if (entry.level === 0) {
+    if (r < 0.3) return 'th-en'
+    if (r < 0.55) return 'en-th'
+    if (r < 0.8) return 'listen'
+    return 'tone'
+  }
+  if (r < 0.35) return 'th-en'
+  if (r < 0.7) return 'en-th'
+  if (r < 0.85) return 'listen'
+  return 'tone'
 }
 
 export function entryOrThrow(id: string): Entry {

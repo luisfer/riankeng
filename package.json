@@ -20,6 +20,7 @@
     "audio": "python3 scripts/gen-audio.py"
   },
   "dependencies": {
+    "@vercel/functions": "^3.9.8",
     "idb-keyval": "^6.3.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0"

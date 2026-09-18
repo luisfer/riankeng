@@ -31,3 +31,7 @@ Voice unlocks the next level when the previous one is mastered. Script unlocks w
 - Script 0–8: seats, ม/มา, the mark on ม้า, ก, ไม่, คน/ไข่, ไป/ยา, ตา/ข้าว, ห on หมา. Level 9 is still empty.
 
 Romanization follows the textbook system in `content/system.ts` (à â á ǎ, g/bp/dt, ε ɔ ə ụ).
+
+## Live site
+
+The Vercel URL is gated by `SITE_PASSWORD` (server-only, never in the bundle). Local `npm run dev` stays open if that var is empty. On Vercel, set it for Production and Preview, then deploy.

@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>riian gèng</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <style>
+      :root {
+        --paper: #f2ead8;
+        --lacquer: #9a2b1f;
+        --ink: #1c1710;
+        --ink-2: #5a5146;
+        --display: "Fraunces", "Iowan Old Style", Georgia, serif;
+      }
+      html, body { min-height: 100%; }
+      body {
+        margin: 0;
+        color: var(--ink);
+        font-family: var(--display);
+        font-size: 18px;
+        line-height: 1.45;
+        background: var(--paper);
+      }
+      main { max-width: 28em; margin: 20vh auto 0; padding: 0 24px; }
+      h1 { font-weight: 300; font-size: 32px; margin: 0 0 8px; }
+      .lede { color: var(--ink-2); margin: 0 0 32px; }
+      form { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: end; }
+      input {
+        width: 100%;
+        background: transparent;
+        border: 0;
+        border-bottom: 1px solid var(--ink);
+        padding: 0 0 6px;
+        font: inherit;
+        font-size: 28px;
+        outline: none;
+      }
+      input:focus { border-bottom-color: var(--lacquer); }
+      button {
+        height: 36px;
+        padding: 0 14px;
+        background: var(--lacquer);
+        color: var(--paper);
+        border: 0;
+        border-radius: 2px;
+        font: inherit;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+      }
+      .miss { margin-top: 16px; color: var(--lacquer); min-height: 1.5em; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>เรียนเก่ง</h1>
+      <p class="lede">A word, then the page.</p>
+      <form id="gate">
+        <input type="password" name="password" autocomplete="current-password" autofocus />
+        <button type="submit">Enter</button>
+      </form>
+      <p class="miss" id="miss"></p>
+    </main>
+    <script>
+      document.getElementById('gate').addEventListener('submit', async (e) => {
+        e.preventDefault()
+        const password = new FormData(e.target).get('password')
+        const miss = document.getElementById('miss')
+        miss.textContent = ''
+        const res = await fetch('/api/gate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password }),
+        })
+        if (res.ok) {
+          location.href = '/'
+          return
+        }
+        miss.textContent = res.status === 503 ? 'Gate is not configured.' : 'Not that word.'
+      })
+    </script>
+  </body>
+</html>

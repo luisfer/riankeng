@@ -9,12 +9,19 @@ function withReps(id: string, reps = 1): ItemProgress {
 }
 
 describe('chooseModality', () => {
-  it('lets Voice 0 listen and name tone', () => {
+  it('keeps unseen Voice on recognition', () => {
     const entry = getEntry('w:maa')!
-    const p = newItemProgress(entry.id)
+    for (let i = 0; i < 20; i++) {
+      expect(chooseModality(entry, newItemProgress(entry.id), String(i))).toBe('th-en')
+    }
+  })
+
+  it('lets Voice 0 listen and name tone after the word has been seen', () => {
+    const entry = getEntry('w:maa')!
+    const p = { ...newItemProgress(entry.id), reps: 2, stage: 2 }
     const seen = new Set<string>()
-    for (let i = 0; i < 30; i++) {
-      const m = chooseModality(entry, { ...p, stage: i % 5 }, String(i))
+    for (let i = 0; i < 40; i++) {
+      const m = chooseModality(entry, p, String(i))
       expect(['en-th', 'th-en', 'listen', 'tone']).toContain(m)
       seen.add(m)
     }

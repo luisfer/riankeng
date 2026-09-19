@@ -20,7 +20,7 @@ function TrackList(props: {
           const s = props.statuses[lvl.n]
           const locked = Boolean(s && s.total > 0 && !s.unlocked)
           const at = here === lvl.n
-          const meta = !s || s.total === 0 ? 'soon' : locked ? 'locked' : String(s.total)
+          const meta = !s || s.total === 0 ? 'soon' : locked ? '' : String(s.total)
           return (
             <li key={`${props.track}-${lvl.n}`}>
               <button

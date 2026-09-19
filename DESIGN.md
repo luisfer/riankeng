@@ -26,7 +26,7 @@ Never gray. Never gold-on-navy.
 - Scale: h1 32–44 / 300 · contents number 28 / 300 · prompt 20 · body 18 · meta 15. Numbers tabular.
 
 ## Components
-- `.trail`: three columns. Wordmark home, remaining count, Pause or Account. Hairline under. Theme lives on Account, not in the trail.
+- `.trail`: three columns. Wordmark home, place plus a 15px lacquer pie (sitting or lesson), Pause or Account. Hairline under. Theme lives on Account, not in the trail.
 - `.contents-row`: contents of a primer. Number, title + rom, count or `soon`. Locked rows have a blank meta. The open level’s number is lacquer.
 - `.btn.commit`: 36×, radius 2px, lacquer on paper. One per screen. Continue is that key. Begin again is a text button.
 - `.text-btn`: ink-2 word, underline on hover. Hear, Slower, Pause, export.

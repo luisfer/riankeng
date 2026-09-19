@@ -6,6 +6,21 @@ export function sittingRatio(correct: number, remaining: number): number {
   return denom === 0 ? 0 : correct / denom
 }
 
+export function QuietPie(props: { value: number; label: string }) {
+  const pct = Math.round(Math.min(1, Math.max(0, props.value)) * 100)
+  return (
+    <span
+      className="quiet-pie"
+      role="progressbar"
+      aria-label={props.label}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={pct}
+      style={{ ['--p' as string]: String(pct) }}
+    />
+  )
+}
+
 export function Commit({
   children,
   onClick,
@@ -50,6 +65,8 @@ export function Trail(props: {
   level?: number
   remaining?: number
   correct?: number
+  lessonSeen?: number
+  lessonTotal?: number
   onPause?: () => void
   place?: string
 }) {
@@ -64,6 +81,8 @@ export function Trail(props: {
   const inSitting = props.remaining !== undefined
   const ratio = inSitting ? sittingRatio(props.correct ?? 0, props.remaining ?? 0) : 0
   const cleared = Math.round(ratio * ((props.correct ?? 0) + (props.remaining ?? 0)))
+  const lessonN = props.lessonTotal ?? 0
+  const lessonRatio = lessonN > 0 ? (props.lessonSeen ?? 0) / lessonN : 0
 
   return (
     <nav className="trail">
@@ -74,16 +93,10 @@ export function Trail(props: {
       <span className="trail-mid">
         {place && <span className="trail-mid-copy">{place}</span>}
         {inSitting && (
-          <span
-            className="trail-progress"
-            role="progressbar"
-            aria-label={`${cleared} cleared, ${props.remaining} remaining`}
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-valuenow={Math.round(ratio * 100)}
-          >
-            <span className="trail-progress-fill" style={{ transform: `scaleX(${ratio})` }} />
-          </span>
+          <QuietPie value={ratio} label={`${cleared} cleared, ${props.remaining} remaining`} />
+        )}
+        {!inSitting && lessonN > 0 && (
+          <QuietPie value={lessonRatio} label={`${props.lessonSeen ?? 0} of ${lessonN} in this lesson`} />
         )}
       </span>
       <div className="trail-end">

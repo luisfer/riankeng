@@ -219,6 +219,12 @@ export function App() {
       : route.name === 'alphabet'
         ? 'The whole script'
         : undefined
+  const lessonStatus =
+    inSession && session && !session.review
+      ? (session.track === 'script' ? scriptStatuses : voiceStatuses)[session.level]
+      : inIntro && route.name === 'intro'
+        ? (route.track === 'script' ? scriptStatuses : voiceStatuses)[route.n]
+        : undefined
 
   return (
     <div className={`app${inSession ? ' in-session' : ''}`}>
@@ -231,6 +237,8 @@ export function App() {
           level={trailLevel}
           remaining={inSession && session ? remaining(session) : undefined}
           correct={inSession && session ? session.correct : undefined}
+          lessonSeen={lessonStatus?.seen}
+          lessonTotal={lessonStatus?.total}
           onPause={inSession || inIntro ? () => go({ name: 'journey' }) : undefined}
           place={trailPlace}
         />
@@ -260,6 +268,8 @@ export function App() {
                 !(route.track === 'script' ? scriptStatuses : voiceStatuses)[route.n]!.unlocked,
             )}
             canContinue={canContinue(session, route.track, route.n)}
+            seen={lessonStatus?.seen}
+            total={lessonStatus?.total}
             onStart={() => beginLevel(route.n, route.track)}
             onContinue={() => go({ name: 'session' })}
           />

@@ -1,7 +1,7 @@
 import { entriesForLevel, levelsFor } from '@content/index'
 import type { TrackId } from '@content/types'
 import { unlockSpeech } from '@/audio/tts'
-import { Commit, TextBtn } from './bits'
+import { Commit, QuietPie, TextBtn } from './bits'
 import { ToneCharts } from './ToneCharts'
 import { showParts, showThai } from './thai'
 
@@ -31,6 +31,8 @@ export function LevelIntro(props: {
   track: TrackId
   locked?: boolean
   canContinue?: boolean
+  seen?: number
+  total?: number
   onStart: () => void
   onContinue?: () => void
 }) {
@@ -54,6 +56,17 @@ export function LevelIntro(props: {
         Level {meta.n}, {meta.title}
       </h1>
       <p className="lede">{meta.blurb}</p>
+      {typeof props.total === 'number' && props.total > 0 && (
+        <p className="lesson-progress">
+          <QuietPie
+            value={(props.seen ?? 0) / props.total}
+            label={`${props.seen ?? 0} of ${props.total} in this lesson`}
+          />
+          <span>
+            {props.seen ?? 0} of {props.total}
+          </span>
+        </p>
+      )}
       {voiceSound && <ToneCharts />}
       <section className="lesson">
         <h2>In this lesson</h2>

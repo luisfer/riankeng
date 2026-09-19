@@ -129,6 +129,36 @@ export function speakThai(thai: string, id: string, rate = 0.85, opts: SpeakOpts
   return speakNow(thai, rate, gesture)
 }
 
+/** Call from a click (Begin, Continue) so later autoplay may speak. */
+export function unlockSpeech(): boolean {
+  if (typeof speechSynthesis === 'undefined') return false
+  unlocked = true
+  try {
+    if (speechSynthesis.paused) speechSynthesis.resume()
+    if (typeof SpeechSynthesisUtterance !== 'undefined') {
+      const u = new SpeechSynthesisUtterance('\u200b')
+      u.volume = 0
+      speechSynthesis.speak(u)
+    }
+  } catch {
+    /* page is still marked unlocked */
+  }
+  return true
+}
+
+export function speechUnlocked(): boolean {
+  return unlocked
+}
+
+export function resetSpeechForTests(): void {
+  unlocked = false
+}
+
+export function canHearThai(id?: string): boolean {
+  if (id !== undefined && clipCached(id) === true) return true
+  return detectVoice().ready
+}
+
 export function speakSlower(thai: string, id: string, rate = 0.85, opts: SpeakOpts = {}): VoiceInfo {
   return speakThai(thai, id, Math.max(0.5, rate * 0.7), opts)
 }

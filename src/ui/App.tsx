@@ -6,6 +6,7 @@ import {
   normalizeSession,
   remaining,
   sessionStillValid,
+  startReviewSession,
   startSession,
   type LiveSession,
 } from '@/engine/session'
@@ -163,6 +164,12 @@ export function App() {
     go(next.queue.length ? { name: 'session' } : { name: 'journey' })
   }
 
+  const sitThese = (ids: string[]) => {
+    const next = startReviewSession(doc, Date.now(), ids, 'voice')
+    setSession(next)
+    go(next.queue.length ? { name: 'session' } : { name: 'review' })
+  }
+
   const onSession = (s: LiveSession) => {
     if (isFinished(s) && s.answered > 0) {
       setDoc((d) => ({
@@ -198,9 +205,20 @@ export function App() {
 
   const inSession = route.name === 'session' && session && !isFinished(session)
   const inIntro = route.name === 'intro'
-  const trailTrack = inSession && session ? (session.track ?? 'voice') : inIntro && route.name === 'intro' ? route.track : undefined
-  const trailLevel = inSession && session ? session.level : inIntro && route.name === 'intro' ? route.n : undefined
-  const trailPlace = route.name === 'review' ? 'Already yours' : route.name === 'alphabet' ? 'The whole script' : undefined
+  const trailTrack =
+    inSession && session && !session.review
+      ? (session.track ?? 'voice')
+      : inIntro && route.name === 'intro'
+        ? route.track
+        : undefined
+  const trailLevel =
+    inSession && session && !session.review ? session.level : inIntro && route.name === 'intro' ? route.n : undefined
+  const trailPlace =
+    route.name === 'review' || (inSession && session?.review)
+      ? 'Already yours'
+      : route.name === 'alphabet'
+        ? 'The whole script'
+        : undefined
 
   return (
     <div className={`app${inSession ? ' in-session' : ''}`}>
@@ -229,7 +247,9 @@ export function App() {
             onAlphabet={() => go({ name: 'alphabet' })}
           />
         )}
-        {route.name === 'review' && <ReviewPage pool={yours} />}
+        {route.name === 'review' && (
+          <ReviewPage pool={yours} audioRate={doc.settings.audioRate} onSit={sitThese} />
+        )}
         {route.name === 'alphabet' && <Alphabet doc={doc} onOpen={(n) => go({ name: 'intro', n, track: 'script' })} />}
         {route.name === 'intro' && (
           <LevelIntro

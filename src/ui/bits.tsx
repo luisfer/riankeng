@@ -6,6 +6,45 @@ export function sittingRatio(correct: number, remaining: number): number {
   return denom === 0 ? 0 : correct / denom
 }
 
+export function lessonRatio(seen: number, total: number): number {
+  return total === 0 ? 0 : seen / total
+}
+
+/** Begin is only for a level you have not touched. */
+export function startLabel(seen: number, canContinue: boolean): 'Begin' | 'Sit again' | 'Begin again' {
+  if (canContinue) return 'Begin again'
+  return seen > 0 ? 'Sit again' : 'Begin'
+}
+
+/** Lesson pie when the level has a total. Sitting pie only on review (no total). */
+export function trailPie(args: {
+  lessonSeen?: number
+  lessonTotal?: number
+  remaining?: number
+  correct?: number
+}): { kind: 'lesson' | 'sitting'; value: number; label: string } | null {
+  const lessonN = args.lessonTotal ?? 0
+  const seen = args.lessonSeen ?? 0
+  const inSitting = args.remaining !== undefined
+  if (lessonN > 0) {
+    return {
+      kind: 'lesson',
+      value: lessonRatio(seen, lessonN),
+      label: `${seen} of ${lessonN} in this lesson`,
+    }
+  }
+  if (inSitting) {
+    const sitRatio = sittingRatio(args.correct ?? 0, args.remaining ?? 0)
+    const cleared = Math.round(sitRatio * ((args.correct ?? 0) + (args.remaining ?? 0)))
+    return {
+      kind: 'sitting',
+      value: sitRatio,
+      label: `${cleared} cleared, ${args.remaining} remaining`,
+    }
+  }
+  return null
+}
+
 export function QuietPie(props: { value: number; label: string }) {
   const pct = Math.round(Math.min(1, Math.max(0, props.value)) * 100)
   return (
@@ -79,10 +118,12 @@ export function Trail(props: {
       .filter(Boolean)
       .join(', ')
   const inSitting = props.remaining !== undefined
-  const ratio = inSitting ? sittingRatio(props.correct ?? 0, props.remaining ?? 0) : 0
-  const cleared = Math.round(ratio * ((props.correct ?? 0) + (props.remaining ?? 0)))
-  const lessonN = props.lessonTotal ?? 0
-  const lessonRatio = lessonN > 0 ? (props.lessonSeen ?? 0) / lessonN : 0
+  const pie = trailPie({
+    lessonSeen: props.lessonSeen,
+    lessonTotal: props.lessonTotal,
+    remaining: props.remaining,
+    correct: props.correct,
+  })
 
   return (
     <nav className="trail">
@@ -92,12 +133,8 @@ export function Trail(props: {
       </button>
       <span className="trail-mid">
         {place && <span className="trail-mid-copy">{place}</span>}
-        {inSitting && (
-          <QuietPie value={ratio} label={`${cleared} cleared, ${props.remaining} remaining`} />
-        )}
-        {!inSitting && lessonN > 0 && (
-          <QuietPie value={lessonRatio} label={`${props.lessonSeen ?? 0} of ${lessonN} in this lesson`} />
-        )}
+        {pie && <QuietPie value={pie.value} label={pie.label} />}
+        {inSitting && <span className="trail-left">{props.remaining} left</span>}
       </span>
       <div className="trail-end">
         {props.onPause && <TextBtn onClick={props.onPause}>Pause</TextBtn>}

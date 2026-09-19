@@ -26,9 +26,9 @@ Never gray. Never gold-on-navy.
 - Scale: h1 32–44 / 300 · contents number 28 / 300 · prompt 20 · body 18 · meta 15. Numbers tabular.
 
 ## Components
-- `.trail`: three columns. Wordmark home, place plus a 15px lacquer pie (sitting or lesson), Pause or Account. Hairline under. Theme lives on Account, not in the trail.
+- `.trail`: three columns. Wordmark home, place plus a 15px lacquer pie for the level (`seen` of `total`). A sitting adds quiet “11 left”, not a second wedge. Pause or Account. Hairline under. Theme lives on Account, not in the trail.
 - `.contents-row`: contents of a primer. Number, title + rom, count or `soon`. Locked rows have a blank meta. The open level’s number is lacquer.
-- `.btn.commit`: 36×, radius 2px, lacquer on paper. One per screen. Continue is that key. Begin again is a text button.
+- `.btn.commit`: 36×, radius 2px, lacquer on paper. One per screen. Continue is that key. Sit again when the level is started. Begin again is a text button.
 - `.text-btn`: ink-2 word, underline on hover. Hear, Slower, Pause, export.
 - `.answer-form`: field and Check share row 1. Popover and key strip span below.
 - `.tone-word`: five words, underline on hover. Not chips.

@@ -1,7 +1,7 @@
 import { entriesForLevel, levelsFor } from '@content/index'
 import type { TrackId } from '@content/types'
 import { unlockSpeech } from '@/audio/tts'
-import { Commit, QuietPie, TextBtn } from './bits'
+import { Commit, QuietPie, lessonRatio, startLabel, TextBtn } from './bits'
 import { ToneCharts } from './ToneCharts'
 import { showParts, showThai } from './thai'
 
@@ -59,7 +59,7 @@ export function LevelIntro(props: {
       {typeof props.total === 'number' && props.total > 0 && (
         <p className="lesson-progress">
           <QuietPie
-            value={(props.seen ?? 0) / props.total}
+            value={lessonRatio(props.seen ?? 0, props.total)}
             label={`${props.seen ?? 0} of ${props.total} in this lesson`}
           />
           <span>
@@ -148,7 +148,7 @@ export function LevelIntro(props: {
                   props.onStart()
                 }}
               >
-                Begin
+                {startLabel(props.seen ?? 0, false)}
               </Commit>
             )}
           </>

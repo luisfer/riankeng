@@ -211,6 +211,7 @@ export function chooseModality(entry: Entry, p: ItemProgress, salt: string): Mod
     if (r < 0.7) return 'th-en'
     return 'en-th'
   }
+  if (p.reps === 0 || p.stage <= 0) return 'th-en'
   if (entry.level === 0) {
     if (r < 0.3) return 'th-en'
     if (r < 0.55) return 'en-th'

@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { TONES, TONE_LABEL, type Tone } from '@content/system'
 import { cleanGloss, gradeEnglish } from '@/engine/grader-en'
 import { gradeThai } from '@/engine/grader-thai'
 import { analyseRom } from '@/engine/normalize'
 import {
   afterHold,
+  afterMeet,
   currentItem,
   markCorrect,
   markMissMove,
@@ -32,14 +33,36 @@ export function SessionView(props: {
   const [answer, setAnswer] = useState('')
   const [ack, setAck] = useState<{ ok: boolean; text: string } | null>(null)
   const [heard, setHeard] = useState(false)
+  const goNextRef = useRef(() => {})
   const track = props.session.track ?? 'voice'
   const script = track === 'script'
+  const meeting = Boolean(item?.meet && !props.session.hold)
+  const waitingNext = Boolean(ack && (ack.ok || !props.session.hold))
+  const canAdvance = meeting || waitingNext
 
   useEffect(() => {
     setAnswer('')
     setAck(null)
     setHeard(false)
   }, [item?.id, item?.modality])
+
+  useEffect(() => {
+    if (!canAdvance) return
+    let armed = false
+    const frame = requestAnimationFrame(() => {
+      armed = true
+    })
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Enter' || e.repeat || !armed) return
+      e.preventDefault()
+      goNextRef.current()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => {
+      cancelAnimationFrame(frame)
+      window.removeEventListener('keydown', onKey)
+    }
+  }, [canAdvance])
 
   if (!item) {
     return (
@@ -60,12 +83,17 @@ export function SessionView(props: {
   }
 
   const goNext = () => {
+    if (item.meet && !hold && !ack) {
+      props.onSession(afterMeet(props.session))
+      return
+    }
     setAck(null)
     setAnswer('')
     if (hold) props.onSession(afterHold(props.session))
     else if (ack?.ok) props.onSession(markCorrect(props.session))
     else props.onSession(requeueCurrent(props.session))
   }
+  goNextRef.current = goNext
 
   const submitThai = () => {
     if (hold?.kind === 'retype-th') {
@@ -128,14 +156,15 @@ export function SessionView(props: {
   const writeRom =
     item.modality === 'listen' || (script && (item.modality === 'th-en' || item.modality === 'en-th'))
   const voiceEn = !script && item.modality === 'th-en'
-  const listenLocked = item.modality === 'listen' && !heard && !hold
-  const sense = sittingSense(entry, item.modality)
+  const listenLocked = item.modality === 'listen' && !heard && !hold && !meeting
+  const sense = meeting ? null : sittingSense(entry, item.modality)
   const fromVoice = script && entry.tags.some((t) => t.startsWith('voice:w:'))
-  const waitingNext = Boolean(ack && (ack.ok || !hold))
   const right = Boolean(ack?.ok)
 
   const prompt =
-    hold?.kind === 'retype-th'
+    meeting
+      ? 'Here it is.'
+      : hold?.kind === 'retype-th'
       ? 'Retype the romanization.'
       : item.modality === 'pick'
         ? 'Which one is this?'
@@ -161,6 +190,23 @@ export function SessionView(props: {
   })()
 
   const stimulus = (() => {
+    if (meeting) {
+      if (script) {
+        return (
+          <>
+            <p className="prompt-thai thai">{showThai(entry.thai)}</p>
+            <p className="prompt-rom rom">{entry.rom}</p>
+            <p className="prompt-en">{cleanGloss(entry.en[0] ?? '')}</p>
+          </>
+        )
+      }
+      return (
+        <>
+          <p className="prompt-rom rom">{entry.rom}</p>
+          <p className="prompt-en">{cleanGloss(entry.en[0] ?? '')}</p>
+        </>
+      )
+    }
     if (hold) {
       return (
         <p className="reveal rom">
@@ -218,7 +264,12 @@ export function SessionView(props: {
     submitEn()
   }
 
-  const desk = waitingNext ? (
+  const desk = meeting ? (
+    <div className="answer-form">
+      <div />
+      <Commit onClick={goNext}>Continue</Commit>
+    </div>
+  ) : waitingNext ? (
     <div className="answer-form">
       <div />
       <Commit onClick={goNext}>Next</Commit>

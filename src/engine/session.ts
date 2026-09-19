@@ -8,6 +8,8 @@ export interface QueueItem {
   id: string
   modality: ReturnType<typeof chooseModality>
   salt: string
+  /** Unseen cards show both sides once before the test. Missing on older sittings. */
+  meet?: boolean
 }
 
 /**
@@ -43,7 +45,10 @@ export function startSession(doc: ProgressDoc, now = Date.now(), level?: number,
     if (seen.has(id) || queue.length >= SESSION_SIZE) return
     seen.add(id)
     const entry = entryOrThrow(id)
-    queue.push({ id, modality: chooseModality(entry, progressFor(doc, id), salt), salt })
+    const progress = progressFor(doc, id)
+    const item: QueueItem = { id, modality: chooseModality(entry, progress, salt), salt }
+    if (progress.reps === 0) item.meet = true
+    queue.push(item)
   }
 
   const onLevel = entriesForLevel(target, track)
@@ -103,6 +108,15 @@ export function currentItem(session: LiveSession): QueueItem | null {
 
 export function remaining(session: LiveSession): number {
   return Math.max(0, session.queue.length - session.cursor)
+}
+
+/** After the teach face, the same card becomes the recognition test. */
+export function afterMeet(session: LiveSession): LiveSession {
+  const item = currentItem(session)
+  if (!item?.meet) return session
+  const queue = session.queue.slice()
+  queue[session.cursor] = { ...item, meet: false }
+  return { ...session, queue }
 }
 
 export function markCorrect(session: LiveSession): LiveSession {

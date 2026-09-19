@@ -13,7 +13,7 @@
 
 html[data-theme="dark"] {
   --paper: #1c1710;
-  --lacquer: #d45a48;
+  --lacquer: #9a2b1f;
   --ink: #f2ead8;
   --ink-2: #c9bfae;
   --ink-3: #8a8074;
@@ -106,8 +106,8 @@ button:disabled { cursor: default; opacity: 0.4; }
 }
 .wordmark-rom {
   font-style: italic;
-  font-size: 14px;
-  color: var(--ink-2);
+  font-size: 16px;
+  color: var(--ink);
 }
 .trail-mid {
   justify-self: center;
@@ -246,8 +246,6 @@ h2 {
   font-size: 16px;
   font-weight: 500;
 }
-.btn.commit:hover { filter: brightness(1.05); }
-
 .intro h2 { margin: 0 0 16px; }
 .intro h2.quiet {
   font-size: 16px;
@@ -571,11 +569,12 @@ li.quiet-row { cursor: default; }
   display: block;
   aspect-ratio: 1;
   border-radius: 50%;
-  background: var(--hair);
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--hair);
 }
-.heat-c.c1 { background: color-mix(in srgb, var(--lacquer) 35%, transparent); }
-.heat-c.c2 { background: color-mix(in srgb, var(--lacquer) 65%, transparent); }
-.heat-c.c3 { background: var(--lacquer); }
+.heat-c.c1 { background: color-mix(in srgb, var(--lacquer) 35%, transparent); box-shadow: none; }
+.heat-c.c2 { background: color-mix(in srgb, var(--lacquer) 65%, transparent); box-shadow: none; }
+.heat-c.c3 { background: var(--lacquer); box-shadow: none; }
 .heat-c.today { box-shadow: inset 0 0 0 1.5px var(--lacquer); }
 
 .mini-index { list-style: none; padding: 0; margin: 0 0 40px; }
@@ -679,7 +678,6 @@ li.quiet-row { cursor: default; }
   .wordmark { grid-column: 1; grid-row: 1; }
   .trail-end { justify-self: end; grid-column: 2; grid-row: 1; }
   .trail-mid { grid-column: 1 / -1; grid-row: 2; }
-  .app.in-session .trail-theme-sit { display: none; }
   .quiet-row, .yours-row {
     grid-template-columns: minmax(0, 1fr);
   }

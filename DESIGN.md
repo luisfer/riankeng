@@ -11,7 +11,7 @@ Visual world: **river primer**. A language book on paper, iron-gall ink, one lac
 | Token | Value | Use |
 |---|---|---|
 | `--paper` | `#f2ead8` | ground, text on lacquer |
-| `--lacquer` | `#9a2b1f` | the one commit key, heat high, top bar |
+| `--lacquer` | `#9a2b1f` | the one commit key, heat high, top bar. Same red at night. |
 | `--ink` | `#1c1710` | body, titles, input rule |
 | `--ink-2` | `#5a5146` | lede, quiet actions |
 | `--ink-3` | `#8a8074` | romanization, meta |
@@ -26,8 +26,8 @@ Never gray. Never gold-on-navy.
 - Scale: h1 32–44 / 300 · contents number 28 / 300 · prompt 20 · body 18 · meta 15. Numbers tabular.
 
 ## Components
-- `.trail`: three columns. Wordmark home, remaining count, Pause or Account. Hairline under.
-- `.contents-row`: contents of a primer. Number, title + rom, count or `soon`. The open level’s number is lacquer.
+- `.trail`: three columns. Wordmark home, remaining count, Pause or Account. Hairline under. Theme lives on Account, not in the trail.
+- `.contents-row`: contents of a primer. Number, title + rom, count or `soon`. Locked rows have a blank meta. The open level’s number is lacquer.
 - `.btn.commit`: 36×, radius 2px, lacquer on paper. One per screen. Continue is that key. Begin again is a text button.
 - `.text-btn`: ink-2 word, underline on hover. Hear, Slower, Pause, export.
 - `.answer-form`: field and Check share row 1. Popover and key strip span below.

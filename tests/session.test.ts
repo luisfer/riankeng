@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { entriesForLevel, getEntry } from '../content/index'
 import {
   afterHold,
+  afterMeet,
   canContinue,
   currentItem,
   markCorrect,
@@ -100,12 +101,35 @@ describe('startSession belongs to the opened level', () => {
 })
 
 describe('Voice 0 can listen and name tone', () => {
-  it('returns listen or tone for some Voice 0 salts', () => {
+  it('returns only th-en until the word has been seen', () => {
+    const entry = getEntry('w:maa')!
+    for (let i = 0; i < 40; i++) {
+      expect(chooseModality(entry, newItemProgress(entry.id), String(i))).toBe('th-en')
+    }
+  })
+
+  it('returns listen or tone for some Voice 0 salts after reps', () => {
     const entry = getEntry('w:maa')!
     const seen = new Set<string>()
-    for (let i = 0; i < 200; i++) seen.add(chooseModality(entry, newItemProgress(entry.id), String(i)))
+    const p = { ...newItemProgress(entry.id), reps: 2, stage: 2 }
+    for (let i = 0; i < 200; i++) seen.add(chooseModality(entry, p, String(i)))
     expect(seen.has('listen')).toBe(true)
     expect(seen.has('tone')).toBe(true)
     expect(seen.has('th-en')).toBe(true)
+  })
+})
+
+describe('meet then test', () => {
+  it('marks fresh cards as meet and flips the same id', () => {
+    const s = startSession(emptyDoc(), 1, 0, 'voice')
+    const first = currentItem(s)!
+    expect(first.meet).toBe(true)
+    expect(first.modality).toBe('th-en')
+    const next = afterMeet(s)
+    const same = currentItem(next)!
+    expect(same.id).toBe(first.id)
+    expect(same.meet).toBe(false)
+    expect(next.answered).toBe(0)
+    expect(next.cursor).toBe(0)
   })
 })

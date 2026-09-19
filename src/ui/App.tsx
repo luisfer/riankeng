@@ -24,7 +24,7 @@ import { emptyDoc, type ProgressDoc } from '@/storage/progress-schema'
 import { resetDoc } from '@/storage/import'
 import { onVoices } from '@/audio/tts'
 import { go, parseHash, type Route } from './hash'
-import { applyTheme, resolvedTheme } from './theme'
+import { applyTheme } from './theme'
 import { Account } from './Account'
 import { Alphabet } from './Alphabet'
 import { Glyphs } from './Glyphs'
@@ -154,7 +154,6 @@ export function App() {
   const scriptStatuses = allLevelStatus(doc, Date.now(), 'script')
   const yours = seenEntries(doc, 'voice')
   const accountLabel = doc.settings.name.trim() || 'Account'
-  const resolved = resolvedTheme(doc.settings.theme)
 
   const beginLevel = (n: number, track: TrackId) => {
     const list = track === 'script' ? scriptStatuses : voiceStatuses
@@ -187,13 +186,6 @@ export function App() {
     setSession(s)
   }
 
-  const flipTheme = () => {
-    setDoc((d) => ({
-      ...d,
-      settings: { ...d.settings, theme: resolvedTheme(d.settings.theme) === 'dark' ? 'light' : 'dark' },
-    }))
-  }
-
   const eraseDevice = () => {
     const next = resetDoc()
     persistOk.current = true
@@ -222,9 +214,6 @@ export function App() {
           remaining={inSession && session ? remaining(session) : undefined}
           correct={inSession && session ? session.correct : undefined}
           onPause={inSession || inIntro ? () => go({ name: 'journey' }) : undefined}
-          themeLabel={resolved === 'dark' ? 'Day' : 'Night'}
-          onTheme={flipTheme}
-          hideTheme={Boolean(inSession)}
           place={trailPlace}
         />
         {route.name === 'journey' && (

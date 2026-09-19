@@ -1,11 +1,36 @@
+import manifest from './clip-manifest.json'
+
 const cache = new Map<string, boolean>()
+const shipped = new Set(manifest.ids)
+
+/** Slash is a path and # is a URL fragment. Both become underscores on disk. */
+export function clipStem(id: string): string {
+  return id.replaceAll('/', '_').replaceAll('#', '_')
+}
 
 export function clipUrl(id: string): string {
-  return `/audio/${encodeURIComponent(id)}.mp3`
+  return `/audio/${encodeURI(clipStem(id))}.mp3`
 }
 
 export function clipCached(id: string): boolean | undefined {
   return cache.get(id)
+}
+
+export function setClipCached(id: string, ok: boolean): void {
+  cache.set(id, ok)
+}
+
+export function resetClipCacheForTests(): void {
+  cache.clear()
+}
+
+/** Try the mp3 unless we already know it is missing. */
+export function shouldTryClip(id: string): boolean {
+  return clipCached(id) !== false
+}
+
+export function hasShippedClip(id: string): boolean {
+  return shipped.has(id)
 }
 
 /** Vite's SPA fallback returns 200 text/html for missing files. That is not a clip. */

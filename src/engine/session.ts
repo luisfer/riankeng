@@ -1,5 +1,6 @@
 import { entriesForLevel, getEntry } from '@content/index'
 import type { TrackId } from '@content/types'
+import { hasShippedClip } from '@/audio/clips'
 import { detectVoice } from '@/audio/tts'
 import type { ProgressDoc } from '@/storage/progress-schema'
 import { chooseModality, currentLevel, dueIds, entryOrThrow, progressFor } from './scheduler'
@@ -44,12 +45,13 @@ export function startSession(doc: ProgressDoc, now = Date.now(), level?: number,
   const seen = new Set<string>()
   const newCap = Math.max(0, doc.settings.newPerSession)
 
-  const canHear = detectVoice().ready
+  const voiceReady = detectVoice().ready
   const push = (id: string) => {
     if (seen.has(id) || queue.length >= SESSION_SIZE) return
     seen.add(id)
     const entry = entryOrThrow(id)
     const progress = progressFor(doc, id)
+    const canHear = voiceReady || hasShippedClip(id)
     const item: QueueItem = { id, modality: chooseModality(entry, progress, salt, canHear), salt }
     if (progress.reps === 0) item.meet = true
     queue.push(item)
@@ -93,7 +95,7 @@ export function startReviewSession(
   track: TrackId = 'voice',
 ): LiveSession {
   const salt = String(now)
-  const canHear = detectVoice().ready
+  const voiceReady = detectVoice().ready
   const queue: QueueItem[] = []
   const seen = new Set<string>()
   for (const id of ids) {
@@ -105,7 +107,7 @@ export function startReviewSession(
     const progress = progressFor(doc, id)
     queue.push({
       id,
-      modality: chooseModality(entry, progress, salt, canHear),
+      modality: chooseModality(entry, progress, salt, voiceReady || hasShippedClip(id)),
       salt,
       meet: false,
     })

@@ -1,6 +1,6 @@
 import { LEVELS, SCRIPT_LEVELS } from '@content/index'
 import type { TrackId } from '@content/types'
-import type { LevelStatus } from '@/engine/scheduler'
+import { hereLevel, type LevelStatus } from '@/engine/scheduler'
 
 function TrackList(props: {
   title: string
@@ -10,6 +10,7 @@ function TrackList(props: {
   track: TrackId
   onOpen: (track: TrackId, n: number) => void
 }) {
+  const here = hereLevel(props.statuses)
   return (
     <section className="track-block">
       <h2>{props.title}</h2>
@@ -18,12 +19,14 @@ function TrackList(props: {
         {props.levels.map((lvl) => {
           const s = props.statuses[lvl.n]
           const locked = Boolean(s && s.total > 0 && !s.unlocked)
+          const at = here === lvl.n
           const meta = !s || s.total === 0 ? 'soon' : locked ? 'locked' : String(s.total)
           return (
             <li key={`${props.track}-${lvl.n}`}>
               <button
                 type="button"
-                className="contents-row"
+                className={at ? 'contents-row here' : 'contents-row'}
+                aria-current={at || undefined}
                 disabled={locked}
                 onClick={() => {
                   if (locked) return

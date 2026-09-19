@@ -1,6 +1,6 @@
 import { entriesForLevel, levelsFor } from '@content/index'
 import type { TrackId } from '@content/types'
-import { Commit } from './bits'
+import { Commit, TextBtn } from './bits'
 import { ToneCharts } from './ToneCharts'
 import { showParts, showThai } from './thai'
 
@@ -63,7 +63,9 @@ export function LevelIntro(props: {
             return (
               <li key={f}>
                 <span className={cls}>{showThai(lead)}</span>
-                {note && <span className="note thai-inline">{showThai(note)}</span>}
+                {note && (
+                  <span className={THAI.test(note) ? 'note thai-inline' : 'note'}>{showThai(note)}</span>
+                )}
               </li>
             )
           })}
@@ -107,7 +109,11 @@ export function LevelIntro(props: {
         ) : (
           <>
             {props.canContinue && props.onContinue && <Commit onClick={props.onContinue}>Continue</Commit>}
-            <Commit onClick={props.onStart}>{props.canContinue ? 'Begin again' : 'Begin'}</Commit>
+            {props.canContinue ? (
+              <TextBtn onClick={props.onStart}>Begin again</TextBtn>
+            ) : (
+              <Commit onClick={props.onStart}>Begin</Commit>
+            )}
           </>
         )}
       </div>

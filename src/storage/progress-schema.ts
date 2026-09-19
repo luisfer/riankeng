@@ -23,7 +23,7 @@ export const DEFAULT_SETTINGS: Settings = {
   autoplay: true,
   newPerSession: 8,
   name: '',
-  theme: 'system',
+  theme: 'light',
 }
 
 export interface SessionLog {

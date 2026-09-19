@@ -69,6 +69,15 @@ export function currentLevel(doc: ProgressDoc, now = Date.now(), track: TrackId 
   return levelsFor(track).length - 1
 }
 
+/** First unlocked, incomplete level that has cards. Null if the track is finished. */
+export function hereLevel(statuses: LevelStatus[]): number | null {
+  for (const s of statuses) {
+    if (s.total === 0) continue
+    if (s.unlocked && !s.complete) return s.n
+  }
+  return null
+}
+
 /** All due item ids on this track, most overdue first. */
 export function dueIds(doc: ProgressDoc, now = Date.now(), track: TrackId = 'voice'): string[] {
   const due: ItemProgress[] = []

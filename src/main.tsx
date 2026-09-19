@@ -12,7 +12,7 @@ try {
   const parsed = raw ? (JSON.parse(raw) as { settings?: { theme?: 'light' | 'dark' | 'system' } }) : null
   applyTheme(parsed?.settings?.theme)
 } catch {
-  applyTheme('system')
+  applyTheme('light')
 }
 
 createRoot(document.getElementById('root')!).render(

@@ -1,7 +1,7 @@
 export type ThemePref = 'light' | 'dark' | 'system'
 
 export function resolvedTheme(pref: ThemePref | undefined): 'light' | 'dark' {
-  const p = pref ?? 'system'
+  const p = pref ?? 'light'
   if (p === 'light' || p === 'dark') return p
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
 }

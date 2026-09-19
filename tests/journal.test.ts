@@ -3,7 +3,7 @@ import { activeDays, sittingSense, streak, todayStats } from '../src/engine/sche
 import { getEntry } from '../content/index'
 import { emptyDoc } from '../src/storage/progress-schema'
 import { newItemProgress } from '../src/engine/srs'
-import { lastWeeks } from '../src/ui/Account'
+import { heatMonthMarks, lastWeeks, localDayKey } from '../src/ui/Account'
 
 describe('journal from days', () => {
   it('keeps a mastered day after history has forgotten it', () => {
@@ -38,11 +38,20 @@ describe('journal from days', () => {
 
 describe('heatmap weeks', () => {
   it('lays out twelve Sunday-first weeks', () => {
-    const now = Date.UTC(2026, 8, 18, 12)
+    const now = new Date(2026, 8, 18, 12).getTime()
     const cells = lastWeeks(12, now)
     expect(cells).toHaveLength(84)
     const first = new Date(`${cells[0]}T00:00:00`)
     expect(first.getDay()).toBe(0)
+    expect(cells).toContain(localDayKey(now))
+  })
+
+  it('marks the first Sunday column of each month', () => {
+    const now = new Date(2026, 8, 18, 12).getTime()
+    const marks = heatMonthMarks(lastWeeks(12, now))
+    expect(marks).toHaveLength(12)
+    expect(marks.filter(Boolean).length).toBeGreaterThanOrEqual(2)
+    expect(marks.some((m) => m === 'Sep')).toBe(true)
   })
 })
 

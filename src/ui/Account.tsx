@@ -7,6 +7,14 @@ import { applyImport, parseExport, previewImport } from '@/storage/import'
 import { detectVoice } from '@/audio/tts'
 import { Commit, TextBtn } from './bits'
 
+const MONTH_WORD = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] as const
+
+export function localDayKey(now = Date.now()): string {
+  const day = new Date(now)
+  day.setHours(0, 0, 0, 0)
+  return `${day.getFullYear()}-${String(day.getMonth() + 1).padStart(2, '0')}-${String(day.getDate()).padStart(2, '0')}`
+}
+
 /** Twelve week columns, Sunday first, ending on this week. */
 export function lastWeeks(n: number, now = Date.now()): string[] {
   const out: string[] = []
@@ -15,11 +23,27 @@ export function lastWeeks(n: number, now = Date.now()): string[] {
   const start = new Date(today)
   start.setDate(start.getDate() - start.getDay() - (n - 1) * 7)
   for (let i = 0; i < n * 7; i++) {
-    const key = `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, '0')}-${String(start.getDate()).padStart(2, '0')}`
-    out.push(key)
+    out.push(localDayKey(start.getTime()))
     start.setDate(start.getDate() + 1)
   }
   return out
+}
+
+/** Quiet month word under the first Sunday column of each new month. */
+export function heatMonthMarks(keys: string[]): (string | null)[] {
+  const cols = Math.floor(keys.length / 7)
+  const marks: (string | null)[] = Array.from({ length: cols }, () => null)
+  let prev = ''
+  for (let col = 0; col < cols; col++) {
+    const key = keys[col * 7]
+    if (!key) continue
+    const month = key.slice(5, 7)
+    if (month === prev) continue
+    const n = Number(month)
+    marks[col] = MONTH_WORD[n - 1] ?? null
+    prev = month
+  }
+  return marks
 }
 
 export function Account(props: {
@@ -36,15 +60,32 @@ export function Account(props: {
   const [offlineReady, setOfflineReady] = useState(false)
   const days = activeDays(props.doc)
   const cells = lastWeeks(12)
+  const months = heatMonthMarks(cells)
+  const todayKey = localDayKey()
   const today = todayStats(props.doc)
   const s = streak(props.doc)
   const voice = detectVoice()
 
   useEffect(() => {
-    if (!('serviceWorker' in navigator)) return
-    void navigator.serviceWorker.getRegistration().then((reg) => {
-      setOfflineReady(Boolean(reg))
-    })
+    if (!('serviceWorker' in navigator)) {
+      setOfflineReady(import.meta.env.DEV)
+      return
+    }
+    let cancelled = false
+    const mark = () => {
+      if (!cancelled) setOfflineReady(true)
+    }
+    void navigator.serviceWorker.ready.then(mark)
+    navigator.serviceWorker.addEventListener('controllerchange', mark)
+    if (import.meta.env.DEV) {
+      void navigator.serviceWorker.getRegistration().then((reg) => {
+        if (!reg) mark()
+      })
+    }
+    return () => {
+      cancelled = true
+      navigator.serviceWorker.removeEventListener('controllerchange', mark)
+    }
   }, [])
 
   const set = <K extends keyof ProgressDoc['settings']>(key: K, value: ProgressDoc['settings'][K]) => {
@@ -60,12 +101,26 @@ export function Account(props: {
       </p>
       <p className="lede">{offlineReady ? 'Works offline.' : 'Needs the network to open.'}</p>
 
-      <div className="heat" aria-label="twelve week heatmap, Sunday first">
-        {cells.map((key) => {
-          const n = days.get(key) ?? 0
-          const band = n === 0 ? 0 : n < 4 ? 1 : n < 10 ? 2 : 3
-          return <span key={key} className={`heat-c c${band}`} title={`${key}, ${n}`} />
-        })}
+      <div className="heat-wrap">
+        <div className="heat" aria-label="twelve week heatmap, Sunday first">
+          {cells.map((key) => {
+            const n = days.get(key) ?? 0
+            const band = n === 0 ? 0 : n < 4 ? 1 : n < 10 ? 2 : 3
+            const todayCell = key === todayKey
+            return (
+              <span
+                key={key}
+                className={`heat-c c${band}${todayCell ? ' today' : ''}`}
+                title={`${key}, ${n}`}
+              />
+            )
+          })}
+        </div>
+        <div className="heat-months" aria-hidden>
+          {months.map((m, i) => (
+            <span key={`m-${i}`}>{m ?? ''}</span>
+          ))}
+        </div>
       </div>
       <p className="heat-legend">Each column is a week. Sunday at the top.</p>
 

@@ -38,7 +38,8 @@ body {
   margin: 0;
   color: var(--ink);
   font-family: var(--display);
-  font-optical-sizing: auto;
+  font-optical-sizing: none;
+  letter-spacing: 0.01em;
   font-size: 18px;
   line-height: 1.45;
   background-color: var(--paper);
@@ -50,7 +51,7 @@ body::before {
   top: 0;
   left: 0;
   right: 0;
-  height: 8px;
+  height: calc(8px + env(safe-area-inset-top, 0px));
   background: var(--lacquer);
   z-index: 4;
 }
@@ -58,10 +59,10 @@ button, input { font: inherit; color: inherit; }
 button { background: none; border: 0; padding: 0; cursor: pointer; }
 button:disabled { cursor: default; opacity: 0.4; }
 
-.app { min-height: 100vh; padding: 32px 24px 80px; }
+.app { min-height: 100vh; padding: calc(32px + env(safe-area-inset-top, 0px)) 24px calc(80px + env(safe-area-inset-bottom, 0px)); }
 .app.in-session {
   min-height: 100dvh;
-  padding: 28px 24px 36px;
+  padding: calc(28px + env(safe-area-inset-top, 0px)) 24px calc(36px + env(safe-area-inset-bottom, 0px));
   display: flex;
   flex-direction: column;
 }
@@ -71,7 +72,7 @@ button:disabled { cursor: default; opacity: 0.4; }
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 720px;
+  max-width: 560px;
   min-height: 0;
 }
 .app.in-session .trail {
@@ -161,6 +162,7 @@ button:disabled { cursor: default; opacity: 0.4; }
 
 h1 {
   font-weight: 300;
+  font-optical-sizing: auto;
   font-size: clamp(32px, 6vw, 44px);
   line-height: 1.15;
   margin: 0 0 16px;
@@ -214,9 +216,11 @@ h2 {
 .contents-n {
   font-size: 28px;
   font-weight: 300;
+  font-optical-sizing: auto;
   font-variant-numeric: tabular-nums;
   line-height: 1;
 }
+.contents-row.here .contents-n { color: var(--lacquer); }
 .contents-title { font-size: 20px; }
 .contents-rom {
   display: block;
@@ -265,7 +269,7 @@ h2 {
   margin-top: 2px;
   color: var(--ink-2);
   font-size: 16px;
-  font-family: var(--thai), var(--display);
+  font-family: var(--display);
 }
 .preview li { padding: 8px 0; border-bottom: 1px solid var(--hair); color: var(--ink-2); }
 .quiet-row {
@@ -407,8 +411,14 @@ li.quiet-row { cursor: default; }
 .prompt-en {
   font-size: 44px;
   font-weight: 300;
+  font-optical-sizing: auto;
   line-height: 1.15;
   margin: 0;
+}
+.prompt-listen {
+  margin: 0;
+  min-height: 1.15em;
+  font-size: 48px;
 }
 .prompt-rom {
   font-family: var(--phonetic);
@@ -422,7 +432,7 @@ li.quiet-row { cursor: default; }
   margin: 0;
 }
 .pick-rom { font-size: 22px; color: var(--ink-2); }
-.glyph-picks { display: flex; gap: 20px; flex-wrap: wrap; margin: 0; min-height: 7.25rem; align-items: end; }
+.glyph-picks { display: flex; gap: 20px; flex-wrap: wrap; margin: 0; align-items: end; }
 .glyph-pick {
   font-size: 40px;
   line-height: 1;
@@ -436,7 +446,7 @@ li.quiet-row { cursor: default; }
   margin: 0;
 }
 
-.tone-picks { display: flex; gap: 20px; flex-wrap: wrap; margin: 0; min-height: 7.25rem; align-items: end; }
+.tone-picks { display: flex; gap: 20px; flex-wrap: wrap; margin: 0; align-items: end; }
 .tone-word { color: var(--ink-2); text-underline-offset: 4px; }
 .tone-word:hover { color: var(--ink); text-decoration: underline; }
 
@@ -446,7 +456,6 @@ li.quiet-row { cursor: default; }
   column-gap: 16px;
   align-items: end;
   position: relative;
-  min-height: 7.25rem;
 }
 .roman { display: contents; }
 .roman-line { grid-column: 1; grid-row: 1; min-height: 48px; }
@@ -536,13 +545,22 @@ li.quiet-row { cursor: default; }
   .tone-chart-path { animation: none; transition: none; }
 }
 
+.heat-wrap { margin: 0 0 8px; }
 .heat {
   display: grid;
   grid-template-rows: repeat(7, minmax(0, 1fr));
   grid-auto-flow: column;
   grid-auto-columns: minmax(0, 1fr);
   gap: 6px;
-  margin: 0 0 8px;
+}
+.heat-months {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 6px;
+  margin-top: 6px;
+  color: var(--ink-3);
+  font-size: 13px;
 }
 .heat-legend {
   margin: 0 0 40px;
@@ -558,6 +576,7 @@ li.quiet-row { cursor: default; }
 .heat-c.c1 { background: color-mix(in srgb, var(--lacquer) 35%, transparent); }
 .heat-c.c2 { background: color-mix(in srgb, var(--lacquer) 65%, transparent); }
 .heat-c.c3 { background: var(--lacquer); }
+.heat-c.today { box-shadow: inset 0 0 0 1.5px var(--lacquer); }
 
 .mini-index { list-style: none; padding: 0; margin: 0 0 40px; }
 .mini-index li {
@@ -596,9 +615,7 @@ li.quiet-row { cursor: default; }
   margin: 0;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
-  gap: 1px;
-  background: var(--hair);
-  border: 1px solid var(--hair);
+  gap: 12px 16px;
 }
 .alpha-grid:empty { display: none; }
 .alpha-cell {
@@ -614,6 +631,7 @@ li.quiet-row { cursor: default; }
   color: var(--ink-3);
 }
 .alpha-cell:not(:disabled):hover .alpha-char { color: var(--lacquer); }
+.alpha-cell:disabled { opacity: 1; cursor: default; }
 .alpha-cell.seen { color: var(--ink); }
 .alpha-cell.seen .alpha-char { color: var(--lacquer); }
 .alpha-cell.retired .alpha-char { text-decoration: line-through; text-decoration-thickness: 1px; }
@@ -646,19 +664,21 @@ li.quiet-row { cursor: default; }
 ::selection { background: var(--lacquer); color: var(--paper); }
 
 @media (max-width: 520px) {
-  .app { padding: 28px 16px 64px; }
-  .app.in-session { padding: 24px 16px 28px; }
+  .app { padding: calc(28px + env(safe-area-inset-top, 0px)) 16px calc(64px + env(safe-area-inset-bottom, 0px)); }
+  .app.in-session { padding: calc(24px + env(safe-area-inset-top, 0px)) 16px calc(28px + env(safe-area-inset-bottom, 0px)); }
   .contents-n { font-size: 22px; }
   .prompt-en { font-size: 34px; }
-  .prompt-rom, .prompt-thai, .roman-field, .reveal { font-size: 28px; }
+  .prompt-rom, .prompt-thai, .prompt-listen, .roman-field, .reveal { font-size: 28px; }
   .tone-charts-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px 12px; }
   .tone-chart-name { font-size: 12px; }
   .tone-chart-rom { font-size: 15px; }
   .trail {
-    grid-template-columns: auto 1fr;
+    grid-template-columns: 1fr auto;
     row-gap: 8px;
   }
-  .trail-end { justify-self: end; grid-column: 2; }
+  .wordmark { grid-column: 1; grid-row: 1; }
+  .trail-end { justify-self: end; grid-column: 2; grid-row: 1; }
+  .trail-mid { grid-column: 1 / -1; grid-row: 2; }
   .app.in-session .trail-theme-sit { display: none; }
   .quiet-row, .yours-row {
     grid-template-columns: minmax(0, 1fr);

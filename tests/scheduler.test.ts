@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { entriesForLevel, getEntry } from '../content/index'
-import { allLevelStatus, chooseModality, pickChoices, seenEntries } from '../src/engine/scheduler'
+import { allLevelStatus, chooseModality, hereLevel, pickChoices, seenEntries, type LevelStatus } from '../src/engine/scheduler'
 import { newItemProgress, type ItemProgress } from '../src/engine/srs'
 import { emptyDoc } from '../src/storage/progress-schema'
 
@@ -76,5 +76,44 @@ describe('script unlock', () => {
     }
     const voice = allLevelStatus(doc, Date.now(), 'voice')
     expect(voice[1]!.unlocked).toBe(false)
+  })
+})
+
+function status(partial: Partial<LevelStatus> & Pick<LevelStatus, 'n'>): LevelStatus {
+  return {
+    total: 0,
+    seen: 0,
+    mastered: 0,
+    due: 0,
+    unlocked: true,
+    complete: false,
+    progress: 0,
+    ...partial,
+  }
+}
+
+describe('hereLevel', () => {
+  it('bookmarks Voice 0 on a fresh doc', () => {
+    const voice = allLevelStatus(emptyDoc(), Date.now(), 'voice')
+    expect(hereLevel(voice)).toBe(0)
+  })
+
+  it('skips empty soon levels and finished ones', () => {
+    expect(
+      hereLevel([
+        status({ n: 0, total: 2, seen: 2, mastered: 2, complete: true, progress: 1 }),
+        status({ n: 1, total: 0, unlocked: true }),
+        status({ n: 2, total: 3, unlocked: true }),
+      ]),
+    ).toBe(2)
+  })
+
+  it('is null when every authored level is complete', () => {
+    expect(
+      hereLevel([
+        status({ n: 0, total: 2, seen: 2, mastered: 2, complete: true, progress: 1 }),
+        status({ n: 1, total: 2, seen: 2, mastered: 2, complete: true, progress: 1 }),
+      ]),
+    ).toBeNull()
   })
 })

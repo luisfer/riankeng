@@ -1,6 +1,6 @@
 # riian gèng · design system
 
-Visual world: **river primer**. A language book on paper, iron-gall ink, one lacquer mark. Not a night-market app, not a dark SaaS shell. Direction taken from the shipped CSS in `src/styles.css`.
+Visual world: **river primer**. A language book on paper, iron-gall ink, one lacquer mark. Not a night-market app, not a dark SaaS shell. Paper (Day) is the default. Night is a choice. Direction taken from the shipped CSS in `src/styles.css`.
 
 ## Ground
 - Page: `#f2ead8` paper. No photograph, no blur, no glass.
@@ -20,15 +20,15 @@ Visual world: **river primer**. A language book on paper, iron-gall ink, one lac
 Never gray. Never gold-on-navy.
 
 ## Type
-- English UI: **Fraunces** 300–600, optical size on. Headings, wordmark (italic), prompts, buttons.
+- English UI: **Fraunces** 300–600. Optical size on headings and the big prompt. Body 18px, optical off, a hair of tracking. Headings, wordmark (italic), prompts, buttons.
 - Phonetic: **Charis SIL**. Answers, romanization, tone samples, glyph table.
 - Thai (when toggled): **Noto Serif Thai**.
 - Scale: h1 32–44 / 300 · contents number 28 / 300 · prompt 20 · body 18 · meta 15. Numbers tabular.
 
 ## Components
 - `.trail`: three columns. Wordmark home, remaining count, Pause or Account. Hairline under.
-- `.contents-row`: contents of a primer. Number, title + rom, count or `soon`.
-- `.btn.commit`: 36×, radius 2px, lacquer on paper. One per screen.
+- `.contents-row`: contents of a primer. Number, title + rom, count or `soon`. The open level’s number is lacquer.
+- `.btn.commit`: 36×, radius 2px, lacquer on paper. One per screen. Continue is that key. Begin again is a text button.
 - `.text-btn`: ink-2 word, underline on hover. Hear, Slower, Pause, export.
 - `.answer-form`: field and Check share row 1. Popover and key strip span below.
 - `.tone-word`: five words, underline on hover. Not chips.

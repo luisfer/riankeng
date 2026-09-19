@@ -177,7 +177,7 @@ export function SessionView(props: {
         </p>
       )
     }
-    if (item.modality === 'listen') return null
+    if (item.modality === 'listen') return <p className="prompt-listen" />
     if (item.modality === 'tone') {
       return props.doc.settings.thaiScript ? (
         <p className="prompt-thai thai">{showThai(entry.thai)}</p>
@@ -294,6 +294,7 @@ export function SessionView(props: {
           {prompt}
           <span className="prompt-tools">
             <TextBtn
+              current={listenLocked}
               onClick={() => {
                 setHeard(true)
                 if (ack?.text === 'Hear it first.') setAck(null)

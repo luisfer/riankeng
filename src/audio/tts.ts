@@ -1,4 +1,4 @@
-import { clipCached, clipUrl, prefetchClip } from './clips'
+import { clipCached, clipUrl, hasShippedClip, prefetchClip, setClipCached, shouldTryClip } from './clips'
 
 export interface VoiceInfo {
   ready: boolean
@@ -105,28 +105,33 @@ function speakNow(thai: string, rate: number, gesture: boolean): VoiceInfo {
   return { ready: true, name: voice?.name ?? 'th-TH', warning: null }
 }
 
+function playClip(thai: string, id: string, rate: number, gesture: boolean): VoiceInfo {
+  lastAudio?.pause()
+  const audio = new Audio(clipUrl(id))
+  audio.playbackRate = Math.min(1.2, Math.max(0.6, rate / 0.85))
+  lastAudio = audio
+  void audio.play().then(
+    () => {
+      unlocked = true
+      setClipCached(id, true)
+    },
+    () => {
+      setClipCached(id, false)
+      speakNow(thai, rate, gesture)
+    },
+  )
+  return { ready: true, name: 'clip', warning: null }
+}
+
 /** Speak immediately. Never await network; that drops the user-gesture. */
 export function speakThai(thai: string, id: string, rate = 0.85, opts: SpeakOpts = {}): VoiceInfo {
   const gesture = opts.gesture === true
   lastAudio?.pause()
-  prefetchClip(id)
-
-  if (clipCached(id) === true) {
-    const audio = new Audio(clipUrl(id))
-    audio.playbackRate = Math.min(1.2, Math.max(0.6, rate / 0.85))
-    lastAudio = audio
-    void audio.play().then(
-      () => {
-        unlocked = true
-      },
-      () => {
-        speakNow(thai, rate, gesture)
-      },
-    )
-    return { ready: true, name: 'clip', warning: null }
+  if (!shouldTryClip(id)) {
+    prefetchClip(id)
+    return speakNow(thai, rate, gesture)
   }
-
-  return speakNow(thai, rate, gesture)
+  return playClip(thai, id, rate, gesture)
 }
 
 /** Call from a click (Begin, Continue) so later autoplay may speak. */
@@ -155,7 +160,7 @@ export function resetSpeechForTests(): void {
 }
 
 export function canHearThai(id?: string): boolean {
-  if (id !== undefined && clipCached(id) === true) return true
+  if (id !== undefined && (clipCached(id) === true || hasShippedClip(id))) return true
   return detectVoice().ready
 }
 

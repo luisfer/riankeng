@@ -17,6 +17,7 @@ import { applyAttempt, type ItemProgress } from '@/engine/srs'
 import type { ProgressDoc } from '@/storage/progress-schema'
 import { entryOrThrow, pairRoms, pickChoices, sittingSense } from '@/engine/scheduler'
 import { judgeTonePick, toneSyllableShow } from '@/engine/tone-step'
+import { prefetchClip } from '@/audio/clips'
 import { canHearThai, onVoices, speakSlower, speakThai, speechUnlocked } from '@/audio/tts'
 import { RomanInput } from '@/input/RomanInput'
 import { Commit, TextBtn } from './bits'
@@ -51,6 +52,10 @@ export function SessionView(props: {
   }, [item?.id, item?.modality, item?.meet])
 
   useEffect(() => onVoices(() => setVoiceTick((n) => n + 1)), [])
+
+  useEffect(() => {
+    for (const q of props.session.queue) prefetchClip(q.id)
+  }, [props.session.queue])
 
   useEffect(() => {
     if (!item) return

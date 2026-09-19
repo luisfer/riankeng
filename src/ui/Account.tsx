@@ -180,6 +180,7 @@ export function Account(props: {
         <input type="range" min={0.5} max={1.2} step={0.05} value={props.doc.settings.audioRate} onChange={(e) => set('audioRate', Number(e.target.value))} />
       </label>
       <p className={voice.ready ? 'lede' : 'warn'}>{voice.ready ? `Thai voice: ${voice.name}` : voice.warning}</p>
+      <p className="lede">Hear uses recorded Thai when a clip exists. The Mac voice is a fallback and is bad at tones.</p>
 
       <h2>Progress file</h2>
       <p className="lede">JSON is the backup you can import. CSV is a table, not a backup.</p>

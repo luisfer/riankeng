@@ -6,5 +6,7 @@ dist
 .env
 .env.*
 !.env.example
-public/audio/*.mp3
 scripts/__pycache__
+public/audio/catalog.json
+public/audio/*.part.mp3
+public/audio/catalog.json

@@ -21,7 +21,7 @@ npx tsx scripts/validate-content.ts
 
 ## How a sitting works
 
-Type the answer. Paste is blocked. A correct card stays up with **Right.** until you hit Next. A miss keeps the grader’s reason on screen and makes you retype the target. **Begin** unlocks speech; cards play once when autoplay is on. **Hear** and **Slower** speak the Thai.
+Type the answer. Paste is blocked. A correct card stays up with **Right.** until you hit Next. A miss keeps the grader’s reason on screen and makes you retype the target. **Begin** unlocks speech; cards play once when autoplay is on. **Hear** and **Slower** play recorded Thai (Voice clips in `public/audio`). `npm run audio` rebuilds them.
 
 Voice unlocks the next level when the previous one is mastered. Script unlocks when every item on the previous level has been seen.
 

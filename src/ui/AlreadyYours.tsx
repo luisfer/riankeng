@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { Entry } from '@content/types'
+import { prefetchClip } from '@/audio/clips'
 import { speakThai } from '@/audio/tts'
 import { shuffleSeen } from '@/engine/scheduler'
 import { TextBtn } from './bits'
@@ -34,6 +35,10 @@ export function AlreadyYours(props: {
 }) {
   const [salt, setSalt] = useState('0')
   const rows = shuffleSeen(props.pool, salt, props.take)
+
+  useEffect(() => {
+    for (const e of rows) prefetchClip(e.id)
+  }, [salt, props.pool, props.take])
 
   return (
     <section className="track-block yours-block">

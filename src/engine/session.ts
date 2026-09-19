@@ -1,5 +1,6 @@
 import { entriesForLevel, getEntry } from '@content/index'
 import type { TrackId } from '@content/types'
+import { detectVoice } from '@/audio/tts'
 import type { ProgressDoc } from '@/storage/progress-schema'
 import { chooseModality, currentLevel, dueIds, entryOrThrow, progressFor } from './scheduler'
 import { isDue } from './srs'
@@ -28,6 +29,8 @@ export interface LiveSession {
   answered: number
   correct: number
   hold: Hold | null
+  /** Already-yours sitting. Pause still goes home; Continue on a level is off. */
+  review?: boolean
 }
 
 export const SESSION_SIZE = 16
@@ -41,12 +44,13 @@ export function startSession(doc: ProgressDoc, now = Date.now(), level?: number,
   const seen = new Set<string>()
   const newCap = Math.max(0, doc.settings.newPerSession)
 
+  const canHear = detectVoice().ready
   const push = (id: string) => {
     if (seen.has(id) || queue.length >= SESSION_SIZE) return
     seen.add(id)
     const entry = entryOrThrow(id)
     const progress = progressFor(doc, id)
-    const item: QueueItem = { id, modality: chooseModality(entry, progress, salt), salt }
+    const item: QueueItem = { id, modality: chooseModality(entry, progress, salt, canHear), salt }
     if (progress.reps === 0) item.meet = true
     queue.push(item)
   }
@@ -82,6 +86,43 @@ export function startSession(doc: ProgressDoc, now = Date.now(), level?: number,
   }
 }
 
+export function startReviewSession(
+  doc: ProgressDoc,
+  now: number,
+  ids: string[],
+  track: TrackId = 'voice',
+): LiveSession {
+  const salt = String(now)
+  const canHear = detectVoice().ready
+  const queue: QueueItem[] = []
+  const seen = new Set<string>()
+  for (const id of ids) {
+    if (queue.length >= SESSION_SIZE) break
+    if (seen.has(id)) continue
+    const entry = getEntry(id)
+    if (!entry) continue
+    seen.add(id)
+    const progress = progressFor(doc, id)
+    queue.push({
+      id,
+      modality: chooseModality(entry, progress, salt, canHear),
+      salt,
+      meet: false,
+    })
+  }
+  return {
+    startedAt: now,
+    level: 0,
+    track,
+    queue,
+    cursor: 0,
+    answered: 0,
+    correct: 0,
+    hold: null,
+    review: true,
+  }
+}
+
 export function normalizeSession(session: LiveSession): LiveSession {
   return {
     ...session,
@@ -92,6 +133,7 @@ export function normalizeSession(session: LiveSession): LiveSession {
 /** Unfinished sitting for this track and level, with every card still in the catalog. */
 export function canContinue(session: LiveSession | null, track: TrackId, level: number): session is LiveSession {
   if (!session) return false
+  if (session.review) return false
   if ((session.track ?? 'voice') !== track || session.level !== level) return false
   if (session.queue.length === 0 || session.cursor >= session.queue.length) return false
   return session.queue.every((q) => Boolean(getEntry(q.id)))

@@ -177,7 +177,7 @@ h2 {
 .yours-list { margin: 0 0 16px; }
 .yours-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) minmax(0, auto);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) minmax(0, auto) minmax(0, auto);
   justify-content: start;
   align-items: baseline;
 }

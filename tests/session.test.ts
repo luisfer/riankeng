@@ -10,6 +10,7 @@ import {
   markMissStay,
   requeueCurrent,
   SESSION_SIZE,
+  startReviewSession,
   startSession,
 } from '../src/engine/session'
 import { chooseModality } from '../src/engine/scheduler'
@@ -116,6 +117,21 @@ describe('Voice 0 can listen and name tone', () => {
     expect(seen.has('listen')).toBe(true)
     expect(seen.has('tone')).toBe(true)
     expect(seen.has('th-en')).toBe(true)
+  })
+})
+
+describe('review sitting', () => {
+  it('sits at most sixteen seen cards without a meet', () => {
+    const now = 9
+    const doc = emptyDoc(now)
+    const ids = entriesForLevel(0, 'voice').slice(0, 20).map((e) => e.id)
+    expect(ids.length).toBe(20)
+    for (const id of ids) doc.items[id] = dueItem(id, now)
+    const s = startReviewSession(doc, now, ids, 'voice')
+    expect(s.queue.length).toBe(SESSION_SIZE)
+    expect(s.queue.every((q) => q.meet === false)).toBe(true)
+    expect(s.review).toBe(true)
+    expect(canContinue(s, 'voice', 0)).toBe(false)
   })
 })
 

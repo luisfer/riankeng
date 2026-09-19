@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { entriesForLevel, getEntry } from '../content/index'
-import { allLevelStatus, chooseModality, hereLevel, pickChoices, seenEntries, type LevelStatus } from '../src/engine/scheduler'
+import { allLevelStatus, chooseModality, hereLevel, pairRoms, pickChoices, seenEntries, type LevelStatus } from '../src/engine/scheduler'
 import { newItemProgress, type ItemProgress } from '../src/engine/srs'
 import { emptyDoc } from '../src/storage/progress-schema'
 
@@ -39,6 +39,24 @@ describe('chooseModality', () => {
     const entry = getEntry('s:mɔɔ')!
     const m = chooseModality(entry, newItemProgress(entry.id), '1')
     expect(['pick', 'th-en', 'en-th']).toContain(m)
+  })
+
+  it('does not pick listen when the page cannot hear', () => {
+    const entry = getEntry('w:maa')!
+    const p = { ...newItemProgress(entry.id), reps: 2, stage: 2 }
+    for (let i = 0; i < 200; i++) {
+      expect(chooseModality(entry, p, String(i), false)).not.toBe('listen')
+    }
+  })
+})
+
+describe('pairRoms', () => {
+  it('puts máa and mǎa on the w:maa listen desk', () => {
+    const entry = getEntry('w:maa')!
+    const roms = pairRoms(entry)
+    expect(roms).toContain('maa')
+    expect(roms).toContain('máa')
+    expect(roms).toContain('mǎa')
   })
 })
 

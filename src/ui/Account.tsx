@@ -171,6 +171,10 @@ export function Account(props: {
         <input type="checkbox" checked={props.doc.settings.thaiScript} onChange={(e) => set('thaiScript', e.target.checked)} />
         Show Thai script
       </label>
+      <label className="check">
+        <input type="checkbox" checked={props.doc.settings.autoplay} onChange={(e) => set('autoplay', e.target.checked)} />
+        Play each card when it appears
+      </label>
       <label className="field">
         <span>Hear rate {props.doc.settings.audioRate.toFixed(2)}</span>
         <input type="range" min={0.5} max={1.2} step={0.05} value={props.doc.settings.audioRate} onChange={(e) => set('audioRate', Number(e.target.value))} />

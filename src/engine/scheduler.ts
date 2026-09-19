@@ -202,7 +202,7 @@ export function sittingSense(entry: Entry, modality: Modality): string | null {
  * in recognition, sprouts are forced to produce, flowers and ripe items get
  * everything, weighted towards production and dictation.
  */
-export function chooseModality(entry: Entry, p: ItemProgress, salt: string): Modality {
+export function chooseModality(entry: Entry, p: ItemProgress, salt: string, canHear = true): Modality {
   const r = hash(entry.id + salt)
   if (entryTrack(entry) === 'script') {
     if (entry.thai === 'ไหม' && /silk/i.test(entry.en[0] ?? '')) return 'pick'
@@ -212,16 +212,33 @@ export function chooseModality(entry: Entry, p: ItemProgress, salt: string): Mod
     return 'en-th'
   }
   if (p.reps === 0 || p.stage <= 0) return 'th-en'
+  let next: Modality
   if (entry.level === 0) {
-    if (r < 0.3) return 'th-en'
-    if (r < 0.55) return 'en-th'
-    if (r < 0.8) return 'listen'
-    return 'tone'
+    if (canHear && entry.minimalPairOf?.length) {
+      if (r < 0.5) next = 'listen'
+      else if (r < 0.65) next = 'th-en'
+      else if (r < 0.8) next = 'en-th'
+      else next = 'tone'
+    } else if (r < 0.3) next = 'th-en'
+    else if (r < 0.55) next = 'en-th'
+    else if (r < 0.8) next = 'listen'
+    else next = 'tone'
+  } else if (r < 0.35) next = 'th-en'
+  else if (r < 0.7) next = 'en-th'
+  else if (r < 0.85) next = 'listen'
+  else next = 'tone'
+  if (next === 'listen' && !canHear) return 'tone'
+  return next
+}
+
+/** This word’s rom plus the authored siblings, shuffled so the answer is not first. */
+export function pairRoms(entry: Entry): string[] {
+  const roms = [entry.rom]
+  for (const id of entry.minimalPairOf ?? []) {
+    const other = getEntry(id)
+    if (other && !roms.includes(other.rom)) roms.push(other.rom)
   }
-  if (r < 0.35) return 'th-en'
-  if (r < 0.7) return 'en-th'
-  if (r < 0.85) return 'listen'
-  return 'tone'
+  return roms.sort((a, b) => hash(entry.id + ':pair:' + a) - hash(entry.id + ':pair:' + b))
 }
 
 export function entryOrThrow(id: string): Entry {

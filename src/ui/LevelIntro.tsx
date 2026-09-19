@@ -1,5 +1,6 @@
 import { entriesForLevel, levelsFor } from '@content/index'
 import type { TrackId } from '@content/types'
+import { unlockSpeech } from '@/audio/tts'
 import { Commit, TextBtn } from './bits'
 import { ToneCharts } from './ToneCharts'
 import { showParts, showThai } from './thai'
@@ -108,11 +109,34 @@ export function LevelIntro(props: {
           <p className="warn">This level is not authored yet.</p>
         ) : (
           <>
-            {props.canContinue && props.onContinue && <Commit onClick={props.onContinue}>Continue</Commit>}
+            {props.canContinue && props.onContinue && (
+              <Commit
+                onClick={() => {
+                  unlockSpeech()
+                  props.onContinue?.()
+                }}
+              >
+                Continue
+              </Commit>
+            )}
             {props.canContinue ? (
-              <TextBtn onClick={props.onStart}>Begin again</TextBtn>
+              <TextBtn
+                onClick={() => {
+                  unlockSpeech()
+                  props.onStart()
+                }}
+              >
+                Begin again
+              </TextBtn>
             ) : (
-              <Commit onClick={props.onStart}>Begin</Commit>
+              <Commit
+                onClick={() => {
+                  unlockSpeech()
+                  props.onStart()
+                }}
+              >
+                Begin
+              </Commit>
             )}
           </>
         )}

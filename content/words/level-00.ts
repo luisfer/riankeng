@@ -24,7 +24,7 @@ const rows = words(0, [
   // ── yaa family
   ['yaa', 'ยา', ['medicine', 'drug', 'medication'], 'n', ['tone-mid', 'pair-yaa']],
   ['yàa', 'อย่า', ["don't", 'do not'], 'adv', ['tone-low', 'pair-yaa']],
-  ['yâa', 'ย่า', ['grandmother', '(paternal) grandmother', "father's mother"], 'n', ['tone-falling', 'pair-yaa']],
+  ['yâa', 'ย้า', ['grandmother', '(paternal) grandmother', "father's mother"], 'n', ['tone-falling', 'pair-yaa']],
   // ── glai / glâi
   ['glai', 'ไกล', ['far', 'far away'], 'adj', ['tone-mid', 'pair-glai']],
   ['glâi', 'ใกล้', ['near', 'close', 'nearby'], 'adj', ['tone-falling', 'pair-glai']],

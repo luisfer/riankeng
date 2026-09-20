@@ -57,6 +57,11 @@ export function emptyDoc(now = Date.now()): ProgressDoc {
   }
 }
 
+/** Stamp memory so another tab cannot clobber with an older updatedAt. */
+export function stampDoc(doc: ProgressDoc, now = Date.now()): ProgressDoc {
+  return { ...doc, updatedAt: now }
+}
+
 /**
  * A hand-written JSON Schema (draft 2020-12) for the export file. Kept in the
  * repo so other tools can validate riankeng-progress-v1.json files.

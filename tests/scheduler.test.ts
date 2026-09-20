@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { entriesForLevel, getEntry } from '../content/index'
-import { allLevelStatus, chooseModality, hereLevel, pairRoms, pickChoices, reviewEntries, seenEntries, type LevelStatus } from '../src/engine/scheduler'
-import { newItemProgress, type ItemProgress } from '../src/engine/srs'
+import { allLevelStatus, chooseModality, fromVoiceKnown, hereLevel, pairRoms, pickChoices, reviewEntries, seenEntries, unlockCount, type LevelStatus } from '../src/engine/scheduler'
+import { applyMeet, newItemProgress, type ItemProgress } from '../src/engine/srs'
 import { emptyDoc } from '../src/storage/progress-schema'
 
 function withReps(id: string, reps = 1): ItemProgress {
@@ -135,6 +135,31 @@ describe('script unlock', () => {
     }
     const voice = allLevelStatus(doc, Date.now(), 'voice')
     expect(voice[1]!.unlocked).toBe(false)
+  })
+
+  it('keeps Voice 1 locked and the pie at 0 after fifty Looks and no correct answers', () => {
+    const now = 1_700_000_000_000
+    const doc = emptyDoc(now)
+    const level0 = entriesForLevel(0, 'voice')
+    expect(level0.length).toBe(50)
+    for (const e of level0) doc.items[e.id] = applyMeet(newItemProgress(e.id), now)
+    const voice = allLevelStatus(doc, now, 'voice')
+    expect(voice[0]!.seen).toBe(0)
+    expect(voice[0]!.mastered).toBe(0)
+    expect(unlockCount(voice[0]!, 'voice')).toBe(0)
+    expect(voice[1]!.unlocked).toBe(false)
+  })
+})
+
+describe('fromVoiceKnown', () => {
+  it('is false until the Voice twin has a scored rep', () => {
+    const entry = getEntry('s:yâa')!
+    const doc = emptyDoc()
+    expect(fromVoiceKnown(doc, entry)).toBe(false)
+    doc.items['w:yâa'] = { ...newItemProgress('w:yâa'), lastSeen: 1 }
+    expect(fromVoiceKnown(doc, entry)).toBe(false)
+    doc.items['w:yâa'] = withReps('w:yâa')
+    expect(fromVoiceKnown(doc, entry)).toBe(true)
   })
 })
 

@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
-import { allLevelStatus, reviewEntries } from '@/engine/scheduler'
+import { allLevelStatus, reviewEntries, unlockCount } from '@/engine/scheduler'
 import {
   canContinue,
   canResumeReview,
   isFinished,
   normalizeSession,
+  pauseSession,
   remaining,
   sessionStillValid,
   startReviewSession,
@@ -22,7 +23,7 @@ import {
   saveSession,
   TAB_CHANNEL,
 } from '@/storage/db'
-import { emptyDoc, type ProgressDoc } from '@/storage/progress-schema'
+import { emptyDoc, stampDoc, type ProgressDoc } from '@/storage/progress-schema'
 import { resetDoc } from '@/storage/import'
 import { onVoices } from '@/audio/tts'
 import { go, parseHash, replace, type Route } from './hash'
@@ -55,7 +56,7 @@ export function App() {
   }, [])
 
   useEffect(() => {
-    if (loadState === 'pending') return
+    if (loadState !== 'ready') return
     if (route.name !== 'session') return
     if (session && !isFinished(session)) return
     replace({ name: 'journey' })
@@ -65,28 +66,21 @@ export function App() {
     let alive = true
     void (async () => {
       const result = await loadDoc()
+      const stored = await loadSession()
       if (!alive) return
-      if (result.status === 'timeout' || result.status === 'failed') {
-        if (result.doc) {
-          setDoc(result.doc)
-          hydratedSnapshot.current = result.doc
-          persistOk.current = true
-          setLoadState('ready')
-        } else {
-          persistOk.current = false
-          setLoadState('failed')
-        }
-      } else {
-        setDoc(result.doc)
-        hydratedSnapshot.current = result.doc
-        persistOk.current = true
-        setLoadState('ready')
+      const live = stored ? normalizeSession(stored) : null
+      if ((result.status === 'timeout' || result.status === 'failed') && !result.doc) {
+        persistOk.current = false
+        setSession(null)
+        setLoadState('failed')
+        return
       }
-      const s = await loadSession()
-      if (!alive) return
-      const live = s ? normalizeSession(s) : null
-      const base = result.doc ?? emptyDoc()
-      setSession(live && sessionStillValid(live, base.createdAt) ? live : null)
+      const nextDoc = result.doc ?? emptyDoc()
+      setDoc(nextDoc)
+      hydratedSnapshot.current = nextDoc
+      persistOk.current = true
+      setSession(live && sessionStillValid(live, nextDoc.createdAt) ? live : null)
+      setLoadState('ready')
     })()
     return () => {
       alive = false
@@ -178,22 +172,26 @@ export function App() {
     go(next.queue.length ? { name: 'session' } : { name: 'review' })
   }
 
+  const commitDoc = (next: ProgressDoc) => setDoc(stampDoc(next))
+
   const onSession = (s: LiveSession) => {
     if (isFinished(s) && s.answered > 0) {
-      setDoc((d) => ({
-        ...d,
-        sessions: [
-          ...d.sessions,
-          {
-            startedAt: s.startedAt,
-            endedAt: Date.now(),
-            level: s.level,
-            track: s.track ?? 'voice',
-            answered: s.answered,
-            correct: s.correct,
-          },
-        ],
-      }))
+      setDoc((d) =>
+        stampDoc({
+          ...d,
+          sessions: [
+            ...d.sessions,
+            {
+              startedAt: s.startedAt,
+              endedAt: Date.now(),
+              level: s.level,
+              track: s.track ?? 'voice',
+              answered: s.answered,
+              correct: s.correct,
+            },
+          ],
+        }),
+      )
       setSession(null)
       go({ name: 'journey' })
       return
@@ -233,24 +231,43 @@ export function App() {
       : inIntro && route.name === 'intro'
         ? (route.track === 'script' ? scriptStatuses : voiceStatuses)[route.n]
         : undefined
+  const lessonMeter =
+    lessonStatus && trailTrack ? unlockCount(lessonStatus, trailTrack) : undefined
+
+  const leaveSitting = () => {
+    if (inSession && session) {
+      const next = pauseSession(session)
+      if (next !== session) {
+        onSession(next)
+        if (isFinished(next)) return
+      }
+    }
+    go({ name: 'journey' })
+  }
 
   return (
     <div className={`app${inSession ? ' in-session' : ''}`}>
       <div className="shell">
         <Trail
-          onHome={() => go({ name: 'journey' })}
+          onHome={inSession ? leaveSitting : () => go({ name: 'journey' })}
           accountLabel={accountLabel}
-          onAccount={!inSession && !inIntro ? () => go({ name: 'account' }) : undefined}
+          onAccount={!inSession && !inIntro && loadState === 'ready' ? () => go({ name: 'account' }) : undefined}
           track={trailTrack}
           level={trailLevel}
           remaining={inSession && session ? remaining(session) : undefined}
           correct={inSession && session ? session.correct : undefined}
-          lessonSeen={lessonStatus?.seen}
+          lessonSeen={lessonMeter}
           lessonTotal={lessonStatus?.total}
-          onPause={inSession || inIntro ? () => go({ name: 'journey' }) : undefined}
+          onPause={inSession || inIntro ? leaveSitting : undefined}
           place={trailPlace}
         />
-        {route.name === 'journey' && (
+        {loadState === 'pending' && <main className="page" />}
+        {loadState === 'failed' && (
+          <main className="page">
+            <p className="lede">Progress did not load.</p>
+          </main>
+        )}
+        {loadState === 'ready' && route.name === 'journey' && (
           <Journey
             voice={voiceStatuses}
             script={scriptStatuses}
@@ -263,7 +280,7 @@ export function App() {
             onAlphabet={() => go({ name: 'alphabet' })}
           />
         )}
-        {route.name === 'review' && (
+        {loadState === 'ready' && route.name === 'review' && (
           <ReviewPage
             pool={yours}
             audioRate={doc.settings.audioRate}
@@ -272,7 +289,7 @@ export function App() {
             onResume={() => go({ name: 'session' })}
           />
         )}
-        {route.name === 'alphabet' && (
+        {loadState === 'ready' && route.name === 'alphabet' && (
           <Alphabet
             doc={doc}
             unlocked={(n) => {
@@ -286,7 +303,7 @@ export function App() {
             }}
           />
         )}
-        {route.name === 'intro' && (
+        {loadState === 'ready' && route.name === 'intro' && (
           <LevelIntro
             n={route.n}
             track={route.track}
@@ -295,24 +312,27 @@ export function App() {
                 !(route.track === 'script' ? scriptStatuses : voiceStatuses)[route.n]!.unlocked,
             )}
             canContinue={canContinue(session, route.track, route.n)}
-            seen={lessonStatus?.seen}
+            meter={lessonMeter}
+            touched={lessonStatus?.seen}
             total={lessonStatus?.total}
             onStart={() => beginLevel(route.n, route.track)}
             onContinue={() => go({ name: 'session' })}
           />
         )}
-        {route.name === 'session' && session && <SessionView doc={doc} session={session} onDoc={setDoc} onSession={onSession} />}
-        {route.name === 'account' && (
+        {loadState === 'ready' && route.name === 'session' && session && (
+          <SessionView doc={doc} session={session} onDoc={commitDoc} onSession={onSession} />
+        )}
+        {loadState === 'ready' && route.name === 'account' && (
           <Account
             doc={doc}
             voice={voiceStatuses}
             script={scriptStatuses}
-            onDoc={setDoc}
+            onDoc={commitDoc}
             onGlyphs={() => go({ name: 'glyphs' })}
             onReset={eraseDevice}
           />
         )}
-        {route.name === 'glyphs' && <Glyphs />}
+        {loadState === 'ready' && route.name === 'glyphs' && <Glyphs />}
       </div>
     </div>
   )

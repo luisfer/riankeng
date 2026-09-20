@@ -97,10 +97,9 @@ export function applyAttempt(p: ItemProgress, attempt: Attempt): ItemProgress {
   }
 }
 
-/** Teach face: the word is seen, but this is not a scored rep. */
+/** Teach face: remember the Look. This is not a scored rep. */
 export function applyMeet(p: ItemProgress, t: number): ItemProgress {
-  if (p.reps > 0) return { ...p, lastSeen: t }
-  return { ...p, reps: 1, lastSeen: t, due: t }
+  return { ...p, lastSeen: t }
 }
 
 export function isDue(p: ItemProgress, now: number): boolean {

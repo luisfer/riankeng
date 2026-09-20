@@ -68,7 +68,7 @@ const SYNONYM_ROWS: string[][] = [
   ['pretty', 'beautiful', 'lovely', 'gorgeous'],
   ['fast', 'quick', 'quickly', 'fastly'],
   ['slow', 'slowly'],
-  ['tired', 'exhausted', 'sleepy'],
+  ['tired', 'exhausted'],
   ['sick', 'ill', 'unwell'],
   ['hi', 'hello', 'hey'],
   ['bye', 'goodbye'],
@@ -84,7 +84,7 @@ const SYNONYM_ROWS: string[][] = [
   ['kids', 'children'],
   ['friend', 'mate', 'buddy', 'pal'],
   ['boyfriend', 'girlfriend', 'partner'],
-  ['husband', 'wife', 'spouse'],
+  ['husband', 'hubby'],
   ['begin', 'start'],
   ['finish', 'end', 'done'],
   ['want', 'wanna'],
@@ -180,12 +180,20 @@ function stem(w: string): string {
   return w
 }
 
+function fuzzyPair(a: string, b: string): string {
+  return a < b ? `${a}|${b}` : `${b}|${a}`
+}
+
+/** Near-misses that are different English words, not typos. */
+const FUZZY_BLOCK = new Set(['horse|house', 'eight|right'])
+
 export function tokensMatch(a: string, b: string): boolean {
   if (a === b) return true
   if (stem(a) === stem(b)) return true
   const sa = SYNONYM_ID.get(a)
   const sb = SYNONYM_ID.get(b)
   if (sa !== undefined && sa === sb) return true
+  if (FUZZY_BLOCK.has(fuzzyPair(a, b))) return false
   const len = Math.min(a.length, b.length)
   if (len >= 5 && editDistance(a, b) <= 1) return true
   if (len >= 8 && editDistance(a, b) <= 2) return true

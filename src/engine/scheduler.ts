@@ -16,8 +16,13 @@ export interface LevelStatus {
   unlocked: boolean
   /** Every item mastered. */
   complete: boolean
-  /** Proportion 0–1 of items at stage ≥ 1. */
+  /** Proportion 0–1 of scored items. Look does not count. */
   progress: number
+}
+
+/** The count that unlocks the next level: mastery on Voice, one correct on Script. */
+export function unlockCount(s: LevelStatus, track: TrackId): number {
+  return track === 'script' ? s.passed : s.mastered
 }
 
 export function progressFor(doc: ProgressDoc, id: string): ItemProgress {
@@ -275,6 +280,16 @@ export function entryOrThrow(id: string): Entry {
   const e = getEntry(id)
   if (!e) throw new Error(`Unknown entry ${id}`)
   return e
+}
+
+/** Script “from Voice” only after a scored attempt on the linked Voice card. */
+export function fromVoiceKnown(doc: ProgressDoc, entry: Entry): boolean {
+  for (const tag of entry.tags) {
+    if (!tag.startsWith('voice:')) continue
+    const id = tag.slice('voice:'.length)
+    if ((doc.items[id]?.reps ?? 0) > 0) return true
+  }
+  return false
 }
 
 const LONE_TONE_MARK = /^[่้๊๋]$/

@@ -96,6 +96,18 @@ describe('content', () => {
     expect(pet.en).not.toContain('too spicy')
   })
 
+  it('writes ย่า with mai tho on Voice 0 and Script 6', () => {
+    const voice = getEntry('w:yâa')!
+    const script = getEntry('s:yâa')!
+    const maiTho = '\u0E49'
+    const maiEk = '\u0E48'
+    expect(voice.thai).toBe(`ย${maiTho}า`)
+    expect(script.thai).toBe(`ย${maiTho}า`)
+    expect(script.compose).toEqual(['ย', maiTho, 'า'])
+    expect(script.compose?.join('')).not.toContain(maiEk)
+    expect(gradeThai(voice.rom, 'yâa').verdict).toBe('exact')
+  })
+
   it('every script bridge points at a voice word and spells it the same', () => {
     for (const e of ENTRIES.filter((e) => e.track === 'script')) {
       const link = e.tags.find((t) => t.startsWith('voice:'))

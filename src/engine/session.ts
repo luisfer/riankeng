@@ -12,6 +12,8 @@ export interface QueueItem {
   salt: string
   /** Unseen cards show both sides once before the test. Missing on older sittings. */
   meet?: boolean
+  /** This sitting already recorded a Check for this card. */
+  scored?: boolean
 }
 
 /**
@@ -32,6 +34,8 @@ export interface LiveSession {
   hold: Hold | null
   /** Already-yours sitting. Pause still goes home; Continue on a level is off. */
   review?: boolean
+  /** Last Check on the current card, so resume and Pause know the verdict. */
+  pending?: { ok: boolean; text: string }
 }
 
 export const SESSION_SIZE = 16
@@ -184,7 +188,27 @@ export function markCorrect(session: LiveSession): LiveSession {
     answered: session.answered + 1,
     correct: session.correct + 1,
     hold: null,
+    pending: undefined,
   }
+}
+
+/** Persist the Check so a second Check is ignored and Pause can advance. */
+export function markScored(session: LiveSession, pending: { ok: boolean; text: string }): LiveSession {
+  const item = currentItem(session)
+  if (!item || item.scored || session.pending) return session
+  const queue = session.queue.map((q, i) => (i === session.cursor ? { ...q, scored: true } : q))
+  return { ...session, queue, pending }
+}
+
+export function alreadyScored(session: LiveSession): boolean {
+  const item = currentItem(session)
+  return Boolean(item?.scored || session.pending)
+}
+
+/** Pause after a correct Check is Next, so resume is not the same card. */
+export function pauseSession(session: LiveSession): LiveSession {
+  if (!session.pending?.ok) return session
+  return markCorrect({ ...session, pending: undefined })
 }
 
 /** Missed a typed card: stay on it and force a retype. */
@@ -211,13 +235,14 @@ export function afterHold(session: LiveSession): LiveSession {
 
 export function requeueCurrent(session: LiveSession): LiveSession {
   const item = currentItem(session)
-  if (!item) return { ...session, hold: null }
+  if (!item) return { ...session, hold: null, pending: undefined }
   const rest = session.queue.slice(session.cursor + 1)
   return {
     ...session,
     queue: [...rest, item],
     cursor: 0,
     hold: null,
+    pending: undefined,
   }
 }
 

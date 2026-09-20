@@ -31,8 +31,11 @@ export function LevelIntro(props: {
   track: TrackId
   locked?: boolean
   canContinue?: boolean
-  seen?: number
+  /** Unlock meter: Voice mastered, Script passed. */
+  meter?: number
   total?: number
+  /** Scored attempts. Sit again and the quiet seen line use this. */
+  touched?: number
   onStart: () => void
   onContinue?: () => void
 }) {
@@ -59,11 +62,16 @@ export function LevelIntro(props: {
       {typeof props.total === 'number' && props.total > 0 && (
         <p className="lesson-progress">
           <QuietPie
-            value={lessonRatio(props.seen ?? 0, props.total)}
-            label={`${props.seen ?? 0} of ${props.total} in this lesson`}
+            value={lessonRatio(props.meter ?? 0, props.total)}
+            label={`${props.meter ?? 0} of ${props.total} in this lesson`}
           />
           <span>
-            {props.seen ?? 0} of {props.total}
+            <span>
+              {props.meter ?? 0} of {props.total}
+            </span>
+            {(props.touched ?? 0) > (props.meter ?? 0) && (
+              <span className="contents-rom">{props.touched} seen</span>
+            )}
           </span>
         </p>
       )}
@@ -118,7 +126,7 @@ export function LevelIntro(props: {
       <div className="intro-actions">
         {props.locked ? (
           <p className="warn">
-            {props.track === 'voice' ? 'Master the previous level first.' : 'Get every letter on the previous level right first.'}
+            {props.track === 'voice' ? 'Master the previous level first.' : 'Get every card on the previous level right first.'}
           </p>
         ) : empty ? (
           <p className="warn">This level is not authored yet.</p>
@@ -150,7 +158,7 @@ export function LevelIntro(props: {
                   props.onStart()
                 }}
               >
-                {startLabel(props.seen ?? 0, false)}
+                {startLabel(props.touched ?? 0, false)}
               </Commit>
             )}
           </>

@@ -3,12 +3,15 @@ import { entriesForLevel, getEntry } from '../content/index'
 import {
   afterHold,
   afterMeet,
+  alreadyScored,
   canContinue,
   canResumeReview,
   currentItem,
   markCorrect,
   markMissMove,
   markMissStay,
+  markScored,
+  pauseSession,
   requeueCurrent,
   REVIEW_TAIL,
   SESSION_SIZE,
@@ -18,6 +21,7 @@ import {
 import { chooseModality } from '../src/engine/scheduler'
 import { emptyDoc } from '../src/storage/progress-schema'
 import { newItemProgress, type ItemProgress } from '../src/engine/srs'
+import { pickPrompt } from '../src/ui/Session'
 
 describe('session transitions', () => {
   it('markCorrect advances and scores', () => {
@@ -138,6 +142,32 @@ describe('review sitting', () => {
   })
 })
 
+describe('check once', () => {
+  it('ignores a second Check and Pause after a correct Check advances', () => {
+    const s = startSession(emptyDoc(), 1, 0, 'voice')
+    const scored = markScored(s, { ok: true, text: 'Right.' })
+    expect(alreadyScored(scored)).toBe(true)
+    expect(currentItem(scored)!.scored).toBe(true)
+    const again = markScored(scored, { ok: false, text: 'again' })
+    expect(again.pending).toEqual({ ok: true, text: 'Right.' })
+    const paused = pauseSession(scored)
+    expect(paused.cursor).toBe(s.cursor + 1)
+    expect(paused.correct).toBe(1)
+    expect(paused.pending).toBeUndefined()
+    expect(currentItem(paused)?.id).not.toBe(currentItem(s)!.id)
+  })
+
+  it('does not apply a second miss on Pause after a wrong Check', () => {
+    const s = startSession(emptyDoc(), 1, 0, 'voice')
+    const missed = markMissMove(markScored(s, { ok: false, text: 'No.' }))
+    expect(missed.answered).toBe(1)
+    const paused = pauseSession(missed)
+    expect(paused.answered).toBe(1)
+    expect(paused.cursor).toBe(s.cursor)
+    expect(paused.pending?.ok).toBe(false)
+  })
+})
+
 describe('meet then test', () => {
   it('sends the test later in the sitting so it is not an echo', () => {
     const s = startSession(emptyDoc(), 1, 0, 'voice')
@@ -174,5 +204,15 @@ describe('startSession leftover', () => {
     const s = startSession(doc, now, 4, 'voice')
     const earlyIds = new Set(early.map((e) => e.id))
     expect(s.queue.filter((q) => earlyIds.has(q.id)).length).toBe(REVIEW_TAIL)
+  })
+})
+
+describe('pick prompt', () => {
+  it('is the English gloss only, with no rom', () => {
+    const silk = getEntry('s:mǎi')!
+    const prompt = pickPrompt(silk)
+    expect(prompt).toBe('silk')
+    expect(prompt).not.toMatch(/mǎi/)
+    expect(prompt).not.toMatch(silk.rom)
   })
 })

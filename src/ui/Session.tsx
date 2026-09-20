@@ -6,16 +6,19 @@ import { analyseRom } from '@/engine/normalize'
 import {
   afterHold,
   afterMeet,
+  alreadyScored,
   currentItem,
   markCorrect,
   markMissMove,
   markMissStay,
+  markScored,
   requeueCurrent,
+  type Hold,
   type LiveSession,
 } from '@/engine/session'
 import { applyAttempt, applyMeet, type ItemProgress } from '@/engine/srs'
 import type { ProgressDoc } from '@/storage/progress-schema'
-import { entryOrThrow, pairRoms, pickChoices, sittingSense } from '@/engine/scheduler'
+import { entryOrThrow, fromVoiceKnown, pairRoms, pickChoices, sittingSense } from '@/engine/scheduler'
 import { entryTrack } from '@content/index'
 import { judgeTonePick, toneBareShow } from '@/engine/tone-step'
 import { prefetchClip } from '@/audio/clips'
@@ -26,6 +29,11 @@ import { chrome } from './copy'
 import { showThai } from './thai'
 
 const TONE_ORDER: Tone[] = TONES
+
+/** Pick shows the English gloss only. Rom would give the answer away. */
+export function pickPrompt(entry: { en: string[] }): string {
+  return cleanGloss(entry.en[0] ?? '')
+}
 
 export function SessionView(props: {
   doc: ProgressDoc
@@ -40,6 +48,7 @@ export function SessionView(props: {
   const [toneStep, setToneStep] = useState(0)
   const [, setVoiceTick] = useState(0)
   const goNextRef = useRef(() => {})
+  const attemptedRef = useRef(false)
   const track = props.session.track ?? 'voice'
   const script = item ? entryTrack(entryOrThrow(item.id)) === 'script' : track === 'script'
   const meeting = Boolean(item?.meet && !props.session.hold)
@@ -47,11 +56,12 @@ export function SessionView(props: {
   const canAdvance = meeting || waitingNext
 
   useEffect(() => {
+    attemptedRef.current = Boolean(item?.scored || props.session.pending)
     setAnswer('')
-    setAck(null)
+    setAck(props.session.pending ?? null)
     setHeard(false)
     setToneStep(0)
-  }, [item?.id, item?.modality, item?.meet])
+  }, [item?.id, item?.modality, item?.meet, item?.scored, props.session.pending])
 
   useEffect(() => onVoices(() => setVoiceTick((n) => n + 1)), [])
 
@@ -96,13 +106,6 @@ export function SessionView(props: {
   const entry = entryOrThrow(item.id)
   const hold = props.session.hold
 
-  const record = (ok: boolean, v: string) => {
-    const now = Date.now()
-    const prev = props.doc.items[entry.id] ?? ({ id: entry.id, stage: 0, due: 0, reps: 0, lapses: 0, lastSeen: 0, days: [], history: [] } satisfies ItemProgress)
-    const nextItem = applyAttempt(prev, { t: now, ok, v, m: item.modality })
-    props.onDoc({ ...props.doc, items: { ...props.doc.items, [entry.id]: nextItem } })
-  }
-
   const goNext = () => {
     if (item.meet && !hold && !ack) {
       const now = Date.now()
@@ -111,13 +114,28 @@ export function SessionView(props: {
       props.onSession(afterMeet(props.session))
       return
     }
+    const verdict = ack ?? props.session.pending
     setAck(null)
     setAnswer('')
     if (hold) props.onSession(afterHold(props.session))
-    else if (ack?.ok) props.onSession(markCorrect(props.session))
+    else if (verdict?.ok) props.onSession(markCorrect(props.session))
     else props.onSession(requeueCurrent(props.session))
   }
   goNextRef.current = goNext
+
+  const noteAttempt = (ok: boolean, v: string, text: string, miss?: 'move' | 'stay', holdNext?: Hold) => {
+    if (attemptedRef.current || alreadyScored(props.session)) return false
+    attemptedRef.current = true
+    const now = Date.now()
+    const prev = props.doc.items[entry.id] ?? ({ id: entry.id, stage: 0, due: 0, reps: 0, lapses: 0, lastSeen: 0, days: [], history: [] } satisfies ItemProgress)
+    props.onDoc({ ...props.doc, items: { ...props.doc.items, [entry.id]: applyAttempt(prev, { t: now, ok, v, m: item.modality }) } })
+    let next = markScored(props.session, { ok, text })
+    if (miss === 'move') next = markMissMove(next)
+    if (miss === 'stay' && holdNext) next = markMissStay(next, holdNext)
+    props.onSession(next)
+    setAck({ ok, text })
+    return true
+  }
 
   const submitThai = () => {
     if (hold?.kind === 'retype-th') {
@@ -128,47 +146,30 @@ export function SessionView(props: {
     }
     const g = gradeThai(entry.rom, answer)
     if (g.correct) {
-      record(true, g.verdict)
-      setAck({ ok: true, text: 'Right.' })
+      noteAttempt(true, g.verdict, 'Right.')
     } else if (g.verdict === 'tone' || g.verdict === 'length') {
-      record(false, g.verdict)
-      props.onSession(markMissMove(props.session))
-      setAck({ ok: false, text: g.message })
+      noteAttempt(false, g.verdict, g.message, 'move')
     } else {
-      record(false, g.verdict === 'empty' || g.verdict === 'invalid' ? g.verdict : 'wrong')
-      props.onSession(markMissStay(props.session, { kind: 'retype-th', id: entry.id, target: g.matchedTarget }))
-      setAck({ ok: false, text: g.message })
-      setAnswer('')
+      if (noteAttempt(false, g.verdict === 'empty' || g.verdict === 'invalid' ? g.verdict : 'wrong', g.message, 'stay', { kind: 'retype-th', id: entry.id, target: g.matchedTarget })) {
+        setAnswer('')
+      }
     }
   }
 
   const submitEn = () => {
-    if (ack) return
+    if (ack || alreadyScored(props.session)) return
     const g = gradeEnglish(entry.en, answer)
-    if (g.correct) {
-      record(true, 'en-ok')
-      setAck({ ok: true, text: 'Right.' })
-    } else {
-      // Show the meaning and move on; the card comes back later in the sitting.
-      record(false, 'en-wrong')
-      props.onSession(markMissMove(props.session))
-      setAck({ ok: false, text: g.message })
-    }
+    if (g.correct) noteAttempt(true, 'en-ok', 'Right.')
+    else noteAttempt(false, 'en-wrong', g.message, 'move')
   }
 
   const submitTone = (tone: Tone) => {
-    if (ack) return
+    if (ack || alreadyScored(props.session)) return
     const nuclei = analyseRom(entry.rom).nuclei
     if (nuclei.length <= 1) {
       const expected = nuclei[0]?.tone ?? 'mid'
       const ok = tone === expected
-      record(ok, ok ? 'exact' : 'tone')
-      if (ok) {
-        setAck({ ok: true, text: 'Right.' })
-      } else {
-        props.onSession(markMissMove(props.session))
-        setAck({ ok: false, text: `That syllable is ${TONE_LABEL[expected]}.` })
-      }
+      noteAttempt(ok, ok ? 'exact' : 'tone', ok ? 'Right.' : `That syllable is ${TONE_LABEL[expected]}.`, ok ? undefined : 'move')
       return
     }
     const judged = judgeTonePick(entry.rom, toneStep, tone)
@@ -177,37 +178,22 @@ export function SessionView(props: {
       return
     }
     if (judged.kind === 'right') {
-      record(true, 'exact')
-      setAck({ ok: true, text: 'Right.' })
+      noteAttempt(true, 'exact', 'Right.')
       return
     }
-    record(false, 'tone')
-    props.onSession(markMissMove(props.session))
-    setAck({ ok: false, text: judged.line })
+    noteAttempt(false, 'tone', judged.line, 'move')
   }
 
   const submitPair = (rom: string) => {
-    if (ack) return
+    if (ack || alreadyScored(props.session)) return
     const ok = rom === entry.rom
-    record(ok, ok ? 'exact' : 'wrong')
-    if (ok) {
-      setAck({ ok: true, text: 'Right.' })
-    } else {
-      props.onSession(markMissMove(props.session))
-      setAck({ ok: false, text: `That was ${entry.rom}.` })
-    }
+    noteAttempt(ok, ok ? 'exact' : 'wrong', ok ? 'Right.' : `That was ${entry.rom}.`, ok ? undefined : 'move')
   }
 
   const submitPick = (thai: string) => {
-    if (ack) return
+    if (ack || alreadyScored(props.session)) return
     const ok = thai === entry.thai
-    record(ok, ok ? 'exact' : 'wrong')
-    if (ok) {
-      setAck({ ok: true, text: 'Right.' })
-    } else {
-      props.onSession(markMissMove(props.session))
-      setAck({ ok: false, text: `That one is ${showThai(entry.thai)}.` })
-    }
+    noteAttempt(ok, ok ? 'exact' : 'wrong', ok ? 'Right.' : `That one is ${showThai(entry.thai)}.`, ok ? undefined : 'move')
   }
 
   const writeRom =
@@ -218,7 +204,7 @@ export function SessionView(props: {
   const listenLocked = item.modality === 'listen' && !heard && !hold && !meeting && hearable
   const multiTone = item.modality === 'tone' && analyseRom(entry.rom).nuclei.length > 1
   const sense = meeting ? null : sittingSense(entry, item.modality)
-  const fromVoice = script && entry.tags.some((t) => t.startsWith('voice:w:'))
+  const fromVoice = script && fromVoiceKnown(props.doc, entry)
   const right = Boolean(ack?.ok)
 
   const prompt =
@@ -278,12 +264,7 @@ export function SessionView(props: {
       )
     }
     if (item.modality === 'pick') {
-      return (
-        <p className="prompt-en">
-          {cleanGloss(entry.en[0] ?? '')}
-          <span className="rom pick-rom"> {entry.rom}</span>
-        </p>
-      )
+      return <p className="prompt-en">{pickPrompt(entry)}</p>
     }
     if (item.modality === 'listen') return <p className="prompt-listen" />
     if (item.modality === 'tone') {
@@ -312,6 +293,7 @@ export function SessionView(props: {
       setAck({ ok: false, text: 'Hear it first.' })
       return
     }
+    if (!hold && alreadyScored(props.session)) return
     submitThai()
   }
 
@@ -320,6 +302,7 @@ export function SessionView(props: {
       setAck({ ok: false, text: 'Hear it first.' })
       return
     }
+    if (alreadyScored(props.session)) return
     submitEn()
   }
 

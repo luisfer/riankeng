@@ -31,12 +31,14 @@ describe('srs', () => {
     expect(p.due).toBe(t0)
   })
 
-  it('marks a meet as seen without growing the stage', () => {
+  it('records a Look without counting a scored seen', () => {
     const p = applyMeet(newItemProgress('w:maa'), t0)
-    expect(p.reps).toBe(1)
+    expect(p.reps).toBe(0)
+    expect(p.lastSeen).toBe(t0)
     expect(p.stage).toBe(0)
     expect(p.days).toEqual([])
-    expect(p.due).toBe(t0)
+    expect(p.due).toBe(0)
+    expect(isDue(p, t0)).toBe(false)
   })
 
   it('never goes below seed', () => {

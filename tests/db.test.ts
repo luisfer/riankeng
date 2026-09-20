@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { resolveLoad, sameDocPayload } from '../src/storage/db'
-import { emptyDoc } from '../src/storage/progress-schema'
+import { emptyDoc, stampDoc } from '../src/storage/progress-schema'
 
 describe('resolveLoad', () => {
   it('does not treat a timeout as an empty document', () => {
@@ -37,5 +37,12 @@ describe('sameDocPayload', () => {
     const a = emptyDoc(1)
     const b = { ...a, updatedAt: 99 }
     expect(sameDocPayload(a, b)).toBe(true)
+  })
+
+  it('stamps updatedAt on the in-memory doc', () => {
+    const a = emptyDoc(1)
+    const b = stampDoc(a, 50)
+    expect(b.updatedAt).toBe(50)
+    expect(a.updatedAt).toBe(1)
   })
 })

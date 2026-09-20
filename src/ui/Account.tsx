@@ -145,7 +145,7 @@ export function Account(props: {
             <li key={`s-${lvl.n}`}>
               <span>{lvl.n}</span>
               <span>{lvl.title}</span>
-              <span className="rom">{st && st.total > 0 ? `${st.mastered}/${st.total}` : 'soon'}</span>
+              <span className="rom">{st && st.total > 0 ? `${st.passed}/${st.total}` : 'soon'}</span>
             </li>
           )
         })}

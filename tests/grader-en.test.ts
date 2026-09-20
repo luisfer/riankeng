@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { getEntry } from '../content/index'
 import { editDistance, gradeEnglish, normalizeEnglish, parseGloss, tokensMatch } from '../src/engine/grader-en'
 
 describe('normalizeEnglish', () => {
@@ -29,6 +30,10 @@ describe('tokensMatch', () => {
     expect(tokensMatch('eggs', 'egg')).toBe(true)
     expect(tokensMatch('mother', 'mom')).toBe(true)
     expect(tokensMatch('big', 'bag')).toBe(false)
+    expect(tokensMatch('horse', 'house')).toBe(false)
+    expect(tokensMatch('right', 'eight')).toBe(false)
+    expect(tokensMatch('tired', 'sleepy')).toBe(false)
+    expect(tokensMatch('husband', 'wife')).toBe(false)
     expect(editDistance('kitten', 'sitting')).toBe(3)
   })
 })
@@ -85,5 +90,11 @@ describe('gradeEnglish', () => {
   it('names the closest gloss when wrong', () => {
     const g = gradeEnglish(['(the) market'], 'shop')
     expect(g.message).toContain('the market')
+  })
+
+  it('rejects wife for สามี, house for ม้า, and get for เข้าใจ', () => {
+    expect(gradeEnglish(getEntry('w:sǎa-mii')!.en, 'wife').correct).toBe(false)
+    expect(gradeEnglish(getEntry('w:máa')!.en, 'house').correct).toBe(false)
+    expect(gradeEnglish(getEntry('w:kâo jai')!.en, 'get').correct).toBe(false)
   })
 })

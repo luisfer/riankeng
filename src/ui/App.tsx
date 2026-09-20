@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { allLevelStatus, reviewEntries, unlockCount } from '@/engine/scheduler'
+import { allLevelStatus, reviewEntries } from '@/engine/scheduler'
 import {
   canContinue,
   canResumeReview,
@@ -231,9 +231,6 @@ export function App() {
       : inIntro && route.name === 'intro'
         ? (route.track === 'script' ? scriptStatuses : voiceStatuses)[route.n]
         : undefined
-  const lessonMeter =
-    lessonStatus && trailTrack ? unlockCount(lessonStatus, trailTrack) : undefined
-
   const leaveSitting = () => {
     if (inSession && session) {
       const next = pauseSession(session)
@@ -256,7 +253,7 @@ export function App() {
           level={trailLevel}
           remaining={inSession && session ? remaining(session) : undefined}
           correct={inSession && session ? session.correct : undefined}
-          lessonSeen={lessonMeter}
+          lessonSeen={lessonStatus?.seen}
           lessonTotal={lessonStatus?.total}
           onPause={inSession || inIntro ? leaveSitting : undefined}
           place={trailPlace}
@@ -312,8 +309,7 @@ export function App() {
                 !(route.track === 'script' ? scriptStatuses : voiceStatuses)[route.n]!.unlocked,
             )}
             canContinue={canContinue(session, route.track, route.n)}
-            meter={lessonMeter}
-            touched={lessonStatus?.seen}
+            seen={lessonStatus?.seen}
             total={lessonStatus?.total}
             onStart={() => beginLevel(route.n, route.track)}
             onContinue={() => go({ name: 'session' })}

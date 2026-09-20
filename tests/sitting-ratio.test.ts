@@ -26,27 +26,21 @@ describe('one lesson pie', () => {
     const level0 = entriesForLevel(0, 'voice')
     expect(level0.length).toBe(50)
     for (const e of level0.slice(0, 17)) {
-      doc.items[e.id] = {
-        ...newItemProgress(e.id),
-        reps: 5,
-        stage: 3,
-        lastSeen: now - 1,
-        due: now + 86_400_000,
-        days: ['2026-01-01', '2026-01-02', '2026-01-03'],
-      }
+      doc.items[e.id] = { ...newItemProgress(e.id), reps: 2, stage: 1, lastSeen: now - 1, due: now + 86_400_000 }
     }
     const before = levelStatus(doc, 0, now, 'voice')
-    expect(before.mastered).toBe(17)
-    const intro = trailPie({ lessonSeen: before.mastered, lessonTotal: before.total })
+    expect(before.seen).toBe(17)
+    expect(before.mastered).toBe(0)
+    const intro = trailPie({ lessonSeen: before.seen, lessonTotal: before.total })
     expect(intro?.kind).toBe('lesson')
     expect(intro?.value).toBe(17 / 50)
 
     const sit = startSession(doc, now, 0, 'voice')
     expect(sit.correct).toBe(0)
     const after = levelStatus(doc, 0, now, 'voice')
-    expect(after.mastered).toBe(17)
+    expect(after.seen).toBe(17)
     const pie = trailPie({
-      lessonSeen: after.mastered,
+      lessonSeen: after.seen,
       lessonTotal: after.total,
       remaining: remaining(sit),
       correct: sit.correct,
@@ -64,7 +58,7 @@ describe('one lesson pie', () => {
     }
     const voice = allLevelStatus(doc, now, 'voice')
     expect(voice[0]!.seen).toBe(0)
-    expect(trailPie({ lessonSeen: voice[0]!.mastered, lessonTotal: voice[0]!.total })?.value).toBe(0)
+    expect(trailPie({ lessonSeen: voice[0]!.seen, lessonTotal: voice[0]!.total })?.value).toBe(0)
     expect(voice[1]!.unlocked).toBe(false)
   })
 

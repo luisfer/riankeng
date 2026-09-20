@@ -31,11 +31,8 @@ export function LevelIntro(props: {
   track: TrackId
   locked?: boolean
   canContinue?: boolean
-  /** Unlock meter: Voice mastered, Script passed. */
-  meter?: number
+  seen?: number
   total?: number
-  /** Scored attempts. Sit again and the quiet seen line use this. */
-  touched?: number
   onStart: () => void
   onContinue?: () => void
 }) {
@@ -62,16 +59,11 @@ export function LevelIntro(props: {
       {typeof props.total === 'number' && props.total > 0 && (
         <p className="lesson-progress">
           <QuietPie
-            value={lessonRatio(props.meter ?? 0, props.total)}
-            label={`${props.meter ?? 0} of ${props.total} in this lesson`}
+            value={lessonRatio(props.seen ?? 0, props.total)}
+            label={`${props.seen ?? 0} of ${props.total} in this lesson`}
           />
           <span>
-            <span>
-              {props.meter ?? 0} of {props.total}
-            </span>
-            {(props.touched ?? 0) > (props.meter ?? 0) && (
-              <span className="contents-rom">{props.touched} seen</span>
-            )}
+            {props.seen ?? 0} of {props.total}
           </span>
         </p>
       )}
@@ -158,7 +150,7 @@ export function LevelIntro(props: {
                   props.onStart()
                 }}
               >
-                {startLabel(props.touched ?? 0, false)}
+                {startLabel(props.seen ?? 0, false)}
               </Commit>
             )}
           </>

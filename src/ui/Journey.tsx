@@ -1,6 +1,6 @@
 import { LEVELS, SCRIPT_LEVELS } from '@content/index'
 import type { TrackId } from '@content/types'
-import { hereLevel, unlockCount, type LevelStatus } from '@/engine/scheduler'
+import { hereLevel, type LevelStatus } from '@/engine/scheduler'
 import { chrome } from './copy'
 
 function TrackList(props: {
@@ -21,9 +21,7 @@ function TrackList(props: {
           const s = props.statuses[lvl.n]
           const locked = Boolean(s && s.total > 0 && !s.unlocked)
           const at = here === lvl.n
-          const meter = s ? unlockCount(s, props.track) : 0
-          const meta = !s || s.total === 0 ? 'soon' : locked ? '' : meter > 0 ? `${meter} of ${s.total}` : String(s.total)
-          const seenExtra = s && !locked && s.seen > meter ? `${s.seen} seen` : null
+          const meta = !s || s.total === 0 ? 'soon' : locked ? '' : s.seen > 0 ? `${s.seen} of ${s.total}` : String(s.total)
           return (
             <li key={`${props.track}-${lvl.n}`}>
               <button
@@ -40,7 +38,6 @@ function TrackList(props: {
                 <span>
                   <span className="contents-title">{lvl.title}</span>
                   <span className="contents-rom rom">{lvl.rom}</span>
-                  {seenExtra && <span className="contents-rom">{seenExtra}</span>}
                 </span>
                 <span className="contents-meta">{meta}</span>
               </button>

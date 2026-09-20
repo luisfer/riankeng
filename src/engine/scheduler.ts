@@ -8,6 +8,8 @@ export interface LevelStatus {
   n: number
   total: number
   seen: number
+  /** At least one correct answer. Script unlocks on this, not a miss. */
+  passed: number
   mastered: number
   due: number
   /** Learner may work on this level. */
@@ -25,11 +27,13 @@ export function progressFor(doc: ProgressDoc, id: string): ItemProgress {
 export function levelStatus(doc: ProgressDoc, n: number, now = Date.now(), track: TrackId = 'voice'): LevelStatus {
   const entries = entriesForLevel(n, track)
   let seen = 0
+  let passed = 0
   let mastered = 0
   let due = 0
   for (const e of entries) {
     const p = progressFor(doc, e.id)
     if (p.reps > 0) seen++
+    if (hasPassed(p)) passed++
     if (isMastered(p)) mastered++
     if (isDue(p, now)) due++
   }
@@ -39,6 +43,7 @@ export function levelStatus(doc: ProgressDoc, n: number, now = Date.now(), track
     n,
     total: entries.length,
     seen,
+    passed,
     mastered,
     due,
     unlocked,
@@ -90,10 +95,15 @@ export function dueIds(doc: ProgressDoc, now = Date.now(), track: TrackId = 'voi
   return due.map((p) => p.id)
 }
 
-/** Script opens the next level once every item has been seen. Voice still waits for mastery. */
+export function hasPassed(p: ItemProgress): boolean {
+  if (p.days.length > 0) return true
+  return p.history.some((h) => h.ok)
+}
+
+/** Script opens the next level once every item has been right once. Voice still waits for mastery. */
 export function scriptLevelOpened(s: LevelStatus, track: TrackId): boolean {
   if (s.total === 0) return s.complete
-  if (track === 'script') return s.seen >= s.total
+  if (track === 'script') return s.passed >= s.total
   return s.complete
 }
 
@@ -110,6 +120,22 @@ export function seenEntries(doc: ProgressDoc, track: TrackId = 'voice'): Entry[]
 
 export function shuffleSeen<T extends { id: string }>(items: T[], salt: string, take: number): T[] {
   return [...items].sort((a, b) => hash(`${salt}:${a.id}`) - hash(`${salt}:${b.id}`)).slice(0, take)
+}
+
+/** Seen cards on every track, overdue first. */
+export function reviewEntries(doc: ProgressDoc, now = Date.now()): Entry[] {
+  const rows: { e: Entry; due: number; overdue: boolean }[] = []
+  for (const e of ENTRIES) {
+    const p = doc.items[e.id]
+    if (!p || p.reps === 0) continue
+    rows.push({ e, due: p.due, overdue: isDue(p, now) })
+  }
+  rows.sort((a, b) => {
+    if (a.overdue !== b.overdue) return a.overdue ? -1 : 1
+    if (a.overdue && b.overdue) return a.due - b.due
+    return a.e.id.localeCompare(b.e.id)
+  })
+  return rows.map((r) => r.e)
 }
 
 /** Total items answered today and correct today. History for counts; `days` so a capped history cannot hide today. */
@@ -198,9 +224,9 @@ export function sittingSense(entry: Entry, modality: Modality): string | null {
 }
 
 /**
- * Pick the exercise for an item given its stage. Seeds first meet the learner
- * in recognition, sprouts are forced to produce, flowers and ripe items get
- * everything, weighted towards production and dictation.
+ * Pick the exercise for an item given its stage. Voice 0 asks the ear from the
+ * first sitting. A lapse can listen or produce; it is not stuck on recognition.
+ * Flowers and ripe items get everything, weighted towards production and dictation.
  */
 export function chooseModality(entry: Entry, p: ItemProgress, salt: string, canHear = true): Modality {
   const r = hash(entry.id + salt)
@@ -211,7 +237,6 @@ export function chooseModality(entry: Entry, p: ItemProgress, salt: string, canH
     if (r < 0.7) return 'th-en'
     return 'en-th'
   }
-  if (p.reps === 0 || p.stage <= 0) return 'th-en'
   let next: Modality
   if (entry.level === 0) {
     if (canHear && entry.minimalPairOf?.length) {
@@ -223,11 +248,16 @@ export function chooseModality(entry: Entry, p: ItemProgress, salt: string, canH
     else if (r < 0.55) next = 'en-th'
     else if (r < 0.8) next = 'listen'
     else next = 'tone'
+  } else if (p.stage <= 0) {
+    if (r < 0.4) next = 'en-th'
+    else if (r < 0.7) next = 'th-en'
+    else if (r < 0.85) next = 'listen'
+    else next = 'tone'
   } else if (r < 0.35) next = 'th-en'
   else if (r < 0.7) next = 'en-th'
   else if (r < 0.85) next = 'listen'
   else next = 'tone'
-  if (next === 'listen' && !canHear) return 'tone'
+  if (next === 'listen' && !canHear) return 'th-en'
   return next
 }
 

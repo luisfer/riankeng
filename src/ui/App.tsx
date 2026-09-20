@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
-import { allLevelStatus, seenEntries } from '@/engine/scheduler'
+import { allLevelStatus, reviewEntries } from '@/engine/scheduler'
 import {
   canContinue,
+  canResumeReview,
   isFinished,
   normalizeSession,
   remaining,
@@ -24,7 +25,7 @@ import {
 import { emptyDoc, type ProgressDoc } from '@/storage/progress-schema'
 import { resetDoc } from '@/storage/import'
 import { onVoices } from '@/audio/tts'
-import { go, parseHash, type Route } from './hash'
+import { go, parseHash, replace, type Route } from './hash'
 import { applyTheme } from './theme'
 import { Account } from './Account'
 import { Alphabet } from './Alphabet'
@@ -52,6 +53,13 @@ export function App() {
     if (!window.location.hash) window.location.hash = '#/'
     return () => window.removeEventListener('hashchange', onHash)
   }, [])
+
+  useEffect(() => {
+    if (loadState === 'pending') return
+    if (route.name !== 'session') return
+    if (session && !isFinished(session)) return
+    replace({ name: 'journey' })
+  }, [loadState, route.name, session])
 
   useEffect(() => {
     let alive = true
@@ -153,7 +161,7 @@ export function App() {
 
   const voiceStatuses = allLevelStatus(doc, Date.now(), 'voice')
   const scriptStatuses = allLevelStatus(doc, Date.now(), 'script')
-  const yours = seenEntries(doc, 'voice')
+  const yours = reviewEntries(doc)
   const accountLabel = doc.settings.name.trim() || 'Account'
 
   const beginLevel = (n: number, track: TrackId) => {
@@ -256,9 +264,28 @@ export function App() {
           />
         )}
         {route.name === 'review' && (
-          <ReviewPage pool={yours} audioRate={doc.settings.audioRate} onSit={sitThese} />
+          <ReviewPage
+            pool={yours}
+            audioRate={doc.settings.audioRate}
+            onSit={sitThese}
+            canResume={canResumeReview(session)}
+            onResume={() => go({ name: 'session' })}
+          />
         )}
-        {route.name === 'alphabet' && <Alphabet doc={doc} onOpen={(n) => go({ name: 'intro', n, track: 'script' })} />}
+        {route.name === 'alphabet' && (
+          <Alphabet
+            doc={doc}
+            unlocked={(n) => {
+              const s = scriptStatuses[n]
+              return !s || s.total === 0 || s.unlocked
+            }}
+            onOpen={(n) => {
+              const s = scriptStatuses[n]
+              if (s && s.total > 0 && !s.unlocked) return
+              go({ name: 'intro', n, track: 'script' })
+            }}
+          />
+        )}
         {route.name === 'intro' && (
           <LevelIntro
             n={route.n}

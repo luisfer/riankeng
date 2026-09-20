@@ -8,7 +8,7 @@ export default words(3, [
   ['tam-mai', 'ทำไม', ['why'], 'q', ['question']],
   ['krai', 'ใคร', ['who', 'whom'], 'q', ['question']],
   ['yang-ngai', 'ยังไง', ['how', 'in what way'], 'q', ['question'], 'Spoken form of yàang-rai.'],
-  ['yàang-rai', 'อย่างไร', ['how (formal)', 'how', 'in what manner'], 'q', ['question'], 'Written and formal. You will hear yang-ngai.'],
+  ['yàang-rai', 'อย่างไร', ['how (formal)', 'how', 'in what manner'], 'q', ['question'], 'Written and formal. Spoken Thai uses yang-ngai.'],
   ['tâo-rài', 'เท่าไร', ['how much', 'how much (money)'], 'q', ['question']],
   ['gìi', 'กี่', ['how many'], 'q', ['question'], 'Always followed by a classifier: gìi kon, gìi bpii.'],
   ['rụ̌ụ', 'หรือ', ['or', 'or?', 'really?'], 'conj', ['question'], 'At the end of a sentence it asks for confirmation: kun bpai rụ̌ụ = oh, you are going?'],

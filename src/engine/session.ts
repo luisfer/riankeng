@@ -46,8 +46,8 @@ export function startSession(doc: ProgressDoc, now = Date.now(), level?: number,
   const newCap = Math.max(0, doc.settings.newPerSession)
 
   const voiceReady = detectVoice().ready
-  const push = (id: string) => {
-    if (seen.has(id) || queue.length >= SESSION_SIZE) return
+  const push = (id: string, cap = SESSION_SIZE) => {
+    if (seen.has(id) || queue.length >= cap) return
     seen.add(id)
     const entry = entryOrThrow(id)
     const progress = progressFor(doc, id)
@@ -62,18 +62,22 @@ export function startSession(doc: ProgressDoc, now = Date.now(), level?: number,
   const dueHere = onLevel.filter((e) => isDue(progressFor(doc, e.id), now))
   const leftover = onLevel.filter((e) => progressFor(doc, e.id).reps > 0)
 
-  for (const e of fresh.slice(0, newCap)) push(e.id)
-  for (const e of dueHere) push(e.id)
-  for (const e of leftover) push(e.id)
-
-  let tail = 0
+  const tailIds: string[] = []
   for (const id of dueIds(doc, now, track)) {
-    if (tail >= REVIEW_TAIL) break
+    if (tailIds.length >= REVIEW_TAIL) break
     const entry = getEntry(id)
     if (!entry || entry.level >= target) continue
-    if (seen.has(id)) continue
-    push(id)
-    tail++
+    tailIds.push(id)
+  }
+
+  const introducing = fresh.slice(0, newCap)
+  const levelCap = SESSION_SIZE - tailIds.length
+  for (const e of introducing) push(e.id, levelCap)
+  for (const e of dueHere) push(e.id, levelCap)
+  for (const id of tailIds) push(id)
+  // Not-due leftovers only when the sitting would otherwise be empty (Sit again, nothing due).
+  if (queue.length === 0) {
+    for (const e of leftover) push(e.id)
   }
 
   return {
@@ -132,13 +136,22 @@ export function normalizeSession(session: LiveSession): LiveSession {
   }
 }
 
-/** Unfinished sitting for this track and level, with every card still in the catalog. */
-export function canContinue(session: LiveSession | null, track: TrackId, level: number): session is LiveSession {
+function sittingOpen(session: LiveSession | null): session is LiveSession {
   if (!session) return false
-  if (session.review) return false
-  if ((session.track ?? 'voice') !== track || session.level !== level) return false
   if (session.queue.length === 0 || session.cursor >= session.queue.length) return false
   return session.queue.every((q) => Boolean(getEntry(q.id)))
+}
+
+/** Unfinished sitting for this track and level, with every card still in the catalog. */
+export function canContinue(session: LiveSession | null, track: TrackId, level: number): session is LiveSession {
+  if (!sittingOpen(session) || session.review) return false
+  if ((session.track ?? 'voice') !== track || session.level !== level) return false
+  return true
+}
+
+/** Unfinished Already-yours sitting. Pause still goes home; resume lives on that page. */
+export function canResumeReview(session: LiveSession | null): session is LiveSession {
+  return sittingOpen(session) && Boolean(session.review)
 }
 
 export function sessionStillValid(session: LiveSession, resetAt: number): boolean {
@@ -154,13 +167,14 @@ export function remaining(session: LiveSession): number {
   return Math.max(0, session.queue.length - session.cursor)
 }
 
-/** After the teach face, the same card becomes the recognition test. */
+/** After the teach face, the test waits later in the sitting so it is not an echo. */
 export function afterMeet(session: LiveSession): LiveSession {
   const item = currentItem(session)
   if (!item?.meet) return session
-  const queue = session.queue.slice()
-  queue[session.cursor] = { ...item, meet: false }
-  return { ...session, queue }
+  const tested = { ...item, meet: false }
+  const rest = session.queue.slice(session.cursor + 1)
+  if (rest.length === 0) return { ...session, queue: [tested] }
+  return { ...session, queue: [...rest, tested], cursor: 0 }
 }
 
 export function markCorrect(session: LiveSession): LiveSession {

@@ -13,14 +13,16 @@ import {
   requeueCurrent,
   type LiveSession,
 } from '@/engine/session'
-import { applyAttempt, type ItemProgress } from '@/engine/srs'
+import { applyAttempt, applyMeet, type ItemProgress } from '@/engine/srs'
 import type { ProgressDoc } from '@/storage/progress-schema'
 import { entryOrThrow, pairRoms, pickChoices, sittingSense } from '@/engine/scheduler'
-import { judgeTonePick, toneSyllableShow } from '@/engine/tone-step'
+import { entryTrack } from '@content/index'
+import { judgeTonePick, toneBareShow } from '@/engine/tone-step'
 import { prefetchClip } from '@/audio/clips'
 import { canHearThai, onVoices, speakSlower, speakThai, speechUnlocked } from '@/audio/tts'
 import { RomanInput } from '@/input/RomanInput'
 import { Commit, TextBtn } from './bits'
+import { chrome } from './copy'
 import { showThai } from './thai'
 
 const TONE_ORDER: Tone[] = TONES
@@ -39,7 +41,7 @@ export function SessionView(props: {
   const [, setVoiceTick] = useState(0)
   const goNextRef = useRef(() => {})
   const track = props.session.track ?? 'voice'
-  const script = track === 'script'
+  const script = item ? entryTrack(entryOrThrow(item.id)) === 'script' : track === 'script'
   const meeting = Boolean(item?.meet && !props.session.hold)
   const waitingNext = Boolean(ack && (ack.ok || !props.session.hold))
   const canAdvance = meeting || waitingNext
@@ -86,7 +88,7 @@ export function SessionView(props: {
   if (!item) {
     return (
       <main className="page session">
-        <p className="lede">This session is empty. Come back when a level has words.</p>
+        <p className="lede">{chrome.emptySitting}</p>
       </main>
     )
   }
@@ -103,6 +105,9 @@ export function SessionView(props: {
 
   const goNext = () => {
     if (item.meet && !hold && !ack) {
+      const now = Date.now()
+      const prev = props.doc.items[entry.id] ?? ({ id: entry.id, stage: 0, due: 0, reps: 0, lapses: 0, lastSeen: 0, days: [], history: [] } satisfies ItemProgress)
+      props.onDoc({ ...props.doc, items: { ...props.doc.items, [entry.id]: applyMeet(prev, now) } })
       props.onSession(afterMeet(props.session))
       return
     }
@@ -125,8 +130,12 @@ export function SessionView(props: {
     if (g.correct) {
       record(true, g.verdict)
       setAck({ ok: true, text: 'Right.' })
+    } else if (g.verdict === 'tone' || g.verdict === 'length') {
+      record(false, g.verdict)
+      props.onSession(markMissMove(props.session))
+      setAck({ ok: false, text: g.message })
     } else {
-      record(false, 'wrong')
+      record(false, g.verdict === 'empty' || g.verdict === 'invalid' ? g.verdict : 'wrong')
       props.onSession(markMissStay(props.session, { kind: 'retype-th', id: entry.id, target: g.matchedTarget }))
       setAck({ ok: false, text: g.message })
       setAnswer('')
@@ -214,26 +223,24 @@ export function SessionView(props: {
 
   const prompt =
     meeting
-      ? 'Here it is.'
+      ? chrome.meet
       : hold?.kind === 'retype-th'
-      ? 'Retype the romanization.'
+      ? chrome.retype
       : item.modality === 'pick'
-        ? 'Which one is this?'
+        ? chrome.pick
         : pairing && heard && hearable
-          ? 'Which did you hear?'
+          ? chrome.hearWhich
         : item.modality === 'en-th'
-          ? script
-            ? 'Write it in romanization.'
-            : 'Write it so you can say it.'
+          ? chrome.writeRom
           : item.modality === 'th-en'
             ? script
-              ? 'Write this the way you already say it.'
-              : 'What does this mean?'
+              ? chrome.writeRom
+              : chrome.writeMeaning
             : item.modality === 'listen'
-              ? 'Write what you would say.'
+              ? chrome.writeHeard
               : multiTone
-                ? 'What tone is this syllable.'
-                : 'What tone is the first syllable?'
+                ? chrome.toneThis
+                : chrome.toneFirst
 
   /** The other half of the card, shown in lacquer once the answer is right. */
   const pairLine = (() => {
@@ -280,14 +287,8 @@ export function SessionView(props: {
     }
     if (item.modality === 'listen') return <p className="prompt-listen" />
     if (item.modality === 'tone') {
-      if (multiTone && !ack) {
-        return <p className="prompt-rom rom">{toneSyllableShow(entry.rom, toneStep)}</p>
-      }
-      return props.doc.settings.thaiScript ? (
-        <p className="prompt-thai thai">{showThai(entry.thai)}</p>
-      ) : (
-        <p className="prompt-rom rom">{entry.rom}</p>
-      )
+      const shown = multiTone && !ack ? toneBareShow(entry.rom, toneStep) : toneBareShow(entry.rom)
+      return <p className="prompt-rom rom">{shown}</p>
     }
     if (item.modality === 'en-th') return <p className="prompt-en">{cleanGloss(entry.en[0] ?? '')}</p>
     if (item.modality === 'th-en' && script) return <p className="prompt-thai thai">{showThai(entry.thai)}</p>

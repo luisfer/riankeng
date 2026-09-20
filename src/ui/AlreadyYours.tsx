@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react'
 import type { Entry } from '@content/types'
 import { prefetchClip } from '@/audio/clips'
 import { speakThai } from '@/audio/tts'
+import { SESSION_SIZE } from '@/engine/session'
 import { shuffleSeen } from '@/engine/scheduler'
-import { TextBtn } from './bits'
+import { Commit, TextBtn } from './bits'
+import { chrome } from './copy'
 
 function ReviewRows(props: { entries: Entry[]; audioRate: number }) {
   return (
@@ -32,6 +34,8 @@ export function AlreadyYours(props: {
   audioRate: number
   onMore?: () => void
   onSit?: (ids: string[]) => void
+  canResume?: boolean
+  onResume?: () => void
 }) {
   const [salt, setSalt] = useState('0')
   const rows = shuffleSeen(props.pool, salt, props.take)
@@ -44,15 +48,14 @@ export function AlreadyYours(props: {
     <section className="track-block yours-block">
       <h2>Already yours</h2>
       {props.pool.length === 0 ? (
-        <p className="lede">Clear a few Voice cards. They will land here.</p>
+        <p className="lede">{chrome.yoursEmpty}</p>
       ) : (
         <>
           <ReviewRows entries={rows} audioRate={props.audioRate} />
           <div className="yours-actions">
+            {props.canResume && props.onResume && <Commit onClick={props.onResume}>Continue</Commit>}
             <TextBtn onClick={() => setSalt(String(Number(salt) + 1))}>Shuffle</TextBtn>
-            {props.onSit && (
-              <TextBtn onClick={() => props.onSit!(rows.slice(0, 16).map((e) => e.id))}>Sit these</TextBtn>
-            )}
+            {props.onSit && <TextBtn onClick={() => props.onSit!(rows.map((e) => e.id))}>Sit these</TextBtn>}
             {props.onMore && <TextBtn onClick={props.onMore}>More</TextBtn>}
           </div>
         </>
@@ -61,10 +64,23 @@ export function AlreadyYours(props: {
   )
 }
 
-export function ReviewPage(props: { pool: Entry[]; audioRate: number; onSit: (ids: string[]) => void }) {
+export function ReviewPage(props: {
+  pool: Entry[]
+  audioRate: number
+  onSit: (ids: string[]) => void
+  canResume?: boolean
+  onResume?: () => void
+}) {
   return (
     <main className="page journey review-page">
-      <AlreadyYours pool={props.pool} take={24} audioRate={props.audioRate} onSit={props.onSit} />
+      <AlreadyYours
+        pool={props.pool}
+        take={SESSION_SIZE}
+        audioRate={props.audioRate}
+        onSit={props.onSit}
+        canResume={props.canResume}
+        onResume={props.onResume}
+      />
     </main>
   )
 }

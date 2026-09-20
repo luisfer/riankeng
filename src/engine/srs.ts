@@ -85,15 +85,22 @@ export function applyAttempt(p: ItemProgress, attempt: Attempt): ItemProgress {
       history,
     }
   }
+  const slip = attempt.v === 'tone' || attempt.v === 'length'
   return {
     ...p,
-    stage: Math.max(0, p.stage - 2),
+    stage: Math.max(0, p.stage - (slip ? 1 : 2)),
     due: attempt.t, // back into the session
     reps: p.reps + 1,
-    lapses: p.lapses + 1,
+    lapses: slip ? p.lapses : p.lapses + 1,
     lastSeen: attempt.t,
     history,
   }
+}
+
+/** Teach face: the word is seen, but this is not a scored rep. */
+export function applyMeet(p: ItemProgress, t: number): ItemProgress {
+  if (p.reps > 0) return { ...p, lastSeen: t }
+  return { ...p, reps: 1, lastSeen: t, due: t }
 }
 
 export function isDue(p: ItemProgress, now: number): boolean {

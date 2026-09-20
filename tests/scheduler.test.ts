@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { entriesForLevel, getEntry } from '../content/index'
-import { allLevelStatus, chooseModality, hereLevel, pairRoms, pickChoices, seenEntries, type LevelStatus } from '../src/engine/scheduler'
+import { allLevelStatus, chooseModality, hereLevel, pairRoms, pickChoices, reviewEntries, seenEntries, type LevelStatus } from '../src/engine/scheduler'
 import { newItemProgress, type ItemProgress } from '../src/engine/srs'
 import { emptyDoc } from '../src/storage/progress-schema'
 
@@ -9,11 +9,15 @@ function withReps(id: string, reps = 1): ItemProgress {
 }
 
 describe('chooseModality', () => {
-  it('keeps unseen Voice on recognition', () => {
+  it('lets unseen Voice 0 listen or name tone, not only recognition', () => {
     const entry = getEntry('w:maa')!
-    for (let i = 0; i < 20; i++) {
-      expect(chooseModality(entry, newItemProgress(entry.id), String(i))).toBe('th-en')
+    const seen = new Set<string>()
+    for (let i = 0; i < 80; i++) {
+      const m = chooseModality(entry, newItemProgress(entry.id), String(i))
+      expect(['en-th', 'th-en', 'listen', 'tone']).toContain(m)
+      seen.add(m)
     }
+    expect(seen.has('listen') || seen.has('tone')).toBe(true)
   })
 
   it('lets Voice 0 listen and name tone after the word has been seen', () => {
@@ -48,6 +52,14 @@ describe('chooseModality', () => {
       expect(chooseModality(entry, p, String(i), false)).not.toBe('listen')
     }
   })
+
+  it('keeps a Voice lapse on produce or ear, not only th-en', () => {
+    const entry = getEntry('w:dâi')!
+    const p = { ...newItemProgress(entry.id), reps: 3, stage: 0 }
+    const seen = new Set<string>()
+    for (let i = 0; i < 80; i++) seen.add(chooseModality(entry, p, String(i)))
+    expect(seen.has('en-th') || seen.has('listen') || seen.has('tone')).toBe(true)
+  })
 })
 
 describe('pairRoms', () => {
@@ -70,6 +82,17 @@ describe('seenEntries', () => {
   })
 })
 
+describe('reviewEntries', () => {
+  it('puts overdue cards first and includes Script', () => {
+    const now = 1_700_000_000_000
+    const doc = emptyDoc(now)
+    doc.items['w:maa'] = { ...withReps('w:maa'), due: now + 86_400_000 }
+    doc.items['s:maa'] = { ...withReps('s:maa'), due: now - 1 }
+    const rows = reviewEntries(doc, now)
+    expect(rows.map((e) => e.id)).toEqual(['s:maa', 'w:maa'])
+  })
+})
+
 describe('pickChoices', () => {
   it('draws distractors from earlier Script levels and never a lone tone mark', () => {
     const entry = getEntry('s:máa')!
@@ -83,13 +106,24 @@ describe('pickChoices', () => {
 })
 
 describe('script unlock', () => {
-  it('opens Script 1 after every Script 0 item has been seen, without mastery', () => {
+  it('keeps Script 1 locked when every Script 0 item was only missed', () => {
     const doc = emptyDoc()
     for (const e of entriesForLevel(0, 'script')) {
       doc.items[e.id] = withReps(e.id)
     }
     const script = allLevelStatus(doc, Date.now(), 'script')
     expect(script[0]!.seen).toBe(script[0]!.total)
+    expect(script[0]!.passed).toBe(0)
+    expect(script[1]!.unlocked).toBe(false)
+  })
+
+  it('opens Script 1 after every Script 0 item has been right once, without mastery', () => {
+    const doc = emptyDoc()
+    for (const e of entriesForLevel(0, 'script')) {
+      doc.items[e.id] = { ...withReps(e.id), days: ['2026-01-01'] }
+    }
+    const script = allLevelStatus(doc, Date.now(), 'script')
+    expect(script[0]!.passed).toBe(script[0]!.total)
     expect(script[0]!.complete).toBe(false)
     expect(script[1]!.unlocked).toBe(true)
   })
@@ -108,6 +142,7 @@ function status(partial: Partial<LevelStatus> & Pick<LevelStatus, 'n'>): LevelSt
   return {
     total: 0,
     seen: 0,
+    passed: 0,
     mastered: 0,
     due: 0,
     unlocked: true,

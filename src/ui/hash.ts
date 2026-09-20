@@ -47,3 +47,15 @@ export function go(route: Route): void {
   if (window.location.hash !== next) window.location.hash = next
   else window.dispatchEvent(new HashChangeEvent('hashchange'))
 }
+
+/** Leave a dead `#/session` without stacking another Back stop. */
+export function replace(route: Route): void {
+  const next = hashFor(route)
+  if (window.location.hash === next) {
+    window.dispatchEvent(new HashChangeEvent('hashchange'))
+    return
+  }
+  const url = `${window.location.pathname}${window.location.search}${next}`
+  window.history.replaceState(null, '', url)
+  window.dispatchEvent(new HashChangeEvent('hashchange'))
+}

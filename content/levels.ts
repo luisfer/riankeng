@@ -6,7 +6,7 @@ export const LEVELS: LevelMeta[] = [
     title: 'The sound system',
     rom: 'sǐang',
     thai: 'เสียง',
-    blurb: 'Five tones, long and short vowels, and the stops English does not separate. Ears first. You will hear, then write, and name the tone.',
+    blurb: 'Five tones. Long and short vowels. g/k, bp/p, dt/t.',
     focus: [
       'maa, máa, mǎa. Come, horse, dog. Mid, high, rising.',
       'mâi, mài, mái. Not, new, and the question.',
@@ -21,7 +21,7 @@ export const LEVELS: LevelMeta[] = [
     title: 'Survival',
     rom: 'sà-wàt-dii',
     thai: 'สวัสดี',
-    blurb: 'Enough to be polite anywhere in Thailand tonight.',
+    blurb: 'Hello, the polite endings, and numbers to ten.',
     focus: [
       'kráp / kâ. Polite endings, by who is speaking.',
       'pǒm, chǎn, kun. I (male), I (female), and you.',
@@ -35,7 +35,7 @@ export const LEVELS: LevelMeta[] = [
     title: 'Core verbs',
     rom: 'bpai maa',
     thai: 'ไปมา',
-    blurb: 'Subject, verb, object. No conjugation, no plurals, no articles. Thai gives you this for free.',
+    blurb: 'Subject, verb, object. No conjugation, no plurals, no articles.',
     focus: [
       'Subject, verb, object. Thai keeps this order.',
       'mâi + verb. That is how you say no.',
@@ -61,7 +61,7 @@ export const LEVELS: LevelMeta[] = [
     title: 'Food and drink',
     rom: 'gin kâao',
     thai: 'กินข้าว',
-    blurb: 'Ordering, tasting, refusing chilli. Where most Thai conversations actually happen.',
+    blurb: 'Ordering, tasting, refusing chilli.',
     focus: [
       'ao … nɔ̀i. I will have a little, the way you order.',
       'mâi pèt. Not spicy.',
@@ -102,7 +102,7 @@ export const LEVELS: LevelMeta[] = [
     title: 'Time and aspect',
     rom: 'dtɔɔn nîi',
     thai: 'ตอนนี้',
-    blurb: 'When it happens, and how far along you are. Now, just now, not yet, Chiang Mai.',
+    blurb: 'Now, just now, and not yet. Chiang Mai is in this lesson.',
     focus: [
       'dtɔɔn, dtɔɔn nîi. When, and now.',
       'pə̂ng. Just now.',
@@ -183,7 +183,7 @@ export const LEVELS: LevelMeta[] = [
     title: 'Work, study, tech',
     rom: 'tam ngaan',
     thai: 'ทำงาน',
-    blurb: 'Offices, meetings, phones, the internet, learning itself.',
+    blurb: 'Meetings, phones, and the internet.',
     focus: [
       'bprà-chum. A meeting.',
       'rian, sɔ̌ɔn. Learn, teach.',
@@ -239,7 +239,7 @@ export const LEVELS: LevelMeta[] = [
     title: 'Particles and register',
     rom: 'ná',
     thai: 'นะ',
-    blurb: 'The little words at the end that carry tone of voice. Polite, casual, close.',
+    blurb: 'The words at the end. ná, sì, kráp, kâ.',
     focus: [
       'ná, sì, lɔ̀k, lâ. Soften, insist, contradict, leave it.',
       'nɔ̀i, rɔ̀k, ləəi. A little, not at all, altogether.',
@@ -279,7 +279,7 @@ export const LEVELS: LevelMeta[] = [
     title: 'Heart words and idioms',
     rom: 'jai',
     thai: 'ใจ',
-    blurb: 'Thai keeps its feelings in the heart words. jai-yen, grεεng-jai, nám-jai.',
+    blurb: 'jai yen, grεεng jai, nám jai.',
     focus: [
       'jai yen, jai rɔ́ɔn. A cool heart, a hot heart.',
       'grεεng jai. The reluctance to impose.',
@@ -293,7 +293,7 @@ export const LEVELS: LevelMeta[] = [
     title: 'Fluency capstone',
     rom: 'pûut dâi lέεo',
     thai: 'พูดได้แล้ว',
-    blurb: 'Long dictations, whole thoughts in Thai, and proverbs. Journey 1 ends here.',
+    blurb: 'Two-sentence dictation, and proverbs.',
     focus: [
       'Two-sentence dictation. Hold a whole thought.',
       'English to Thai paragraphs.',

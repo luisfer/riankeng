@@ -4,11 +4,13 @@ import {
   afterHold,
   afterMeet,
   canContinue,
+  canResumeReview,
   currentItem,
   markCorrect,
   markMissMove,
   markMissStay,
   requeueCurrent,
+  REVIEW_TAIL,
   SESSION_SIZE,
   startReviewSession,
   startSession,
@@ -102,11 +104,11 @@ describe('startSession belongs to the opened level', () => {
 })
 
 describe('Voice 0 can listen and name tone', () => {
-  it('returns only th-en until the word has been seen', () => {
+  it('can listen or name tone on the first sitting', () => {
     const entry = getEntry('w:maa')!
-    for (let i = 0; i < 40; i++) {
-      expect(chooseModality(entry, newItemProgress(entry.id), String(i))).toBe('th-en')
-    }
+    const seen = new Set<string>()
+    for (let i = 0; i < 80; i++) seen.add(chooseModality(entry, newItemProgress(entry.id), String(i)))
+    expect(seen.has('listen') || seen.has('tone')).toBe(true)
   })
 
   it('returns listen or tone for some Voice 0 salts after reps', () => {
@@ -132,20 +134,45 @@ describe('review sitting', () => {
     expect(s.queue.every((q) => q.meet === false)).toBe(true)
     expect(s.review).toBe(true)
     expect(canContinue(s, 'voice', 0)).toBe(false)
+    expect(canResumeReview(s)).toBe(true)
   })
 })
 
 describe('meet then test', () => {
-  it('marks fresh cards as meet and flips the same id', () => {
+  it('sends the test later in the sitting so it is not an echo', () => {
     const s = startSession(emptyDoc(), 1, 0, 'voice')
+    expect(s.queue.length).toBeGreaterThan(1)
     const first = currentItem(s)!
     expect(first.meet).toBe(true)
-    expect(first.modality).toBe('th-en')
     const next = afterMeet(s)
-    const same = currentItem(next)!
-    expect(same.id).toBe(first.id)
-    expect(same.meet).toBe(false)
+    expect(currentItem(next)!.id).not.toBe(first.id)
+    expect(next.queue.at(-1)?.id).toBe(first.id)
+    expect(next.queue.at(-1)?.meet).toBe(false)
     expect(next.answered).toBe(0)
-    expect(next.cursor).toBe(0)
+  })
+})
+
+describe('startSession leftover', () => {
+  it('does not fill a half-done level with not-due leftovers', () => {
+    const now = 1_700_000_000_000
+    const doc = emptyDoc(now)
+    const level0 = entriesForLevel(0, 'voice')
+    for (const e of level0.slice(0, 17)) {
+      doc.items[e.id] = { ...newItemProgress(e.id), reps: 2, stage: 1, lastSeen: now - 1, due: now + 86_400_000 }
+    }
+    const s = startSession(doc, now, 0, 'voice')
+    const leftoverIds = new Set(level0.slice(0, 17).map((e) => e.id))
+    expect(s.queue.some((q) => leftoverIds.has(q.id))).toBe(false)
+    expect(s.queue.length).toBeLessThanOrEqual(doc.settings.newPerSession)
+  })
+
+  it('reserves earlier dues instead of stuffing leftovers', () => {
+    const now = 1_700_000_000_000
+    const doc = emptyDoc(now)
+    const early = entriesForLevel(0, 'voice').slice(0, REVIEW_TAIL)
+    for (const e of early) doc.items[e.id] = dueItem(e.id, now)
+    const s = startSession(doc, now, 4, 'voice')
+    const earlyIds = new Set(early.map((e) => e.id))
+    expect(s.queue.filter((q) => earlyIds.has(q.id)).length).toBe(REVIEW_TAIL)
   })
 })

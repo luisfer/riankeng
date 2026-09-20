@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { judgeTonePick, toneSyllableShow } from '../src/engine/tone-step'
+import { judgeTonePick, toneBareShow, toneSyllableShow } from '../src/engine/tone-step'
 
 describe('tone steps', () => {
   it('walks every syllable then rights', () => {
@@ -16,5 +16,11 @@ describe('tone steps', () => {
   it('keeps a single syllable as one pick', () => {
     expect(judgeTonePick('maa', 0, 'mid')).toEqual({ kind: 'right' })
     expect(judgeTonePick('máa', 0, 'low')).toEqual({ kind: 'miss', line: 'high' })
+  })
+
+  it('hides tone marks on the desk', () => {
+    expect(toneBareShow('máa')).toBe('maa')
+    expect(toneBareShow('sà-àat', 0)).not.toMatch(/[àâáǎèêéěìîíǐòôóǒùûúǔ]/)
+    expect(toneBareShow('sà-àat', 0)).not.toBe(toneSyllableShow('sà-àat', 0))
   })
 })

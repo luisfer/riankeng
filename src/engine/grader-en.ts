@@ -89,7 +89,6 @@ const SYNONYM_ROWS: string[][] = [
   ['finish', 'end', 'done'],
   ['want', 'wanna'],
   ['going', 'gonna'],
-  ['understand', 'get'],
   ['maybe', 'perhaps', 'probably'],
   ['also', 'too'],
   ['angry', 'mad'],
@@ -119,7 +118,7 @@ const SYNONYM_ROWS: string[][] = [
   ['litre', 'liter'],
   ['practise', 'practice'],
   ['learn', 'study'],
-  ['speak', 'talk', 'say'],
+  ['speak', 'talk'],
   ['many', 'lots', 'lot', 'much'],
   ['very', 'so'],
 ]

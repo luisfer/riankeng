@@ -117,7 +117,9 @@ export function LevelIntro(props: {
       )}
       <div className="intro-actions">
         {props.locked ? (
-          <p className="warn">Clear the previous level first.</p>
+          <p className="warn">
+            {props.track === 'voice' ? 'Master the previous level first.' : 'Get every letter on the previous level right first.'}
+          </p>
         ) : empty ? (
           <p className="warn">This level is not authored yet.</p>
         ) : (

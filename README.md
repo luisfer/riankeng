@@ -1,6 +1,6 @@
 # riian gèng — เรียนเก่ง
 
-A local-first Thai journey app. Spoken Thai, written so you can hear it. Two tracks: **Voice** (phonetic romanization) and **Script** (letters, tied to words you already say).
+A local-first Thai primer. **Voice** is romanization. **Script** is the letters, on words you already say.
 
 No account. Progress lives in IndexedDB with a localStorage mirror. Export a JSON file when you want a copy.
 
@@ -23,7 +23,7 @@ npx tsx scripts/validate-content.ts
 
 Type the answer. Paste is blocked. A correct card stays up with **Right.** until you hit Next. A miss keeps the grader’s reason on screen and makes you retype the target. **Begin** unlocks speech; cards play once when autoplay is on. **Hear** and **Slower** play recorded Thai (Voice clips in `public/audio`). `npm run audio` rebuilds them.
 
-Voice unlocks the next level when the previous one is mastered. Script unlocks when every item on the previous level has been seen.
+Voice unlocks the next level when the previous one is mastered. Script unlocks when every item on the previous level has been answered correctly.
 
 ## Tracks
 

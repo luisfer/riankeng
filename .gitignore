@@ -1,4 +1,5 @@
 node_modules
+content/.learner-copy.md
 dist
 .vercel
 .DS_Store

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { DAY, HOUR, applyAttempt, isDue, isMastered, newItemProgress, stageName } from '../src/engine/srs'
+import { DAY, HOUR, applyAttempt, applyMeet, isDue, isMastered, newItemProgress, stageName } from '../src/engine/srs'
 
 const t0 = Date.UTC(2026, 8, 17, 12)
 
@@ -16,11 +16,27 @@ describe('srs', () => {
 
   it('drops two stages on a miss and is due immediately', () => {
     let p = { ...newItemProgress('x'), stage: 4, due: t0 + DAY }
-    p = applyAttempt(p, { t: t0, ok: false, v: 'tone', m: 'listen' })
+    p = applyAttempt(p, { t: t0, ok: false, v: 'wrong', m: 'listen' })
     expect(p.stage).toBe(2)
     expect(p.due).toBe(t0)
     expect(p.lapses).toBe(1)
     expect(isDue(p, t0)).toBe(true)
+  })
+
+  it('drops one stage on a tone slip and does not count a lapse', () => {
+    let p = { ...newItemProgress('x'), stage: 4, due: t0 + DAY, reps: 3 }
+    p = applyAttempt(p, { t: t0, ok: false, v: 'tone', m: 'en-th' })
+    expect(p.stage).toBe(3)
+    expect(p.lapses).toBe(0)
+    expect(p.due).toBe(t0)
+  })
+
+  it('marks a meet as seen without growing the stage', () => {
+    const p = applyMeet(newItemProgress('w:maa'), t0)
+    expect(p.reps).toBe(1)
+    expect(p.stage).toBe(0)
+    expect(p.days).toEqual([])
+    expect(p.due).toBe(t0)
   })
 
   it('never goes below seed', () => {

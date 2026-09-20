@@ -1,6 +1,7 @@
 import { LEVELS, SCRIPT_LEVELS } from '@content/index'
 import type { TrackId } from '@content/types'
 import { hereLevel, type LevelStatus } from '@/engine/scheduler'
+import { chrome } from './copy'
 
 function TrackList(props: {
   title: string
@@ -20,7 +21,7 @@ function TrackList(props: {
           const s = props.statuses[lvl.n]
           const locked = Boolean(s && s.total > 0 && !s.unlocked)
           const at = here === lvl.n
-          const meta = !s || s.total === 0 ? 'soon' : locked ? '' : String(s.total)
+          const meta = !s || s.total === 0 ? 'soon' : locked ? '' : s.seen > 0 ? `${s.seen} of ${s.total}` : String(s.total)
           return (
             <li key={`${props.track}-${lvl.n}`}>
               <button
@@ -62,14 +63,14 @@ export function Journey(props: {
           <span className="contents-n" />
           <span>
             <span className="contents-title">Already yours</span>
-            <span className="contents-rom rom">words you have seen</span>
+            <span className="contents-rom rom">{chrome.yoursSub}</span>
           </span>
           <span className="contents-meta">open</span>
         </button>
       </section>
       <TrackList
         title="Voice"
-        lede="Spoken Thai, written so you can hear it. Hear, say, and name the tone."
+        lede={chrome.voiceLede}
         levels={LEVELS}
         statuses={props.voice}
         track="voice"
@@ -77,7 +78,7 @@ export function Journey(props: {
       />
       <TrackList
         title="Script"
-        lede="The letters, one shape at a time. Then the words you already know from Voice."
+        lede={chrome.scriptLede}
         levels={SCRIPT_LEVELS}
         statuses={props.script}
         track="script"
@@ -88,7 +89,7 @@ export function Journey(props: {
           <span className="contents-n" />
           <span>
             <span className="contents-title">The whole script</span>
-            <span className="contents-rom rom">every letter, and where it is taught</span>
+            <span className="contents-rom rom">{chrome.alphabetSub}</span>
           </span>
           <span className="contents-meta">open</span>
         </button>

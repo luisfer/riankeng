@@ -195,7 +195,7 @@ export const SCRIPT_LEVELS: LevelMeta[] = [
     title: 'เรียน',
     rom: 'rian',
     thai: 'เรียน',
-    blurb: 'Vowels written in more than one piece around the consonant. One in เรียน, one in เพื่อน, one in ตัว, one in เธอ. The first half of เรียนเก่ง is here.',
+    blurb: 'Vowels written in more than one piece: เรียน, เพื่อน, ตัว, เธอ.',
     focus: ['เ◌ีย. เรียน.', 'เ◌ือ. เพื่อน, เมือง.', '◌ัว. ตัว, ครัว.', 'เ◌อ. เธอ, เจอ.'],
     min: 10,
   },

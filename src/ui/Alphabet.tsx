@@ -21,7 +21,7 @@ function cell(doc: ProgressDoc, char: string, sub: string, retired?: boolean): C
   return out
 }
 
-function Grid(props: { title: string; note?: string; cells: Cell[]; onOpen: (n: number) => void }) {
+function Grid(props: { title: string; note?: string; cells: Cell[]; onOpen: (n: number) => void; unlocked?: (n: number) => boolean }) {
   return (
     <section className="alpha-block">
       <h2 className="quiet">{props.title}</h2>
@@ -32,7 +32,7 @@ function Grid(props: { title: string; note?: string; cells: Cell[]; onOpen: (n: 
             <button
               type="button"
               className={`alpha-cell${c.seen ? ' seen' : ''}${c.retired ? ' retired' : ''}`}
-              disabled={c.level === undefined}
+              disabled={c.level === undefined || (props.unlocked ? !props.unlocked(c.level) : false)}
               onClick={() => c.level !== undefined && props.onOpen(c.level)}
               title={c.level === undefined ? undefined : `Script level ${c.level}`}
             >
@@ -53,7 +53,7 @@ const CLASS_TITLE: Record<ConsonantClass, string> = {
   low: 'Low class',
 }
 
-export function Alphabet(props: { doc: ProgressDoc; onOpen: (n: number) => void }) {
+export function Alphabet(props: { doc: ProgressDoc; onOpen: (n: number) => void; unlocked?: (n: number) => boolean }) {
   const taught = CONSONANTS.filter((c) => cardFor(c.char) && progressFor(props.doc, cardFor(c.char)!.id).reps > 0).length
   return (
     <main className="page alphabet">
@@ -75,9 +75,10 @@ export function Alphabet(props: { doc: ProgressDoc; onOpen: (n: number) => void 
           }
           cells={CONSONANTS.filter((c) => c.cls === cls).map((c) => cell(props.doc, c.char, c.name, c.retired))}
           onOpen={props.onOpen}
+          unlocked={props.unlocked}
         />
       ))}
-      <Grid title="Vowels" cells={VOWELS.map((v) => cell(props.doc, v.char, v.reads))} onOpen={props.onOpen} />
+      <Grid title="Vowels" cells={VOWELS.map((v) => cell(props.doc, v.char, v.reads))} onOpen={props.onOpen} unlocked={props.unlocked} />
       <section className="alpha-block">
         <h2 className="quiet">Tone marks</h2>
         <p className="lede alpha-note thai-inline">
@@ -103,8 +104,8 @@ export function Alphabet(props: { doc: ProgressDoc; onOpen: (n: number) => void 
           </li>
         </ul>
       </section>
-      <Grid title="Other marks" cells={OTHER_SIGNS.map((s) => cell(props.doc, s.char, s.reads))} onOpen={props.onOpen} />
-      <Grid title="Digits" cells={DIGITS.map((d, i) => cell(props.doc, d, String(i)))} onOpen={props.onOpen} />
+      <Grid title="Other marks" cells={OTHER_SIGNS.map((s) => cell(props.doc, s.char, s.reads))} onOpen={props.onOpen} unlocked={props.unlocked} />
+      <Grid title="Digits" cells={DIGITS.map((d, i) => cell(props.doc, d, String(i)))} onOpen={props.onOpen} unlocked={props.unlocked} />
     </main>
   )
 }

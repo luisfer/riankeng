@@ -13,7 +13,7 @@ export default defineConfig({
       manifest: {
         name: 'riian gèng',
         short_name: 'riankeng',
-        description: 'Spoken Thai, written so you can hear it.',
+        description: 'Thai in romanization, then the letters.',
         theme_color: '#f2ead8',
         background_color: '#f2ead8',
         display: 'standalone',

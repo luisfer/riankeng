@@ -66,6 +66,9 @@ const reject: Array<[string[], string]> = [
   [['thank you'], 'sorry'],
   [['he is not coming'], 'he is coming'],
   [['delicious'], ''],
+  [['understand', 'to understand'], 'get'],
+  [['get', 'can'], 'understand'],
+  [['say', 'tell'], 'talk'],
 ]
 
 describe('gradeEnglish', () => {

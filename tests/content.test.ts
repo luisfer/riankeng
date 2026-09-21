@@ -96,15 +96,15 @@ describe('content', () => {
     expect(pet.en).not.toContain('too spicy')
   })
 
-  it('writes ย่า with mai tho on Voice 0 and Script 6', () => {
+  it('writes ย่า with mai ek on Voice 0 and Script 6', () => {
     const voice = getEntry('w:yâa')!
     const script = getEntry('s:yâa')!
-    const maiTho = '\u0E49'
     const maiEk = '\u0E48'
-    expect(voice.thai).toBe(`ย${maiTho}า`)
-    expect(script.thai).toBe(`ย${maiTho}า`)
-    expect(script.compose).toEqual(['ย', maiTho, 'า'])
-    expect(script.compose?.join('')).not.toContain(maiEk)
+    const maiTho = '\u0E49'
+    expect(voice.thai).toBe(`ย${maiEk}า`)
+    expect(script.thai).toBe(`ย${maiEk}า`)
+    expect(script.compose).toEqual(['ย', maiEk, 'า'])
+    expect(script.compose?.join('')).not.toContain(maiTho)
     expect(gradeThai(voice.rom, 'yâa').verdict).toBe('exact')
   })
 

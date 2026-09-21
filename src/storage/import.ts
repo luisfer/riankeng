@@ -1,4 +1,5 @@
 import { getEntry } from '@content/index'
+import { currentId } from '@content/aliases'
 import { applyAttempt, newItemProgress, type Attempt, type ItemProgress } from '@/engine/srs'
 import { DEFAULT_SETTINGS, emptyDoc, type ProgressDoc, type ProgressExport, type Settings } from './progress-schema'
 
@@ -54,6 +55,29 @@ export function mergeItem(have: ItemProgress | undefined, incoming: ItemProgress
   }
 }
 
+/** File one saved item under its current id, when a spelling fix renamed the entry. */
+export function aliasItem(item: ItemProgress): ItemProgress {
+  const id = currentId(item.id)
+  return id === item.id ? item : { ...item, id }
+}
+
+/**
+ * Rewrite a progress map through the alias table. A renamed card keeps its
+ * history; if both ids are present the two are replayed into one.
+ */
+export function aliasItems(items: Record<string, ItemProgress>): Record<string, ItemProgress> {
+  let moved = false
+  const out: Record<string, ItemProgress> = {}
+  for (const [key, item] of Object.entries(items)) {
+    const id = currentId(key)
+    if (id !== key) moved = true
+    const filed = item.id === id ? item : { ...item, id }
+    const have = out[id]
+    out[id] = have ? mergeItem(have, filed) : filed
+  }
+  return moved ? out : items
+}
+
 export function presentSettings(incoming: Partial<Settings> | undefined): Partial<Settings> {
   if (!incoming) return {}
   const out: Partial<Settings> = {}
@@ -69,7 +93,8 @@ export function previewImport(doc: ProgressDoc, incoming: ProgressExport): Impor
   let newer = 0
   let older = 0
   let unknown = 0
-  for (const item of incoming.items) {
+  for (const raw of incoming.items) {
+    const item = aliasItem(raw)
     if (!getEntry(item.id)) {
       unknown++
       continue
@@ -99,7 +124,8 @@ export function previewImport(doc: ProgressDoc, incoming: ProgressExport): Impor
 
 export function applyImport(doc: ProgressDoc, incoming: ProgressExport, now = Date.now()): ProgressDoc {
   const items: Record<string, ItemProgress> = { ...doc.items }
-  for (const item of incoming.items) {
+  for (const raw of incoming.items) {
+    const item = aliasItem(raw)
     if (!getEntry(item.id)) continue
     items[item.id] = mergeItem(items[item.id], item)
   }

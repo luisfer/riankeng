@@ -24,7 +24,7 @@ const rows = words(0, [
   // ── yaa family
   ['yaa', 'ยา', ['medicine', 'drug', 'medication'], 'n', ['tone-mid', 'pair-yaa']],
   ['yàa', 'อย่า', ["don't", 'do not'], 'adv', ['tone-low', 'pair-yaa']],
-  ['yâa', 'ย้า', ['grandmother', '(paternal) grandmother', "father's mother"], 'n', ['tone-falling', 'pair-yaa']],
+  ['yâa', 'ย่า', ['grandmother', '(paternal) grandmother', "father's mother"], 'n', ['tone-falling', 'pair-yaa']],
   // ── glai / glâi
   ['glai', 'ไกล', ['far', 'far away'], 'adj', ['tone-mid', 'pair-glai']],
   ['glâi', 'ใกล้', ['near', 'close', 'nearby'], 'adj', ['tone-falling', 'pair-glai']],
@@ -63,7 +63,7 @@ const rows = words(0, [
   // ── glottal stop and ng onset
   ["sà-àat", 'สะอาด', ['clean'], 'adj', ['glottal']],
   ['ngaan', 'งาน', ['work', 'job', 'event'], 'n', ['ng-onset']],
-  ['ngǔu', 'งู', ['snake'], 'n', ['ng-onset']],
+  ['nguu', 'งู', ['snake'], 'n', ['ng-onset']],
   // ── long vs short with same tone (pure length pairs)
   ['ao', 'เอา', ['take', 'to take', 'want', "I'll have"], 'v', ['length']],
   ['aa#2', 'อา', ['uncle', "(father's younger) brother"], 'n', ['length'], 'The length twin of ao. Also the letter อ plus า.'],

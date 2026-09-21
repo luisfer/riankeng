@@ -241,7 +241,7 @@ export const LEVELS: LevelMeta[] = [
     thai: 'นะ',
     blurb: 'The words at the end. ná, sì, kráp, kâ.',
     focus: [
-      'ná, sì, lɔ̀k, lâ. Soften, insist, contradict, leave it.',
+      'ná, sì, rɔ̀k, lâ. Soften, insist, contradict, leave it.',
       'nɔ̀i, rɔ̀k, ləəi. A little, not at all, altogether.',
       'kráp, kâ, já. Polite, and close.',
     ],

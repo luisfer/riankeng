@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { allLevelStatus, reviewEntries } from '@/engine/scheduler'
+import { allLevelStatus, reviewEntries, unlockCount } from '@/engine/scheduler'
 import {
   canContinue,
   canResumeReview,
@@ -258,7 +258,7 @@ export function App() {
           level={trailLevel}
           remaining={inSession && session ? remaining(session) : undefined}
           correct={inSession && session ? session.correct : undefined}
-          lessonSeen={lessonStatus?.seen}
+          lessonDone={lessonStatus ? unlockCount(lessonStatus, trailTrack ?? 'voice') : undefined}
           lessonTotal={lessonStatus?.total}
           onPause={inSession || inIntro ? leaveSitting : undefined}
           place={trailPlace}
@@ -322,6 +322,7 @@ export function App() {
             )}
             canContinue={canContinue(session, route.track, route.n)}
             seen={lessonStatus?.seen}
+            done={lessonStatus ? unlockCount(lessonStatus, route.track) : undefined}
             total={lessonStatus?.total}
             onStart={() => beginLevel(route.n, route.track)}
             onContinue={() => go({ name: 'session' })}

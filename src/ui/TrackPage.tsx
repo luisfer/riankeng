@@ -1,6 +1,7 @@
 import { levelsFor } from '@content/index'
 import type { TrackId } from '@content/types'
-import { hereLevel, type LevelStatus } from '@/engine/scheduler'
+import { hereLevel, unlockCount, type LevelStatus } from '@/engine/scheduler'
+import { Meter } from './bits'
 import { chrome } from './copy'
 
 /** The contents of one track: every level, where you are, how much is cleared. */
@@ -21,7 +22,8 @@ export function TrackPage(props: {
             const s = props.statuses[lvl.n]
             const locked = Boolean(s && s.total > 0 && !s.unlocked)
             const at = here === lvl.n
-            const meta = !s || s.total === 0 ? 'soon' : locked ? '' : s.seen > 0 ? `${s.seen} of ${s.total}` : String(s.total)
+            const done = s ? unlockCount(s, props.track) : 0
+            const meta = !s || s.total === 0 ? 'soon' : locked ? '' : done > 0 ? `${done} of ${s.total}` : String(s.total)
             return (
               <li key={`${props.track}-${lvl.n}`}>
                 <button
@@ -40,6 +42,13 @@ export function TrackPage(props: {
                     <span className="contents-rom rom">{lvl.rom}</span>
                   </span>
                   <span className="contents-meta">{meta}</span>
+                  {s && s.total > 0 && !locked && (
+                    <Meter
+                      className="row-meter"
+                      value={done / s.total}
+                      label={`${done} of ${s.total} done in ${lvl.title}`}
+                    />
+                  )}
                 </button>
               </li>
             )

@@ -42,9 +42,15 @@ describe('trackPlace', () => {
 })
 
 describe('trackTally', () => {
-  it('adds up the whole track', () => {
-    const t = trackTally([status({ n: 0, seen: 4 }), status({ n: 1, seen: 6, total: 20 })])
-    expect(t).toEqual({ seen: 10, total: 30 })
+  it('counts mastery on Voice', () => {
+    const t = trackTally([status({ n: 0, mastered: 4 }), status({ n: 1, mastered: 6, total: 20 })], 'voice')
+    expect(t).toEqual({ done: 10, total: 30 })
+  })
+
+  it('counts one right answer on Script, which is what Script unlocks on', () => {
+    const rows = [status({ n: 0, passed: 9, mastered: 1 }), status({ n: 1, passed: 2, total: 20 })]
+    expect(trackTally(rows, 'script')).toEqual({ done: 11, total: 30 })
+    expect(trackTally(rows, 'voice')).toEqual({ done: 1, total: 30 })
   })
 })
 
@@ -87,10 +93,10 @@ describe('the landing page', () => {
     expect(rows[0]!.querySelector('.contents-n')?.textContent).toBe('0')
     // untouched: the meta is the bare catalog count, and the pie is empty
     const doc = emptyDoc()
-    const voiceCards = trackTally(allLevelStatus(doc, Date.now(), 'voice')).total
+    const voiceCards = trackTally(allLevelStatus(doc, Date.now(), 'voice'), 'voice').total
     expect(voiceCards).toBeGreaterThan(0)
     expect(rows[0]!.querySelector('.contents-meta')?.textContent).toBe(String(voiceCards))
-    expect(rows[0]!.querySelector('.quiet-pie')?.getAttribute('aria-valuenow')).toBe('0')
+    expect(rows[0]!.querySelector('.row-meter')?.getAttribute('aria-valuenow')).toBe('0')
   })
 
   it('does not put a level title from either track on the page', () => {

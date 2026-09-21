@@ -15,6 +15,25 @@ export function localDayKey(now = Date.now()): string {
   return `${day.getFullYear()}-${String(day.getMonth() + 1).padStart(2, '0')}-${String(day.getDate()).padStart(2, '0')}`
 }
 
+/** How long ago, in the plainest words that still say it. */
+export function agoWords(then: number, now = Date.now()): string {
+  if (!then) return 'never'
+  const s = Math.max(0, Math.round((now - then) / 1000))
+  if (s < 45) return 'just now'
+  const m = Math.round(s / 60)
+  if (m < 60) return m === 1 ? 'a minute ago' : `${m} minutes ago`
+  const h = Math.round(m / 60)
+  if (h < 24) return h === 1 ? 'an hour ago' : `${h} hours ago`
+  const d = Math.round(h / 24)
+  if (d === 1) return 'yesterday'
+  return `${d} days ago`
+}
+
+/** A backup older than a week, or none at all, is worth saying in lacquer. */
+export function backupStale(lastBackupAt: number, now = Date.now()): boolean {
+  return lastBackupAt === 0 || now - lastBackupAt > 7 * 24 * 60 * 60 * 1000
+}
+
 /** Twelve week columns, Sunday first, ending on this week. */
 export function lastWeeks(n: number, now = Date.now()): string[] {
   const out: string[] = []
@@ -58,6 +77,7 @@ export function Account(props: {
   const [preview, setPreview] = useState<string | null>(null)
   const [pending, setPending] = useState<ReturnType<typeof parseExport>>(null)
   const [offlineReady, setOfflineReady] = useState(false)
+  const [online, setOnline] = useState(() => (typeof navigator === 'undefined' ? true : navigator.onLine))
   const days = activeDays(props.doc)
   const cells = lastWeeks(12)
   const months = heatMonthMarks(cells)
@@ -88,8 +108,26 @@ export function Account(props: {
     }
   }, [])
 
+  useEffect(() => {
+    const up = () => setOnline(true)
+    const down = () => setOnline(false)
+    window.addEventListener('online', up)
+    window.addEventListener('offline', down)
+    return () => {
+      window.removeEventListener('online', up)
+      window.removeEventListener('offline', down)
+    }
+  }, [])
+
   const set = <K extends keyof ProgressDoc['settings']>(key: K, value: ProgressDoc['settings'][K]) => {
     props.onDoc({ ...props.doc, settings: { ...props.doc.settings, [key]: value } })
+  }
+
+  const cards = Object.keys(props.doc.items).length
+  const stale = backupStale(props.doc.settings.lastBackupAt)
+  const backUp = () => {
+    download('riankeng-progress-v1.json', exportJson(props.doc), 'application/json')
+    set('lastBackupAt', Date.now())
   }
 
   return (
@@ -99,7 +137,48 @@ export function Account(props: {
         {s > 0 ? `${s} day streak. ` : ''}
         Today {today.correct} of {today.answered || 0}.
       </p>
-      <p className="lede">{offlineReady ? 'Works offline.' : 'Needs the network to open.'}</p>
+      <h2>Your progress</h2>
+      <ul className="status">
+        <li>
+          <span>Where it lives</span>
+          <span className="status-value">this device</span>
+        </li>
+        <li>
+          <span>Cards with progress</span>
+          <span className="status-value">{cards}</span>
+        </li>
+        <li>
+          <span>Last saved</span>
+          <span className="status-value">{agoWords(props.doc.updatedAt)}</span>
+        </li>
+        <li>
+          <span>Opens without network</span>
+          <span className={offlineReady ? 'status-value' : 'status-value warn'}>
+            {offlineReady ? 'yes' : 'not yet'}
+          </span>
+        </li>
+        <li>
+          <span>Network now</span>
+          <span className="status-value">{online ? 'online' : 'offline'}</span>
+        </li>
+        <li>
+          <span>Last backup file</span>
+          <span className={stale ? 'status-value warn' : 'status-value'}>
+            {agoWords(props.doc.settings.lastBackupAt)}
+          </span>
+        </li>
+      </ul>
+      <p className="lede status-note">
+        Every answer is written to this browser as you go, online or off. Nothing is uploaded, because there is no
+        account yet, so a backup file is the only copy that outlives this browser.
+      </p>
+      <div className="account-actions">
+        <Commit onClick={backUp}>Back up now</Commit>
+        <TextBtn onClick={() => fileRef.current?.click()}>Restore from a file</TextBtn>
+        <TextBtn onClick={() => download('riankeng-progress.csv', exportCsv(props.doc), 'text/csv')}>
+          Export CSV
+        </TextBtn>
+      </div>
 
       <div className="heat-wrap">
         <div className="heat" aria-label="twelve week heatmap, Sunday first">
@@ -172,8 +251,17 @@ export function Account(props: {
         Show Thai script
       </label>
       <label className="check">
-        <input type="checkbox" checked={props.doc.settings.autoplay} onChange={(e) => set('autoplay', e.target.checked)} />
+        <input
+          type="checkbox"
+          checked={props.doc.settings.autoplay}
+          disabled={props.doc.settings.silent}
+          onChange={(e) => set('autoplay', e.target.checked)}
+        />
         Play each card when it appears
+      </label>
+      <label className="check">
+        <input type="checkbox" checked={props.doc.settings.silent} onChange={(e) => set('silent', e.target.checked)} />
+        Silent. No listening exercises, no sound, no Hear
       </label>
       <label className="field">
         <span>Hear rate {props.doc.settings.audioRate.toFixed(2)}</span>
@@ -182,13 +270,6 @@ export function Account(props: {
       <p className={voice.ready ? 'lede' : 'warn'}>{voice.ready ? `Thai voice: ${voice.name}` : voice.warning}</p>
       <p className="lede">Hear uses recorded Thai when a clip exists. The Mac voice is a fallback and is bad at tones.</p>
 
-      <h2>Progress file</h2>
-      <p className="lede">JSON is the backup you can import. CSV is a table, not a backup.</p>
-      <div className="account-actions">
-        <TextBtn onClick={() => download('riankeng-progress-v1.json', exportJson(props.doc), 'application/json')}>Export JSON</TextBtn>
-        <TextBtn onClick={() => download('riankeng-progress.csv', exportCsv(props.doc), 'text/csv')}>Export CSV</TextBtn>
-        <TextBtn onClick={() => fileRef.current?.click()}>Import JSON</TextBtn>
-      </div>
       <input
         ref={fileRef}
         type="file"

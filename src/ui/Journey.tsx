@@ -1,19 +1,22 @@
 import type { ReactNode } from 'react'
 import { LEVELS, SCRIPT_LEVELS } from '@content/index'
 import type { LevelMeta, TrackId } from '@content/types'
-import { hereLevel, type LevelStatus } from '@/engine/scheduler'
-import { QuietPie } from './bits'
+import { hereLevel, unlockCount, type LevelStatus } from '@/engine/scheduler'
+import { Meter } from './bits'
 import { chrome } from './copy'
 
-/** Cards answered at least once, and cards there are, across a whole track. */
-export function trackTally(statuses: LevelStatus[]): { seen: number; total: number } {
-  let seen = 0
+/**
+ * What the track counts as done, over what there is. Voice counts mastery,
+ * Script counts one right answer, which is what each one unlocks on.
+ */
+export function trackTally(statuses: LevelStatus[], track: TrackId): { done: number; total: number } {
+  let done = 0
   let total = 0
   for (const s of statuses) {
-    seen += s.seen
+    done += unlockCount(s, track)
     total += s.total
   }
-  return { seen, total }
+  return { done, total }
 }
 
 /**
@@ -26,7 +29,16 @@ export function trackPlace(statuses: LevelStatus[], levels: LevelMeta[]): { n: n
   return { n, title: levels[n]?.title ?? '', done: here === null }
 }
 
-function Row(props: { n?: number; title: string; sub: string; rom?: boolean; meta: ReactNode; onOpen: () => void }) {
+function Row(props: {
+  n?: number
+  title: string
+  sub: string
+  rom?: boolean
+  meta: ReactNode
+  /** Laid over the row's own divider, so progress needs no column of its own. */
+  meter?: ReactNode
+  onOpen: () => void
+}) {
   return (
     <li>
       <button type="button" className="contents-row" onClick={props.onOpen}>
@@ -36,24 +48,33 @@ function Row(props: { n?: number; title: string; sub: string; rom?: boolean; met
           <span className={props.rom ? 'contents-rom rom' : 'contents-rom'}>{props.sub}</span>
         </span>
         <span className="contents-meta">{props.meta}</span>
+        {props.meter}
       </button>
     </li>
   )
 }
 
-function TrackRow(props: { title: string; statuses: LevelStatus[]; levels: LevelMeta[]; onOpen: () => void }) {
+function TrackRow(props: {
+  title: string
+  track: TrackId
+  statuses: LevelStatus[]
+  levels: LevelMeta[]
+  onOpen: () => void
+}) {
   const place = trackPlace(props.statuses, props.levels)
-  const { seen, total } = trackTally(props.statuses)
+  const { done, total } = trackTally(props.statuses, props.track)
   return (
     <Row
       n={place.n}
       title={props.title}
       sub={place.done ? chrome.trackDone : `Level ${place.n}, ${place.title}`}
-      meta={
-        <span className="track-meta">
-          <QuietPie value={total ? seen / total : 0} label={`${seen} of ${total} on ${props.title}`} />
-          {seen > 0 ? `${seen} of ${total}` : String(total)}
-        </span>
+      meta={done > 0 ? `${done} of ${total}` : String(total)}
+      meter={
+        <Meter
+          className="row-meter"
+          value={total ? done / total : 0}
+          label={`${done} of ${total} done on ${props.title}`}
+        />
       }
       onOpen={props.onOpen}
     />
@@ -69,9 +90,21 @@ export function Journey(props: {
 }) {
   return (
     <main className="page journey">
-      <ol className="contents">
-        <TrackRow title="Voice" statuses={props.voice} levels={LEVELS} onOpen={() => props.onTrack('voice')} />
-        <TrackRow title="Script" statuses={props.script} levels={SCRIPT_LEVELS} onOpen={() => props.onTrack('script')} />
+      <ol className="contents hub">
+        <TrackRow
+          title="Voice"
+          track="voice"
+          statuses={props.voice}
+          levels={LEVELS}
+          onOpen={() => props.onTrack('voice')}
+        />
+        <TrackRow
+          title="Script"
+          track="script"
+          statuses={props.script}
+          levels={SCRIPT_LEVELS}
+          onOpen={() => props.onTrack('script')}
+        />
         <Row title="Already yours" sub={chrome.yoursSub} rom meta="open" onOpen={props.onReview} />
         <Row title="The whole script" sub={chrome.alphabetSub} rom meta="open" onOpen={props.onAlphabet} />
       </ol>

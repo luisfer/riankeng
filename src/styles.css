@@ -145,6 +145,7 @@ button:disabled { cursor: default; opacity: 0.4; }
   font-variant-numeric: tabular-nums;
 }
 .lesson-progress .quiet-pie { flex: 0 0 15px; }
+.track-meta { display: inline-flex; align-items: center; gap: 8px; }
 .trail-end { justify-self: end; display: flex; gap: 16px; align-items: baseline; }
 
 .text-btn {

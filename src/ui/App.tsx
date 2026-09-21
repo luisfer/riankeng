@@ -32,6 +32,7 @@ import { Account } from './Account'
 import { Alphabet } from './Alphabet'
 import { Glyphs } from './Glyphs'
 import { Journey } from './Journey'
+import { TrackPage } from './TrackPage'
 import { ReviewPage } from './AlreadyYours'
 import { LevelIntro } from './LevelIntro'
 import { SessionView } from './Session'
@@ -224,7 +225,11 @@ export function App() {
       ? 'Already yours'
       : route.name === 'alphabet'
         ? 'The whole script'
-        : undefined
+        : route.name === 'track'
+          ? route.track === 'script'
+            ? 'Script'
+            : 'Voice'
+          : undefined
   const lessonStatus =
     inSession && session && !session.review
       ? (session.track === 'script' ? scriptStatuses : voiceStatuses)[session.level]
@@ -268,13 +273,20 @@ export function App() {
           <Journey
             voice={voiceStatuses}
             script={scriptStatuses}
+            onTrack={(track) => go({ name: 'track', track })}
+            onReview={() => go({ name: 'review' })}
+            onAlphabet={() => go({ name: 'alphabet' })}
+          />
+        )}
+        {loadState === 'ready' && route.name === 'track' && (
+          <TrackPage
+            track={route.track}
+            statuses={route.track === 'script' ? scriptStatuses : voiceStatuses}
             onOpen={(track, n) => {
               const list = track === 'script' ? scriptStatuses : voiceStatuses
               if (list[n] && list[n].total > 0 && !list[n].unlocked) return
               go({ name: 'intro', n, track })
             }}
-            onReview={() => go({ name: 'review' })}
-            onAlphabet={() => go({ name: 'alphabet' })}
           />
         )}
         {loadState === 'ready' && route.name === 'review' && (

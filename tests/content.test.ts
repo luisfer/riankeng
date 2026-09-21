@@ -17,8 +17,8 @@ describe('content', () => {
     expect(problems).toEqual([])
   })
 
-  it('has 22 levels', () => {
-    expect(LEVELS).toHaveLength(22)
+  it('has 27 levels', () => {
+    expect(LEVELS).toHaveLength(27)
     LEVELS.forEach((l, i) => expect(l.n).toBe(i))
   })
 

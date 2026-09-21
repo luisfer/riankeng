@@ -25,6 +25,11 @@ import {
 } from '@/storage/db'
 import { emptyDoc, stampDoc, type ProgressDoc } from '@/storage/progress-schema'
 import { resetDoc } from '@/storage/import'
+import { exportJson } from '@/storage/export'
+import { mergeWork } from '@/storage/sync'
+import { mirrorWrittenAt, setMirrorWrittenAt } from '@/storage/device'
+import * as mirrorFile from '@/storage/mirror-file'
+import type { MirrorState } from '@/storage/mirror-file'
 import { onVoices } from '@/audio/tts'
 import { go, parseHash, replace, type Route } from './hash'
 import { applyTheme } from './theme'
@@ -43,6 +48,12 @@ export function App() {
   const [session, setSession] = useState<LiveSession | null>(null)
   const [loadState, setLoadState] = useState<'pending' | 'ready' | 'failed'>('pending')
   const [route, setRoute] = useState<Route>(() => parseHash())
+  const [mirror, setMirror] = useState<FileSystemFileHandle | null>(null)
+  const [mirrorState, setMirrorState] = useState<MirrorState>(() =>
+    mirrorFile.supported() ? 'off' : 'unsupported',
+  )
+  const [mirrorAt, setMirrorAt] = useState(() => mirrorWrittenAt())
+  const mirrorRead = useRef(false)
   const persistOk = useRef(false)
   const skipSave = useRef(false)
   const hydratedSnapshot = useRef<ProgressDoc | null>(null)
@@ -87,6 +98,38 @@ export function App() {
       alive = false
     }
   }, [])
+
+  useEffect(() => {
+    if (loadState !== 'ready' || mirrorRead.current) return
+    mirrorRead.current = true
+    void (async () => {
+      const handle = await mirrorFile.held()
+      if (!handle) return
+      setMirror(handle)
+      const state = await mirrorFile.permission(handle)
+      setMirrorState(state)
+      if (state !== 'granted') return
+      const file = await mirrorFile.read(handle)
+      if (file) setDoc((d) => stampDoc(mergeWork(d, file)))
+    })()
+  }, [loadState])
+
+  // Every change goes to the file too, once the typing has settled.
+  useEffect(() => {
+    if (loadState !== 'ready' || !mirror || mirrorState !== 'granted') return
+    const timer = setTimeout(() => {
+      void (async () => {
+        if (await mirrorFile.write(mirror, exportJson(doc))) {
+          const t = Date.now()
+          setMirrorWrittenAt(t)
+          setMirrorAt(t)
+        } else {
+          setMirrorState('needs-permission')
+        }
+      })()
+    }, 1500)
+    return () => clearTimeout(timer)
+  }, [doc, mirror, mirrorState, loadState])
 
   useEffect(() => {
     if (!persistOk.current || loadState !== 'ready') return
@@ -198,6 +241,28 @@ export function App() {
       return
     }
     setSession(s)
+  }
+
+  const mirrorActions = {
+    state: mirrorState,
+    writtenAt: mirrorAt,
+    onStart: async () => {
+      const handle = await mirrorFile.choose()
+      if (!handle) return
+      setMirror(handle)
+      setMirrorState('granted')
+      const file = await mirrorFile.read(handle)
+      if (file) setDoc((d) => stampDoc(mergeWork(d, file)))
+    },
+    onStop: async () => {
+      await mirrorFile.forget()
+      setMirror(null)
+      setMirrorState('off')
+    },
+    onAuthorise: async () => {
+      if (!mirror) return
+      setMirrorState(await mirrorFile.permission(mirror, true))
+    },
   }
 
   const eraseDevice = () => {
@@ -337,6 +402,7 @@ export function App() {
             voice={voiceStatuses}
             script={scriptStatuses}
             onDoc={commitDoc}
+            mirror={mirrorActions}
             onGlyphs={() => go({ name: 'glyphs' })}
             onReset={eraseDevice}
           />

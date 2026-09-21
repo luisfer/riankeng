@@ -124,6 +124,7 @@ export const PROGRESS_JSON_SCHEMA = {
                 ok: { type: 'boolean' },
                 v: { type: 'string' },
                 m: { type: 'string', enum: ['listen', 'en-th', 'th-en', 'tone', 'pick'] },
+                d: { type: 'string' },
               },
             },
           },

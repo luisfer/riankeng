@@ -17,6 +17,7 @@ import {
   type LiveSession,
 } from '@/engine/session'
 import { applyAttempt, applyMeet, type ItemProgress } from '@/engine/srs'
+import { deviceId } from '@/storage/device'
 import type { ProgressDoc } from '@/storage/progress-schema'
 import { entryOrThrow, fromVoiceKnown, pairRoms, pickChoices, sittingSense } from '@/engine/scheduler'
 import { entryTrack } from '@content/index'
@@ -129,7 +130,7 @@ export function SessionView(props: {
     attemptedRef.current = true
     const now = Date.now()
     const prev = props.doc.items[entry.id] ?? ({ id: entry.id, stage: 0, due: 0, reps: 0, lapses: 0, lastSeen: 0, days: [], history: [] } satisfies ItemProgress)
-    props.onDoc({ ...props.doc, items: { ...props.doc.items, [entry.id]: applyAttempt(prev, { t: now, ok, v, m: item.modality }) } })
+    props.onDoc({ ...props.doc, items: { ...props.doc.items, [entry.id]: applyAttempt(prev, { t: now, ok, v, m: item.modality, d: deviceId() }) } })
     let next = markScored(props.session, { ok, text })
     if (miss === 'move') next = markMissMove(next)
     if (miss === 'stay' && holdNext) next = markMissStay(next, holdNext)

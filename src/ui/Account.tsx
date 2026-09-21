@@ -5,6 +5,7 @@ import type { ProgressDoc } from '@/storage/progress-schema'
 import { download, exportCsv, exportJson } from '@/storage/export'
 import { applyImport, parseExport, previewImport } from '@/storage/import'
 import { detectVoice } from '@/audio/tts'
+import type { MirrorState } from '@/storage/mirror-file'
 import { Commit, TextBtn } from './bits'
 
 const MONTH_WORD = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] as const
@@ -70,6 +71,14 @@ export function Account(props: {
   voice: LevelStatus[]
   script: LevelStatus[]
   onDoc: (doc: ProgressDoc) => void
+  /** The file this device keeps up to date, if the learner has chosen one. */
+  mirror: {
+    state: MirrorState
+    writtenAt: number
+    onStart: () => void | Promise<void>
+    onStop: () => void | Promise<void>
+    onAuthorise: () => void | Promise<void>
+  }
   onGlyphs: () => void
   onReset: () => void
 }) {
@@ -124,7 +133,8 @@ export function Account(props: {
   }
 
   const cards = Object.keys(props.doc.items).length
-  const stale = backupStale(props.doc.settings.lastBackupAt)
+  const mirroring = props.mirror.state === 'granted'
+  const stale = !mirroring && backupStale(props.doc.settings.lastBackupAt)
   const backUp = () => {
     download('riankeng-progress-v1.json', exportJson(props.doc), 'application/json')
     set('lastBackupAt', Date.now())
@@ -141,7 +151,7 @@ export function Account(props: {
       <ul className="status">
         <li>
           <span>Where it lives</span>
-          <span className="status-value">this device</span>
+          <span className="status-value">{mirroring ? 'this device, and your file' : 'this device'}</span>
         </li>
         <li>
           <span>Cards with progress</span>
@@ -162,18 +172,34 @@ export function Account(props: {
           <span className="status-value">{online ? 'online' : 'offline'}</span>
         </li>
         <li>
-          <span>Last backup file</span>
-          <span className={stale ? 'status-value warn' : 'status-value'}>
-            {agoWords(props.doc.settings.lastBackupAt)}
-          </span>
+          <span>Backup file</span>
+          {props.mirror.state === 'granted' ? (
+            <span className="status-value">kept up to date, {agoWords(props.mirror.writtenAt)}</span>
+          ) : props.mirror.state === 'needs-permission' ? (
+            <span className="status-value warn">needs permission again</span>
+          ) : (
+            <span className={stale ? 'status-value warn' : 'status-value'}>
+              {agoWords(props.doc.settings.lastBackupAt)}
+            </span>
+          )}
         </li>
       </ul>
       <p className="lede status-note">
-        Every answer is written to this browser as you go, online or off. Nothing is uploaded, because there is no
-        account yet, so a backup file is the only copy that outlives this browser.
+        {mirroring
+          ? 'Every answer is written to this browser and to your file as you go, online or off. Nothing is uploaded. Keep that file in a folder iCloud or Dropbox syncs and a second machine stays with you, with no account: opening the app reads the file back and merges it, so whichever machine wrote last does not matter.'
+          : props.mirror.state === 'unsupported'
+            ? 'Every answer is written to this browser as you go, online or off. Nothing is uploaded, because there is no account yet, so a backup file is the only copy that outlives this browser.'
+            : 'Every answer is written to this browser as you go, online or off. Nothing is uploaded, because there is no account yet. Chrome can also keep a file of your own up to date as you work, which is the nearest thing to sync without an account.'}
       </p>
       <div className="account-actions">
         <Commit onClick={backUp}>Back up now</Commit>
+        {props.mirror.state === 'off' && (
+          <TextBtn onClick={() => void props.mirror.onStart()}>Keep a file up to date</TextBtn>
+        )}
+        {props.mirror.state === 'needs-permission' && (
+          <TextBtn onClick={() => void props.mirror.onAuthorise()}>Authorise the file again</TextBtn>
+        )}
+        {mirroring && <TextBtn onClick={() => void props.mirror.onStop()}>Stop writing to the file</TextBtn>}
         <TextBtn onClick={() => fileRef.current?.click()}>Restore from a file</TextBtn>
         <TextBtn onClick={() => download('riankeng-progress.csv', exportCsv(props.doc), 'text/csv')}>
           Export CSV

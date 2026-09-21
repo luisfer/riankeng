@@ -22,8 +22,14 @@ export function parseExport(raw: string): ProgressExport | null {
   }
 }
 
+/**
+ * What makes two attempts the same attempt. The device is part of it: two
+ * devices can honestly answer the same card in the same millisecond and neither
+ * should swallow the other. Attempts written before devices had ids carry no
+ * `d` and keep their old key, so an older export still dedupes against itself.
+ */
 function attemptKey(h: Attempt): string {
-  return `${h.t}:${h.ok ? 1 : 0}:${h.v}:${h.m}`
+  return `${h.t}:${h.ok ? 1 : 0}:${h.v}:${h.m}${h.d ? `:${h.d}` : ''}`
 }
 
 function unionHistory(a: Attempt[], b: Attempt[]): Attempt[] {
@@ -36,18 +42,27 @@ function unionDays(a: string[], b: string[]): string[] {
   return [...new Set([...a, ...b])].sort()
 }
 
-/** Replay a merged history, then keep every durable day both sides remember. */
+/**
+ * Replay a merged history, then keep every durable day both sides remember.
+ *
+ * `stage` and `due` come from the replay alone, never from a max against either
+ * side's own copy. A miss lowers them, so they are not monotonic, and taking a
+ * max of a value that can fall makes the merge depend on which device did it:
+ * two devices with the same set of attempts would disagree, which is the one
+ * thing a sync merge may not do. The replay is a pure function of the attempt
+ * set, so both sides land in the same place.
+ *
+ * `reps`, `lapses`, `lastSeen` and `days` only ever grow, so max and union are
+ * both safe and order-independent, and they keep their guard: a capped history
+ * can undercount them, and they must not slide backwards.
+ */
 export function mergeItem(have: ItemProgress | undefined, incoming: ItemProgress): ItemProgress {
   const seed = newItemProgress(incoming.id)
   const history = unionHistory(have?.history ?? [], incoming.history)
   let next = seed
   for (const h of history) next = applyAttempt(next, h)
-  const stage = Math.max(next.stage, have?.stage ?? 0, incoming.stage)
-  const due = Math.max(next.due, have?.due ?? 0, incoming.due)
   return {
     ...next,
-    stage,
-    due,
     reps: Math.max(next.reps, have?.reps ?? 0, incoming.reps),
     lapses: Math.max(next.lapses, have?.lapses ?? 0, incoming.lapses),
     days: unionDays(unionDays(have?.days ?? [], incoming.days), next.days),

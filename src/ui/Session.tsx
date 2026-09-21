@@ -17,6 +17,7 @@ import {
   type LiveSession,
 } from '@/engine/session'
 import { applyAttempt, applyMeet, type ItemProgress } from '@/engine/srs'
+import { deviceId } from '@/storage/device'
 import type { ProgressDoc } from '@/storage/progress-schema'
 import { entryOrThrow, fromVoiceKnown, pairRoms, pickChoices, sittingSense } from '@/engine/scheduler'
 import { entryTrack } from '@content/index'
@@ -71,11 +72,12 @@ export function SessionView(props: {
 
   useEffect(() => {
     if (!item) return
+    if (props.doc.settings.silent) return
     if (!props.doc.settings.autoplay || !speechUnlocked()) return
     const card = entryOrThrow(item.id)
     void speakThai(card.thai, card.id, props.doc.settings.audioRate, { gesture: false })
     setHeard(true)
-  }, [item?.id, item?.modality, item?.meet, props.doc.settings.autoplay, props.doc.settings.audioRate])
+  }, [item?.id, item?.modality, item?.meet, props.doc.settings.autoplay, props.doc.settings.silent, props.doc.settings.audioRate])
 
   useEffect(() => {
     if (!canAdvance) return
@@ -128,7 +130,7 @@ export function SessionView(props: {
     attemptedRef.current = true
     const now = Date.now()
     const prev = props.doc.items[entry.id] ?? ({ id: entry.id, stage: 0, due: 0, reps: 0, lapses: 0, lastSeen: 0, days: [], history: [] } satisfies ItemProgress)
-    props.onDoc({ ...props.doc, items: { ...props.doc.items, [entry.id]: applyAttempt(prev, { t: now, ok, v, m: item.modality }) } })
+    props.onDoc({ ...props.doc, items: { ...props.doc.items, [entry.id]: applyAttempt(prev, { t: now, ok, v, m: item.modality, d: deviceId() }) } })
     let next = markScored(props.session, { ok, text })
     if (miss === 'move') next = markMissMove(next)
     if (miss === 'stay' && holdNext) next = markMissStay(next, holdNext)
@@ -199,7 +201,7 @@ export function SessionView(props: {
   const writeRom =
     item.modality === 'listen' || (script && (item.modality === 'th-en' || item.modality === 'en-th'))
   const voiceEn = !script && item.modality === 'th-en'
-  const hearable = canHearThai(entry.id)
+  const hearable = !props.doc.settings.silent && canHearThai(entry.id)
   const pairing = item.modality === 'listen' && Boolean(entry.minimalPairOf?.length) && !hold && !meeting
   const listenLocked = item.modality === 'listen' && !heard && !hold && !meeting && hearable
   const multiTone = item.modality === 'tone' && analyseRom(entry.rom).nuclei.length > 1
@@ -398,25 +400,29 @@ export function SessionView(props: {
         <p className="prompt session-prompt">
           {prompt}
           <span className="prompt-tools">
-            <TextBtn
-              current={listenLocked}
-              onClick={() => {
-                setHeard(true)
-                if (ack?.text === 'Hear it first.') setAck(null)
-                void speakThai(entry.thai, entry.id, props.doc.settings.audioRate, { gesture: true })
-              }}
-            >
-              Hear
-            </TextBtn>
-            <TextBtn
-              onClick={() => {
-                setHeard(true)
-                if (ack?.text === 'Hear it first.') setAck(null)
-                void speakSlower(entry.thai, entry.id, props.doc.settings.audioRate, { gesture: true })
-              }}
-            >
-              Slower
-            </TextBtn>
+            {!props.doc.settings.silent && (
+              <>
+                <TextBtn
+                  current={listenLocked}
+                  onClick={() => {
+                    setHeard(true)
+                    if (ack?.text === 'Hear it first.') setAck(null)
+                    void speakThai(entry.thai, entry.id, props.doc.settings.audioRate, { gesture: true })
+                  }}
+                >
+                  Hear
+                </TextBtn>
+                <TextBtn
+                  onClick={() => {
+                    setHeard(true)
+                    if (ack?.text === 'Hear it first.') setAck(null)
+                    void speakSlower(entry.thai, entry.id, props.doc.settings.audioRate, { gesture: true })
+                  }}
+                >
+                  Slower
+                </TextBtn>
+              </>
+            )}
             {fromVoice && <span className="from-voice">You know this from Voice</span>}
           </span>
         </p>

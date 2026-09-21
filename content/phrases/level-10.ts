@@ -12,7 +12,7 @@ export default phrases(10, [
   ['dtûu yen mii à-rai', 'ตู้เย็นมีอะไร', ['what is in the fridge']],
   ['bâan sà-àat', 'บ้านสะอาด', ['the house is clean']],
   ['pǒm yùu nai hɔ̂ng', 'ผมอยู่ในห้อง', ['I am in the room']],
-  ['kụ̂n bâan', 'ขึ้นบ้าน', ['come in', 'come up to the house']],
+  ['kụ̂n bâan', 'ขึ้นบ้าน', ['come up to the house', 'go up into the house']],
   ['tɔ̀ɔt rɔɔng táo', 'ถอดรองเท้า', ['take off your shoes']],
   ['sài rɔɔng táo', 'ใส่รองเท้า', ['put on your shoes', 'wear shoes']],
   ['bprεεng fan gɔ̀ɔn nɔɔn', 'แปรงฟันก่อนนอน', ['brush your teeth before bed']],

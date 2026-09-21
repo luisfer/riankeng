@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { allLevelStatus, reviewEntries } from '@/engine/scheduler'
+import { allLevelStatus, reviewEntries, unlockCount } from '@/engine/scheduler'
 import {
   canContinue,
   canResumeReview,
@@ -25,6 +25,11 @@ import {
 } from '@/storage/db'
 import { emptyDoc, stampDoc, type ProgressDoc } from '@/storage/progress-schema'
 import { resetDoc } from '@/storage/import'
+import { exportJson } from '@/storage/export'
+import { mergeWork } from '@/storage/sync'
+import { mirrorWrittenAt, setMirrorWrittenAt } from '@/storage/device'
+import * as mirrorFile from '@/storage/mirror-file'
+import type { MirrorState } from '@/storage/mirror-file'
 import { onVoices } from '@/audio/tts'
 import { go, parseHash, replace, type Route } from './hash'
 import { applyTheme } from './theme'
@@ -32,6 +37,7 @@ import { Account } from './Account'
 import { Alphabet } from './Alphabet'
 import { Glyphs } from './Glyphs'
 import { Journey } from './Journey'
+import { TrackPage } from './TrackPage'
 import { ReviewPage } from './AlreadyYours'
 import { LevelIntro } from './LevelIntro'
 import { SessionView } from './Session'
@@ -42,6 +48,12 @@ export function App() {
   const [session, setSession] = useState<LiveSession | null>(null)
   const [loadState, setLoadState] = useState<'pending' | 'ready' | 'failed'>('pending')
   const [route, setRoute] = useState<Route>(() => parseHash())
+  const [mirror, setMirror] = useState<FileSystemFileHandle | null>(null)
+  const [mirrorState, setMirrorState] = useState<MirrorState>(() =>
+    mirrorFile.supported() ? 'off' : 'unsupported',
+  )
+  const [mirrorAt, setMirrorAt] = useState(() => mirrorWrittenAt())
+  const mirrorRead = useRef(false)
   const persistOk = useRef(false)
   const skipSave = useRef(false)
   const hydratedSnapshot = useRef<ProgressDoc | null>(null)
@@ -86,6 +98,38 @@ export function App() {
       alive = false
     }
   }, [])
+
+  useEffect(() => {
+    if (loadState !== 'ready' || mirrorRead.current) return
+    mirrorRead.current = true
+    void (async () => {
+      const handle = await mirrorFile.held()
+      if (!handle) return
+      setMirror(handle)
+      const state = await mirrorFile.permission(handle)
+      setMirrorState(state)
+      if (state !== 'granted') return
+      const file = await mirrorFile.read(handle)
+      if (file) setDoc((d) => stampDoc(mergeWork(d, file)))
+    })()
+  }, [loadState])
+
+  // Every change goes to the file too, once the typing has settled.
+  useEffect(() => {
+    if (loadState !== 'ready' || !mirror || mirrorState !== 'granted') return
+    const timer = setTimeout(() => {
+      void (async () => {
+        if (await mirrorFile.write(mirror, exportJson(doc))) {
+          const t = Date.now()
+          setMirrorWrittenAt(t)
+          setMirrorAt(t)
+        } else {
+          setMirrorState('needs-permission')
+        }
+      })()
+    }, 1500)
+    return () => clearTimeout(timer)
+  }, [doc, mirror, mirrorState, loadState])
 
   useEffect(() => {
     if (!persistOk.current || loadState !== 'ready') return
@@ -199,6 +243,28 @@ export function App() {
     setSession(s)
   }
 
+  const mirrorActions = {
+    state: mirrorState,
+    writtenAt: mirrorAt,
+    onStart: async () => {
+      const handle = await mirrorFile.choose()
+      if (!handle) return
+      setMirror(handle)
+      setMirrorState('granted')
+      const file = await mirrorFile.read(handle)
+      if (file) setDoc((d) => stampDoc(mergeWork(d, file)))
+    },
+    onStop: async () => {
+      await mirrorFile.forget()
+      setMirror(null)
+      setMirrorState('off')
+    },
+    onAuthorise: async () => {
+      if (!mirror) return
+      setMirrorState(await mirrorFile.permission(mirror, true))
+    },
+  }
+
   const eraseDevice = () => {
     const next = resetDoc()
     persistOk.current = true
@@ -224,7 +290,11 @@ export function App() {
       ? 'Already yours'
       : route.name === 'alphabet'
         ? 'The whole script'
-        : undefined
+        : route.name === 'track'
+          ? route.track === 'script'
+            ? 'Script'
+            : 'Voice'
+          : undefined
   const lessonStatus =
     inSession && session && !session.review
       ? (session.track === 'script' ? scriptStatuses : voiceStatuses)[session.level]
@@ -253,7 +323,7 @@ export function App() {
           level={trailLevel}
           remaining={inSession && session ? remaining(session) : undefined}
           correct={inSession && session ? session.correct : undefined}
-          lessonSeen={lessonStatus?.seen}
+          lessonDone={lessonStatus ? unlockCount(lessonStatus, trailTrack ?? 'voice') : undefined}
           lessonTotal={lessonStatus?.total}
           onPause={inSession || inIntro ? leaveSitting : undefined}
           place={trailPlace}
@@ -268,13 +338,20 @@ export function App() {
           <Journey
             voice={voiceStatuses}
             script={scriptStatuses}
+            onTrack={(track) => go({ name: 'track', track })}
+            onReview={() => go({ name: 'review' })}
+            onAlphabet={() => go({ name: 'alphabet' })}
+          />
+        )}
+        {loadState === 'ready' && route.name === 'track' && (
+          <TrackPage
+            track={route.track}
+            statuses={route.track === 'script' ? scriptStatuses : voiceStatuses}
             onOpen={(track, n) => {
               const list = track === 'script' ? scriptStatuses : voiceStatuses
               if (list[n] && list[n].total > 0 && !list[n].unlocked) return
               go({ name: 'intro', n, track })
             }}
-            onReview={() => go({ name: 'review' })}
-            onAlphabet={() => go({ name: 'alphabet' })}
           />
         )}
         {loadState === 'ready' && route.name === 'review' && (
@@ -310,6 +387,7 @@ export function App() {
             )}
             canContinue={canContinue(session, route.track, route.n)}
             seen={lessonStatus?.seen}
+            done={lessonStatus ? unlockCount(lessonStatus, route.track) : undefined}
             total={lessonStatus?.total}
             onStart={() => beginLevel(route.n, route.track)}
             onContinue={() => go({ name: 'session' })}
@@ -324,6 +402,7 @@ export function App() {
             voice={voiceStatuses}
             script={scriptStatuses}
             onDoc={commitDoc}
+            mirror={mirrorActions}
             onGlyphs={() => go({ name: 'glyphs' })}
             onReset={eraseDevice}
           />

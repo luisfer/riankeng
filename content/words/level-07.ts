@@ -10,7 +10,7 @@ export default words(7, [
   ['mụ̂a gɔ̀ɔn', 'เมื่อก่อน', ['before', 'in the past', 'formerly'], 'adv', ['time']],
   ['jàak nán', 'จากนั้น', ['after that', 'then'], 'adv', ['time']],
   ['sùt táai', 'สุดท้าย', ['finally', 'in the end', 'last'], 'adv', ['time']],
-  ['náan', 'นาน', ['a long time', 'long'], 'adv', ['time']],
+  ['naan', 'นาน', ['a long time', 'long'], 'adv', ['time']],
   ['bɔ̀i', 'บ่อย', ['often', 'frequently'], 'adv', ['time']],
   ['túk wan', 'ทุกวัน', ['every day', 'everyday'], 'adv', ['time']],
   ['túk dụan', 'ทุกเดือน', ['every month'], 'adv', ['time']],

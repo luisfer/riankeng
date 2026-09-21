@@ -37,6 +37,8 @@ export interface Attempt {
   v: string
   /** exercise modality */
   m: Modality
+  /** Which device answered. Absent on attempts written before devices had ids. */
+  d?: string
 }
 
 export type Modality = 'listen' | 'en-th' | 'th-en' | 'tone' | 'pick'

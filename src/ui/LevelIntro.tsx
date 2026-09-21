@@ -1,7 +1,7 @@
 import { entriesForLevel, levelsFor } from '@content/index'
 import type { TrackId } from '@content/types'
 import { unlockSpeech } from '@/audio/tts'
-import { Commit, QuietPie, lessonRatio, startLabel, TextBtn } from './bits'
+import { Commit, Meter, lessonRatio, startLabel, TextBtn } from './bits'
 import { ToneCharts } from './ToneCharts'
 import { showParts, showThai } from './thai'
 
@@ -31,7 +31,10 @@ export function LevelIntro(props: {
   track: TrackId
   locked?: boolean
   canContinue?: boolean
+  /** Touched at least once: decides Begin against Sit again. */
   seen?: number
+  /** Mastered on Voice, right once on Script: what the meter reads. */
+  done?: number
   total?: number
   onStart: () => void
   onContinue?: () => void
@@ -57,15 +60,15 @@ export function LevelIntro(props: {
       </h1>
       <p className="lede">{meta.blurb}</p>
       {typeof props.total === 'number' && props.total > 0 && (
-        <p className="lesson-progress">
-          <QuietPie
-            value={lessonRatio(props.seen ?? 0, props.total)}
-            label={`${props.seen ?? 0} of ${props.total} in this lesson`}
-          />
+        <div className="lesson-progress">
           <span>
-            {props.seen ?? 0} of {props.total}
+            {props.done ?? 0} of {props.total} done
           </span>
-        </p>
+          <Meter
+            value={lessonRatio(props.done ?? 0, props.total)}
+            label={`${props.done ?? 0} of ${props.total} done in this lesson`}
+          />
+        </div>
       )}
       {voiceSound && <ToneCharts />}
       <section className="lesson">

@@ -1,6 +1,7 @@
 import { get, set } from 'idb-keyval'
 import type { LiveSession } from '@/engine/session'
 import { DEFAULT_SETTINGS, emptyDoc, type ProgressDoc } from './progress-schema'
+import { aliasItems } from './import'
 
 const PROGRESS_KEY = 'riankeng:progress:v1'
 const SESSION_KEY = 'riankeng:session:v1'
@@ -52,7 +53,7 @@ export function isDoc(value: unknown): value is ProgressDoc {
 }
 
 function normalizeDoc(doc: ProgressDoc): ProgressDoc {
-  return { ...doc, settings: { ...DEFAULT_SETTINGS, ...doc.settings } }
+  return { ...doc, settings: { ...DEFAULT_SETTINGS, ...doc.settings }, items: aliasItems(doc.items ?? {}) }
 }
 
 export type LoadDocResult =

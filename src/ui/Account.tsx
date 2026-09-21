@@ -5,6 +5,7 @@ import type { ProgressDoc } from '@/storage/progress-schema'
 import { download, exportCsv, exportJson } from '@/storage/export'
 import { applyImport, parseExport, previewImport } from '@/storage/import'
 import { detectVoice } from '@/audio/tts'
+import type { MirrorState } from '@/storage/mirror-file'
 import { Commit, TextBtn } from './bits'
 
 const MONTH_WORD = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] as const
@@ -13,6 +14,25 @@ export function localDayKey(now = Date.now()): string {
   const day = new Date(now)
   day.setHours(0, 0, 0, 0)
   return `${day.getFullYear()}-${String(day.getMonth() + 1).padStart(2, '0')}-${String(day.getDate()).padStart(2, '0')}`
+}
+
+/** How long ago, in the plainest words that still say it. */
+export function agoWords(then: number, now = Date.now()): string {
+  if (!then) return 'never'
+  const s = Math.max(0, Math.round((now - then) / 1000))
+  if (s < 45) return 'just now'
+  const m = Math.round(s / 60)
+  if (m < 60) return m === 1 ? 'a minute ago' : `${m} minutes ago`
+  const h = Math.round(m / 60)
+  if (h < 24) return h === 1 ? 'an hour ago' : `${h} hours ago`
+  const d = Math.round(h / 24)
+  if (d === 1) return 'yesterday'
+  return `${d} days ago`
+}
+
+/** A backup older than a week, or none at all, is worth saying in lacquer. */
+export function backupStale(lastBackupAt: number, now = Date.now()): boolean {
+  return lastBackupAt === 0 || now - lastBackupAt > 7 * 24 * 60 * 60 * 1000
 }
 
 /** Twelve week columns, Sunday first, ending on this week. */
@@ -51,6 +71,14 @@ export function Account(props: {
   voice: LevelStatus[]
   script: LevelStatus[]
   onDoc: (doc: ProgressDoc) => void
+  /** The file this device keeps up to date, if the learner has chosen one. */
+  mirror: {
+    state: MirrorState
+    writtenAt: number
+    onStart: () => void | Promise<void>
+    onStop: () => void | Promise<void>
+    onAuthorise: () => void | Promise<void>
+  }
   onGlyphs: () => void
   onReset: () => void
 }) {
@@ -58,6 +86,7 @@ export function Account(props: {
   const [preview, setPreview] = useState<string | null>(null)
   const [pending, setPending] = useState<ReturnType<typeof parseExport>>(null)
   const [offlineReady, setOfflineReady] = useState(false)
+  const [online, setOnline] = useState(() => (typeof navigator === 'undefined' ? true : navigator.onLine))
   const days = activeDays(props.doc)
   const cells = lastWeeks(12)
   const months = heatMonthMarks(cells)
@@ -88,8 +117,27 @@ export function Account(props: {
     }
   }, [])
 
+  useEffect(() => {
+    const up = () => setOnline(true)
+    const down = () => setOnline(false)
+    window.addEventListener('online', up)
+    window.addEventListener('offline', down)
+    return () => {
+      window.removeEventListener('online', up)
+      window.removeEventListener('offline', down)
+    }
+  }, [])
+
   const set = <K extends keyof ProgressDoc['settings']>(key: K, value: ProgressDoc['settings'][K]) => {
     props.onDoc({ ...props.doc, settings: { ...props.doc.settings, [key]: value } })
+  }
+
+  const cards = Object.keys(props.doc.items).length
+  const mirroring = props.mirror.state === 'granted'
+  const stale = !mirroring && backupStale(props.doc.settings.lastBackupAt)
+  const backUp = () => {
+    download('riankeng-progress-v1.json', exportJson(props.doc), 'application/json')
+    set('lastBackupAt', Date.now())
   }
 
   return (
@@ -99,7 +147,64 @@ export function Account(props: {
         {s > 0 ? `${s} day streak. ` : ''}
         Today {today.correct} of {today.answered || 0}.
       </p>
-      <p className="lede">{offlineReady ? 'Works offline.' : 'Needs the network to open.'}</p>
+      <h2>Your progress</h2>
+      <ul className="status">
+        <li>
+          <span>Where it lives</span>
+          <span className="status-value">{mirroring ? 'this device, and your file' : 'this device'}</span>
+        </li>
+        <li>
+          <span>Cards with progress</span>
+          <span className="status-value">{cards}</span>
+        </li>
+        <li>
+          <span>Last saved</span>
+          <span className="status-value">{agoWords(props.doc.updatedAt)}</span>
+        </li>
+        <li>
+          <span>Opens without network</span>
+          <span className={offlineReady ? 'status-value' : 'status-value warn'}>
+            {offlineReady ? 'yes' : 'not yet'}
+          </span>
+        </li>
+        <li>
+          <span>Network now</span>
+          <span className="status-value">{online ? 'online' : 'offline'}</span>
+        </li>
+        <li>
+          <span>Backup file</span>
+          {props.mirror.state === 'granted' ? (
+            <span className="status-value">kept up to date, {agoWords(props.mirror.writtenAt)}</span>
+          ) : props.mirror.state === 'needs-permission' ? (
+            <span className="status-value warn">needs permission again</span>
+          ) : (
+            <span className={stale ? 'status-value warn' : 'status-value'}>
+              {agoWords(props.doc.settings.lastBackupAt)}
+            </span>
+          )}
+        </li>
+      </ul>
+      <p className="lede status-note">
+        {mirroring
+          ? 'Every answer is written to this browser and to your file as you go, online or off. Nothing is uploaded. Keep that file in a folder iCloud or Dropbox syncs and a second machine stays with you, with no account: opening the app reads the file back and merges it, so whichever machine wrote last does not matter.'
+          : props.mirror.state === 'unsupported'
+            ? 'Every answer is written to this browser as you go, online or off. Nothing is uploaded, because there is no account yet, so a backup file is the only copy that outlives this browser.'
+            : 'Every answer is written to this browser as you go, online or off. Nothing is uploaded, because there is no account yet. Chrome can also keep a file of your own up to date as you work, which is the nearest thing to sync without an account.'}
+      </p>
+      <div className="account-actions">
+        <Commit onClick={backUp}>Back up now</Commit>
+        {props.mirror.state === 'off' && (
+          <TextBtn onClick={() => void props.mirror.onStart()}>Keep a file up to date</TextBtn>
+        )}
+        {props.mirror.state === 'needs-permission' && (
+          <TextBtn onClick={() => void props.mirror.onAuthorise()}>Authorise the file again</TextBtn>
+        )}
+        {mirroring && <TextBtn onClick={() => void props.mirror.onStop()}>Stop writing to the file</TextBtn>}
+        <TextBtn onClick={() => fileRef.current?.click()}>Restore from a file</TextBtn>
+        <TextBtn onClick={() => download('riankeng-progress.csv', exportCsv(props.doc), 'text/csv')}>
+          Export CSV
+        </TextBtn>
+      </div>
 
       <div className="heat-wrap">
         <div className="heat" aria-label="twelve week heatmap, Sunday first">
@@ -172,8 +277,17 @@ export function Account(props: {
         Show Thai script
       </label>
       <label className="check">
-        <input type="checkbox" checked={props.doc.settings.autoplay} onChange={(e) => set('autoplay', e.target.checked)} />
+        <input
+          type="checkbox"
+          checked={props.doc.settings.autoplay}
+          disabled={props.doc.settings.silent}
+          onChange={(e) => set('autoplay', e.target.checked)}
+        />
         Play each card when it appears
+      </label>
+      <label className="check">
+        <input type="checkbox" checked={props.doc.settings.silent} onChange={(e) => set('silent', e.target.checked)} />
+        Silent. No listening exercises, no sound, no Hear
       </label>
       <label className="field">
         <span>Hear rate {props.doc.settings.audioRate.toFixed(2)}</span>
@@ -182,13 +296,6 @@ export function Account(props: {
       <p className={voice.ready ? 'lede' : 'warn'}>{voice.ready ? `Thai voice: ${voice.name}` : voice.warning}</p>
       <p className="lede">Hear uses recorded Thai when a clip exists. The Mac voice is a fallback and is bad at tones.</p>
 
-      <h2>Progress file</h2>
-      <p className="lede">JSON is the backup you can import. CSV is a table, not a backup.</p>
-      <div className="account-actions">
-        <TextBtn onClick={() => download('riankeng-progress-v1.json', exportJson(props.doc), 'application/json')}>Export JSON</TextBtn>
-        <TextBtn onClick={() => download('riankeng-progress.csv', exportCsv(props.doc), 'text/csv')}>Export CSV</TextBtn>
-        <TextBtn onClick={() => fileRef.current?.click()}>Import JSON</TextBtn>
-      </div>
       <input
         ref={fileRef}
         type="file"

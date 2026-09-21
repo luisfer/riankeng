@@ -26,8 +26,10 @@ Never gray. Never gold-on-navy.
 - Scale: h1 32–44 / 300 · contents number 28 / 300 · prompt 20 · body 18 · meta 15. Numbers tabular.
 
 ## Components
-- `.trail`: three columns. Wordmark home, place plus a 15px lacquer pie for the level (`seen` of `total`). A sitting adds quiet “11 left”, not a second wedge. Pause or Account. Hairline under. Theme lives on Account, not in the trail.
-- `.contents-row`: contents of a primer. Number, title + rom, catalog count, `17 of 50` once started, or `soon`. Locked rows have a blank meta. The open level’s number is lacquer.
+- `.trail`: three columns, one row. Wordmark home, then place plus a 48px lacquer meter for the level, then Pause or Account. A sitting adds quiet “11 left” on the same line, not a second row. Hairline under. Theme lives on Account, not in the trail.
+- `.meter`: progress is ink on a rule, never a disc. A hairline in `--hair`, laid in lacquer as far as the work is done. `.row-meter` lies over a contents row’s own divider, so the list keeps one rule per row; the trail and the lesson intro carry a standalone 2px one. Done means mastered on Voice and right-once on Script, which is what each track unlocks on.
+- `.contents-row`: contents of a primer. Number (right-aligned, tabular), title + rom, count of done over total, or `soon`. Locked rows have a blank meta. The open level’s number is lacquer and it carries a 2px lacquer mark in the margin.
+- `.status`: label and value on a hairline row, for what is true about this device’s copy: where it lives, cards with progress, last saved, opens without network, network now, last backup file. A value that needs attention is lacquer, not red-and-loud.
 - `.btn.commit`: 36×, radius 2px, lacquer on paper. One per screen. Continue is that key. Sit again when the level is started. Begin again is a text button.
 - `.text-btn`: ink-2 word, underline on hover. Hear, Slower, Pause, export.
 - `.answer-form`: field and Check share row 1. Popover and key strip span below.
@@ -43,4 +45,4 @@ Name the words. Do not coach. No “you will”, no “ears first”, no Hear-sa
 None required. Reduced-motion is the default. Selection is lacquer on paper.
 
 ## Refused
-Pills, chips, kickers, middots, em dashes, gradient text, glass, photo heroes, featured “start here” cards, faded locked walls, Bricolage, Gentium, Pridi, navy-and-gold.
+Pills, chips, kickers, middots, em dashes, gradient text, glass, photo heroes, featured “start here” cards, faded locked walls, progress rings and pies, Bricolage, Gentium, Pridi, navy-and-gold.

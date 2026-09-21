@@ -16,8 +16,8 @@ export default words(20, [
   ['jàp jai', 'จับใจ', ['touching'], 'adj', ['heart']],
   ['sǎm-kan', 'สำคัญ', ['important'], 'adj', ['heart']],
   ['jai kwâang', 'ใจกว้าง', ['generous', 'open-minded'], 'adj', ['heart']],
-  ['jai dàm', 'ใจดำ', ['cruel', 'black-hearted'], 'adj', ['heart']],
-  ['kέεn jai', 'แค้นใจ', ['resentful'], 'adj', ['heart']],
-  ['plɔ̀ɔp jai', 'ปลอบใจ', ['comfort', 'console'], 'v', ['heart']],
+  ['jai dam', 'ใจดำ', ['cruel', 'black-hearted'], 'adj', ['heart']],
+  ['kέεn jai', 'แค้นใจ', ['resentful'], 'adj', ['heart']],
+  ['bplɔ̀ɔp jai', 'ปลอบใจ', ['comfort', 'console'], 'v', ['heart']],
   ['dtem jai', 'เต็มใจ', ['willing', 'glad to', 'wholeheartedly'], 'adj', ['heart']],
 ])

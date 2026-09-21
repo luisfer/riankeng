@@ -6,7 +6,7 @@ export default idioms(20, [
   ['mii nám jai', 'มีน้ำใจ', ['be kind', 'have a generous heart']],
   ['tam bun tîi wát', 'ทำบุญที่วัด', ['make merit at the temple']],
   ['jai kwâang', 'ใจกว้าง', ['open-minded', 'generous']],
-  ['jai dàm', 'ใจดำ', ['cruel', 'black-hearted']],
+  ['jai dam', 'ใจดำ', ['cruel', 'black-hearted']],
   ['sǐa jai ná', 'เสียใจนะ', ['I am sorry (heart)']],
   ['dii jai tîi maa', 'ดีใจที่มา', ['glad you came']],
   ['wái jai kun dâi', 'ไว้ใจคุณได้', ['I can trust you']],
@@ -14,6 +14,6 @@ export default idioms(20, [
   ['dtàt sǐn jai mâi dâi', 'ตัดสินใจไม่ได้', ['cannot decide']],
   ['bplìan jai lέεo', 'เปลี่ยนใจแล้ว', ['I changed my mind']],
   ['nám jai tai', 'น้ำใจไทย', ['Thai kindness', 'Thai hospitality']],
-  ['plɔ̀ɔp jai nɔ̀i', 'ปลอบใจหน่อย', ['comfort me a little']],
+  ['bplɔ̀ɔp jai nɔ̀i', 'ปลอบใจหน่อย', ['comfort me a little']],
   ['sà-baai jai lέεo', 'สบายใจแล้ว', ['I feel better now']],
 ])

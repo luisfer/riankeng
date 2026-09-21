@@ -10,20 +10,30 @@ export interface Settings {
   audioRate: number
   /** Play audio automatically when a card appears. */
   autoplay: boolean
+  /** No sound at all: no listening exercises, no autoplay, no Hear. For a plane. */
+  silent: boolean
   /** New items introduced per session. */
   newPerSession: number
   /** Learner's display name (used in the app and in exports). */
   name: string
   theme: 'light' | 'dark' | 'system'
+  /**
+   * When the learner last wrote a backup file, epoch ms, 0 for never. State
+   * rather than preference, but it lives here because settings are the part of
+   * the document that already round-trips through export and import.
+   */
+  lastBackupAt: number
 }
 
 export const DEFAULT_SETTINGS: Settings = {
   thaiScript: false,
   audioRate: 0.85,
   autoplay: true,
+  silent: false,
   newPerSession: 8,
   name: '',
   theme: 'light',
+  lastBackupAt: 0,
 }
 
 export interface SessionLog {
@@ -84,9 +94,11 @@ export const PROGRESS_JSON_SCHEMA = {
         thaiScript: { type: 'boolean' },
         audioRate: { type: 'number' },
         autoplay: { type: 'boolean' },
+        silent: { type: 'boolean' },
         newPerSession: { type: 'integer' },
         name: { type: 'string' },
         theme: { type: 'string', enum: ['light', 'dark', 'system'] },
+        lastBackupAt: { type: 'integer' },
       },
     },
     items: {
@@ -112,6 +124,7 @@ export const PROGRESS_JSON_SCHEMA = {
                 ok: { type: 'boolean' },
                 v: { type: 'string' },
                 m: { type: 'string', enum: ['listen', 'en-th', 'th-en', 'tone', 'pick'] },
+                d: { type: 'string' },
               },
             },
           },

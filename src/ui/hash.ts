@@ -2,6 +2,7 @@ import type { TrackId } from '@content/types'
 
 export type Route =
   | { name: 'journey' }
+  | { name: 'track'; track: TrackId }
   | { name: 'intro'; n: number; track: TrackId }
   | { name: 'session' }
   | { name: 'account' }
@@ -15,6 +16,8 @@ export function parseHash(raw = window.location.hash): Route {
   if (scriptLevel) return { name: 'intro', n: Number(scriptLevel[1]), track: 'script' }
   const level = /^\/level\/(\d+)$/.exec(h)
   if (level) return { name: 'intro', n: Number(level[1]), track: 'voice' }
+  if (h === '/voice') return { name: 'track', track: 'voice' }
+  if (h === '/script') return { name: 'track', track: 'script' }
   if (h === '/session') return { name: 'session' }
   if (h === '/account') return { name: 'account' }
   if (h === '/glyphs') return { name: 'glyphs' }
@@ -27,6 +30,8 @@ export function hashFor(route: Route): string {
   switch (route.name) {
     case 'journey':
       return '#/'
+    case 'track':
+      return route.track === 'script' ? '#/script' : '#/voice'
     case 'intro':
       return route.track === 'script' ? `#/script/level/${route.n}` : `#/level/${route.n}`
     case 'session':

@@ -3,6 +3,7 @@ export const chrome = {
   voiceLede: 'Thai in romanization. Hear the word, then write it.',
   scriptLede: 'One letter at a time, on words you already say.',
   yoursSub: 'words you have seen',
+  trackDone: 'every level cleared',
   alphabetSub: 'every letter, and where it is taught',
   meet: 'Look.',
   retype: 'Retype the romanization.',

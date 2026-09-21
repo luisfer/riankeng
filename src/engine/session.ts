@@ -55,7 +55,7 @@ export function startSession(doc: ProgressDoc, now = Date.now(), level?: number,
     seen.add(id)
     const entry = entryOrThrow(id)
     const progress = progressFor(doc, id)
-    const canHear = voiceReady || hasShippedClip(id)
+    const canHear = !doc.settings.silent && (voiceReady || hasShippedClip(id))
     const item: QueueItem = { id, modality: chooseModality(entry, progress, salt, canHear), salt }
     if (progress.reps === 0) item.meet = true
     queue.push(item)
@@ -103,7 +103,7 @@ export function startReviewSession(
   track: TrackId = 'voice',
 ): LiveSession {
   const salt = String(now)
-  const voiceReady = detectVoice().ready
+  const voiceReady = !doc.settings.silent && detectVoice().ready
   const queue: QueueItem[] = []
   const seen = new Set<string>()
   for (const id of ids) {
@@ -115,7 +115,7 @@ export function startReviewSession(
     const progress = progressFor(doc, id)
     queue.push({
       id,
-      modality: chooseModality(entry, progress, salt, voiceReady || hasShippedClip(id)),
+      modality: chooseModality(entry, progress, salt, voiceReady || (!doc.settings.silent && hasShippedClip(id))),
       salt,
       meet: false,
     })

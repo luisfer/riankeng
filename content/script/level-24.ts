@@ -10,6 +10,6 @@ export default scriptWords(24, [
   ['lɔɔ#2', 'ฬ', ['l', 'the letter l (lɔɔ jù-laa)'], 'n', ['letter'], 'Same sound as ล. กีฬา.'],
   ['gii-laa', 'กีฬา', ['sport', 'sports'], 'n', ['bridge', 'voice:w:gii-laa', 'parts:ก+ี+ฬ+า']],
   ['rụ́', 'ฤ', ['rụ́', 'the vowel-letter ฤ'], 'n', ['letter', 'vowel'], 'A vowel that stands alone. Reads rụ́ or rí. พฤหัส, อังกฤษ.'],
-  ['wan pá-rụ́-hàt', 'วันพฤหัสบดี', ['Thursday'], 'n', ['bridge', 'voice:w:wan pá-rụ́-hàt', 'parts:ว+ั+น+พ+ฤ+ห+ั+ส+บ+ด+ี'], 'บดี at the end is written but not said.'],
+  ['wan pá-rụ́-hàt', 'วันพฤหัส', ['Thursday'], 'n', ['bridge', 'voice:w:wan pá-rụ́-hàt', 'parts:ว+ั+น+พ+ฤ+ห+ั+ส'], 'The short form people say. The calendar prints วันพฤหัสบดี.'],
   ['paa-sǎa ang-grìt', 'ภาษาอังกฤษ', ['English'], 'n', ['bridge', 'voice:w:paa-sǎa ang-grìt', 'parts:ภ+า+ษ+า+อ+ั+ง+ก+ฤ+ษ']],
 ])

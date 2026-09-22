@@ -9,8 +9,8 @@
  */
 import { getEntry } from '@content/index'
 import { currentId } from '@content/aliases'
-import { newItemProgress, type Attempt, type ItemProgress } from '@/engine/srs'
-import { mergeItem } from './import'
+import { applyAttempt, newItemProgress, type Attempt, type ItemProgress } from '@/engine/srs'
+import { mergeItem, unionHistory } from './import'
 import type { ProgressDoc, ProgressExport } from './progress-schema'
 
 /** One attempt, and the entry it belongs to. The whole sync payload is these. */
@@ -75,7 +75,11 @@ export function mergeAttempts(doc: ProgressDoc, rows: AttemptRow[], now = Date.n
   if (byId.size === 0) return doc
   const items: Record<string, ItemProgress> = { ...doc.items }
   for (const [id, attempts] of byId) {
-    const incoming: ItemProgress = { ...newItemProgress(id), history: attempts }
+    // A bag of attempts has no stage, days or reps of its own until it is folded.
+    // Handing mergeItem a hollow item would let it adopt stage nought and no days
+    // for a card this device has never seen, so fold the bag first.
+    let incoming = newItemProgress(id)
+    for (const a of unionHistory([], attempts)) incoming = applyAttempt(incoming, a)
     items[id] = mergeItem(items[id], incoming)
   }
   return { ...doc, updatedAt: now, items }

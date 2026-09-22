@@ -32,7 +32,8 @@ function attemptKey(h: Attempt): string {
   return `${h.t}:${h.ok ? 1 : 0}:${h.v}:${h.m}${h.d ? `:${h.d}` : ''}`
 }
 
-function unionHistory(a: Attempt[], b: Attempt[]): Attempt[] {
+/** Every distinct attempt from both sides, oldest first. */
+export function unionHistory(a: Attempt[], b: Attempt[]): Attempt[] {
   const map = new Map<string, Attempt>()
   for (const h of [...a, ...b]) map.set(attemptKey(h), h)
   return [...map.values()].sort((x, y) => x.t - y.t)
@@ -43,31 +44,58 @@ function unionDays(a: string[], b: string[]): string[] {
 }
 
 /**
- * Replay a merged history, then keep every durable day both sides remember.
+ * Merge what two copies know about one card.
  *
- * `stage` and `due` come from the replay alone, never from a max against either
- * side's own copy. A miss lowers them, so they are not monotonic, and taking a
- * max of a value that can fall makes the merge depend on which device did it:
- * two devices with the same set of attempts would disagree, which is the one
- * thing a sync merge may not do. The replay is a pure function of the attempt
- * set, so both sides land in the same place.
+ * A history keeps only its last forty attempts, but `stage` is folded over every
+ * attempt ever made, so a card's stage cannot always be rebuilt from the history
+ * it still carries: a card that climbed to six and then lived between four and
+ * six will replay from a fresh seed into the band between nought and two, and
+ * never climb back. So replay is the last resort, not the first move. There are
+ * four cases, and three of them have an exact answer that loses nothing:
  *
- * `reps`, `lapses`, `lastSeen` and `days` only ever grow, so max and union are
- * both safe and order-independent, and they keep their guard: a capped history
- * can undercount them, and they must not slide backwards.
+ * 1. This side has never seen the card. Take the other copy whole, as it was
+ *    folded. Restoring a file onto a new machine is this case.
+ * 2. The other copy adds no attempt this side lacks. Keep this side's stage.
+ *    Reading back your own file on open is this case, and it must be a no-op.
+ * 3. Everything the other copy adds happened after everything this side knows.
+ *    Carry on from where this side already is, exactly as if the attempts had
+ *    been answered here. Laptop then phone is this case.
+ * 4. The two copies interleave in time, because both machines were used over
+ *    the same stretch offline. Only here do we replay the union from a seed.
+ *    Both machines replay the same union and so still agree; the result can
+ *    only be approximate for a card whose history has already been capped.
+ *
+ * `stage` and `due` are never taken as a max: a miss lowers them, and a max over
+ * a value that can fall would make the answer depend on which machine merged.
+ * `reps`, `lapses`, `lastSeen` and `days` only ever grow, so they keep a max or
+ * union guard in every case, because a capped history can undercount them.
  */
 export function mergeItem(have: ItemProgress | undefined, incoming: ItemProgress): ItemProgress {
-  const seed = newItemProgress(incoming.id)
-  const history = unionHistory(have?.history ?? [], incoming.history)
-  let next = seed
-  for (const h of history) next = applyAttempt(next, h)
-  return {
-    ...next,
-    reps: Math.max(next.reps, have?.reps ?? 0, incoming.reps),
-    lapses: Math.max(next.lapses, have?.lapses ?? 0, incoming.lapses),
-    days: unionDays(unionDays(have?.days ?? [], incoming.days), next.days),
-    lastSeen: Math.max(have?.lastSeen ?? 0, incoming.lastSeen, next.lastSeen),
+  if (!have) return { ...incoming, days: [...incoming.days] }
+
+  const known = new Set(have.history.map(attemptKey))
+  const fresh = unionHistory([], incoming.history).filter((h) => !known.has(attemptKey(h)))
+
+  const guarded = (base: ItemProgress): ItemProgress => ({
+    ...base,
+    reps: Math.max(base.reps, have.reps, incoming.reps),
+    lapses: Math.max(base.lapses, have.lapses, incoming.lapses),
+    days: unionDays(unionDays(have.days, incoming.days), base.days),
+    lastSeen: Math.max(have.lastSeen, incoming.lastSeen, base.lastSeen),
+  })
+
+  if (fresh.length === 0) return guarded(have)
+
+  const newestKnown = have.history.reduce((t, h) => Math.max(t, h.t), -Infinity)
+  if (fresh.every((h) => h.t > newestKnown)) {
+    let next = have
+    for (const h of fresh) next = applyAttempt(next, h)
+    return guarded(next)
   }
+
+  let next = newItemProgress(incoming.id)
+  for (const h of unionHistory(have.history, incoming.history)) next = applyAttempt(next, h)
+  return guarded(next)
 }
 
 /** File one saved item under its current id, when a spelling fix renamed the entry. */

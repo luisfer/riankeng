@@ -236,3 +236,90 @@ describe('mergeWork, which is what reading the mirror file does', () => {
     expect(derived(twice)).toEqual(derived(once))
   })
 })
+
+describe('a card whose history has outgrown the forty-attempt cap', () => {
+  /** Climbs to six, then lives between four and six: a band a fresh seed never reaches. */
+  function stubborn(): ProgressDoc {
+    let doc = emptyDoc(t0)
+    let i = 0
+    const push = (ok: boolean) => {
+      doc = answer(doc, 'w:maa', t0 + i++ * DAY, ok, 'aaa')
+    }
+    for (let k = 0; k < 6; k++) push(true)
+    for (let r = 0; r < 14; r++) {
+      push(false)
+      push(true)
+      push(true)
+    }
+    return doc
+  }
+
+  function fileOf(doc: ProgressDoc) {
+    return {
+      version: 1 as const,
+      app: 'riankeng' as const,
+      exportedAt: new Date(t0).toISOString(),
+      createdAt: doc.createdAt,
+      updatedAt: doc.updatedAt,
+      settings: doc.settings,
+      items: Object.values(doc.items),
+      sessions: [],
+    }
+  }
+
+  it('is the case the cap cannot replay: mastered at six, forty of forty eight attempts kept', () => {
+    const p = stubborn().items['w:maa']!
+    expect(p.stage).toBe(6)
+    expect(p.reps).toBe(48)
+    expect(p.history).toHaveLength(40)
+    expect(isMastered(p)).toBe(true)
+  })
+
+  it('reading back your own file does not move it', () => {
+    const doc = stubborn()
+    const before = doc.items['w:maa']!
+    const after = mergeWork(doc, fileOf(doc), t0 + 60 * DAY).items['w:maa']!
+    expect(after.stage).toBe(before.stage)
+    expect(after.due).toBe(before.due)
+    expect(isMastered(after)).toBe(true)
+  })
+
+  it('restoring it onto a machine that has never seen it keeps it exactly', () => {
+    const doc = stubborn()
+    const before = doc.items['w:maa']!
+    const after = mergeWork(emptyDoc(t0), fileOf(doc), t0 + 60 * DAY).items['w:maa']!
+    expect(after.stage).toBe(before.stage)
+    expect(after.due).toBe(before.due)
+    expect(after.reps).toBe(48)
+    expect(isMastered(after)).toBe(true)
+  })
+
+  it('carries on exactly when the other machine only adds later answers', () => {
+    const laptop = stubborn()
+    const later = t0 + 100 * DAY
+    let phone = emptyDoc(t0)
+    phone = answer(phone, 'w:maa', later, false, 'bbb')
+    phone = answer(phone, 'w:maa', later + DAY, true, 'bbb')
+
+    const merged = mergeAttempts(laptop, attemptsSince(phone, 0), later + 2 * DAY).items['w:maa']!
+    let expected = laptop
+    expected = answer(expected, 'w:maa', later, false, 'bbb')
+    expected = answer(expected, 'w:maa', later + DAY, true, 'bbb')
+    expect(merged.stage).toBe(expected.items['w:maa']!.stage)
+    expect(merged.due).toBe(expected.items['w:maa']!.due)
+  })
+
+  it('never moves any card when you read back your own file, over many shapes of history', () => {
+    let seed = 7
+    const rnd = () => (seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648
+    for (let trial = 0; trial < 400; trial++) {
+      let doc = emptyDoc(t0)
+      const n = 20 + Math.floor(rnd() * 60)
+      for (let i = 0; i < n; i++) doc = answer(doc, 'w:maa', t0 + i * 3_600_000, rnd() < 0.7, 'aaa')
+      const before = doc.items['w:maa']!
+      const after = mergeWork(doc, fileOf(doc), t0).items['w:maa']!
+      expect(after.stage, `trial ${trial}, ${n} answers`).toBe(before.stage)
+      expect(after.due, `trial ${trial}, ${n} answers`).toBe(before.due)
+    }
+  })
+})

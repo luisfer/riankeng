@@ -124,7 +124,7 @@ export const SCRIPT_LEVELS: LevelMeta[] = [
     rom: 'kâao ao',
     thai: 'ข้าวเอา',
     blurb: 'ว can close a vowel. อ can carry a vowel with no consonant sound. เ plus า around a consonant is ao.',
-    focus: ['ว in ข้าว. The ao you already say.', 'เอา. อ plus เ. ao, take.', 'เก่า, เรา. gào, rao.'],
+    focus: ['ว in ข้าว. The aao you already say.', 'เอา. เ and า around อ. ao, take.', 'เก่า, เรา. gào, rao.'],
     min: 4,
   },
   {
@@ -147,7 +147,7 @@ export const SCRIPT_LEVELS: LevelMeta[] = [
   },
   {
     n: 16,
-    title: 'The last tone marks',
+    title: 'The rising mark',
     rom: 'dtǔa',
     thai: 'ตั๋ว',
     blurb: '๋ on ตั๋ว. ่ and ้ you already know on ไม่ and ม้า. No mark is a card of its own.',
@@ -159,8 +159,8 @@ export const SCRIPT_LEVELS: LevelMeta[] = [
     title: 'Live and dead',
     rom: 'maa mǎa',
     thai: 'มาหมา',
-    blurb: 'มา is live: mid. หมา is live with ห: rising. กิน is live too: น keeps the syllable open, so mid-class ก with no mark is mid. ไก่ is dead: ก plus a short closed vowel is low.',
-    focus: ['มา. Live, mid.', 'หมา. ห changes the class.', 'กิน. Live, mid. น keeps it alive.', 'ไก่. Dead, low. Short closed.'],
+    blurb: 'A live syllable ends long, or on m, n, ng or a glide. A dead one ends short, or on k, p or t. Live with no mark, มา and กิน are mid and หมา is rising. ไข่ is live too, since ไ ends in a glide, and ่ makes it low. Dead with no mark, กับ and จาก are low. A low-class letter on a dead syllable splits by length: รัก, short, is high. มาก, long, is falling.',
+    focus: ['มา, กิน. Live, no mark: mid.', 'หมา. ห lends high class: rising.', 'ไข่. Live. ่ makes it low.', 'กับ, จาก. Dead, mid class: low.', 'รัก. Dead, low class, short: high.', 'มาก. Dead, low class, long: falling.'],
     min: 5,
   },
   {
@@ -241,7 +241,7 @@ export const SCRIPT_LEVELS: LevelMeta[] = [
     rom: 'hâa dtua',
     thai: 'ห้าตัว',
     blurb: 'ฑ ฒ ฌ are rare. ฃ ฅ are retired. With these five you have all forty-four consonants.',
-    focus: ['ฑ ฒ. Both th.', 'ฌ. ch.', 'ฃ ฅ. Retired k.'],
+    focus: ['ฑ ฒ. Both low-class t, like ท.', 'ฌ. Low-class ch, like ช.', 'ฃ ฅ. Retired k.'],
     min: 5,
   },
   {

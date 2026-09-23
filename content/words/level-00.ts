@@ -64,9 +64,9 @@ const rows = words(0, [
   ["sà-àat", 'สะอาด', ['clean'], 'adj', ['glottal']],
   ['ngaan', 'งาน', ['work', 'job', 'event'], 'n', ['ng-onset']],
   ['nguu', 'งู', ['snake'], 'n', ['ng-onset']],
-  // ── long vs short with same tone (pure length pairs)
+  // ── ao and aa: short a with a glide, long aa with none
   ['ao', 'เอา', ['take', 'to take', 'want', "I'll have"], 'v', ['length']],
-  ['aa#2', 'อา', ['uncle', "(father's younger) brother"], 'n', ['length'], 'The length twin of ao. Also the letter อ plus า.'],
+  ['aa#2', 'อา', ['uncle', "(father's younger) brother"], 'n', ['length'], 'Long aa, nothing after it. Also the letter อ plus า.'],
 ])
 
 // Link minimal pairs by shared "pair-*" tag.

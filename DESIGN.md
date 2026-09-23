@@ -1,4 +1,4 @@
-# riian gèng · design system
+# rian gèng · design system
 
 Visual world: **river primer**. A language book on paper, iron-gall ink, one lacquer mark. Not a night-market app, not a dark SaaS shell. One look. No Day/Night switch. Direction taken from the shipped CSS in `src/styles.css`.
 

@@ -95,7 +95,7 @@ describe('the landing page', () => {
 
   it('names the extra vowels on the try card, without coaching the sitting', () => {
     expect(text(doc.querySelector('#try .lede'))).toBe(
-      'Thai has more vowels than English, and four tones. The keys write ε, ɔ, ə, ụ and the marks.',
+      'Thai has more vowels than English, and five tones. The keys write ε, ɔ, ə, ụ and the marks.',
     )
   })
 
@@ -118,7 +118,7 @@ describe('the landing page', () => {
 
   it('keeps the English of the name under the wordmark', () => {
     expect(text(doc.querySelector('.nav .wordmark-en'))).toBe('learn well')
-    expect(text(doc.querySelector('.nav .wordmark-rom'))).toBe('riian gèng')
+    expect(text(doc.querySelector('.nav .wordmark-rom'))).toBe('rian gèng')
     expect(text(doc.querySelector('.nav .wordmark-th'))).toBe('เรียนเก่ง')
   })
 

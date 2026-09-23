@@ -5,10 +5,21 @@ import type { ProgressDoc } from '@/storage/progress-schema'
 import { download, exportCsv, exportJson } from '@/storage/export'
 import { applyImport, parseExport, previewImport } from '@/storage/import'
 import { detectVoice } from '@/audio/tts'
+import {
+  accountConfig,
+  changePassword,
+  sendPasswordReset,
+  signInAccount,
+  signOutAccount,
+  updatePassword,
+  type AccountSession,
+} from '@/storage/auth'
 import type { MirrorState } from '@/storage/mirror-file'
 import { Commit, TextBtn } from './bits'
 
 const MONTH_WORD = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] as const
+
+export const ERASE_CONFIRM = 'Erase cards on this browser and sign out? The account keeps its copy.'
 
 export function localDayKey(now = Date.now()): string {
   const day = new Date(now)
@@ -81,12 +92,23 @@ export function Account(props: {
   }
   onGlyphs: () => void
   onReset: () => void
+  account: AccountSession | null
+  onAccount: (session: AccountSession | null) => void
+  recovery: boolean
+  onRecoveryDone: () => void
 }) {
   const fileRef = useRef<HTMLInputElement>(null)
   const [preview, setPreview] = useState<string | null>(null)
   const [pending, setPending] = useState<ReturnType<typeof parseExport>>(null)
   const [offlineReady, setOfflineReady] = useState(false)
   const [online, setOnline] = useState(() => (typeof navigator === 'undefined' ? true : navigator.onLine))
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [currentPassword, setCurrentPassword] = useState('')
+  const [nextPassword, setNextPassword] = useState('')
+  const [signingIn, setSigningIn] = useState(false)
+  const [signInNote, setSignInNote] = useState('')
+  const [passwordNote, setPasswordNote] = useState('')
   const days = activeDays(props.doc)
   const cells = lastWeeks(12)
   const months = heatMonthMarks(cells)
@@ -134,7 +156,69 @@ export function Account(props: {
 
   const cards = Object.keys(props.doc.items).length
   const mirroring = props.mirror.state === 'granted'
+  const signedIn = Boolean(props.account)
   const stale = !mirroring && backupStale(props.doc.settings.lastBackupAt)
+  const where = signedIn
+    ? mirroring
+      ? 'this device, your file, and your account'
+      : 'this device, and your account'
+    : mirroring
+      ? 'this device, and your file'
+      : 'this device'
+  const submitSignIn = () => {
+    if (!accountConfig()) {
+      setSignInNote('Sign in is not set up on this copy.')
+      return
+    }
+    setSigningIn(true)
+    setSignInNote('')
+    void signInAccount(email, password).then((session) => {
+      setSigningIn(false)
+      if (!session) {
+        setSignInNote('Could not sign in.')
+        return
+      }
+      setPassword('')
+      props.onAccount(session)
+    })
+  }
+  const submitPassword = () => {
+    if (!accountConfig()) {
+      setPasswordNote('Sign in is not set up on this copy.')
+      return
+    }
+    setSigningIn(true)
+    setPasswordNote('')
+    const run = props.recovery
+      ? props.account
+        ? updatePassword(nextPassword, props.account)
+        : Promise.resolve(false)
+      : changePassword(currentPassword, nextPassword)
+    void run.then((ok) => {
+      setSigningIn(false)
+      if (!ok) {
+        setPasswordNote('Could not change this.')
+        return
+      }
+      setCurrentPassword('')
+      setNextPassword('')
+      setPasswordNote('Password changed.')
+      if (props.recovery) props.onRecoveryDone()
+    })
+  }
+  const submitReset = () => {
+    if (!accountConfig()) {
+      setSignInNote('Sign in is not set up on this copy.')
+      return
+    }
+    setSigningIn(true)
+    setSignInNote('')
+    const redirect = `${window.location.origin}/learn/`
+    void sendPasswordReset(email, redirect).then((ok) => {
+      setSigningIn(false)
+      setSignInNote(ok ? 'Check your email.' : 'Could not send this.')
+    })
+  }
   const backUp = () => {
     download('riankeng-progress-v1.json', exportJson(props.doc), 'application/json')
     set('lastBackupAt', Date.now())
@@ -147,11 +231,101 @@ export function Account(props: {
         {s > 0 ? `${s} day streak. ` : ''}
         Today {today.correct} of {today.answered || 0}.
       </p>
+      <h2>{signedIn ? 'Signed in' : 'Sign in'}</h2>
+      {signedIn ? (
+        <>
+          <p className="lede">{props.account?.displayName || props.account?.email}</p>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              submitPassword()
+            }}
+          >
+            {props.recovery ? null : (
+              <label className="field">
+                <span>Current password</span>
+                <input
+                  className="roman-field en"
+                  type="password"
+                  autoComplete="current-password"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                />
+              </label>
+            )}
+            <label className="field">
+              <span>New password</span>
+              <input
+                className="roman-field en"
+                type="password"
+                autoComplete="new-password"
+                value={nextPassword}
+                onChange={(e) => setNextPassword(e.target.value)}
+              />
+            </label>
+            <div className="account-actions">
+              <Commit type="submit" disabled={signingIn}>
+                Change password
+              </Commit>
+            </div>
+            {passwordNote && <p className="lede">{passwordNote}</p>}
+          </form>
+          <div className="account-actions">
+            <TextBtn
+              onClick={() => {
+                signOutAccount()
+                props.onAccount(null)
+                props.onRecoveryDone()
+              }}
+            >
+              Sign out
+            </TextBtn>
+          </div>
+        </>
+      ) : (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault()
+            submitSignIn()
+          }}
+        >
+          <label className="field">
+            <span>Email</span>
+            <input
+              className="roman-field en"
+              type="email"
+              autoComplete="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </label>
+          <label className="field">
+            <span>Password</span>
+            <input
+              className="roman-field en"
+              type="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </label>
+          <div className="account-actions">
+            <Commit type="submit" disabled={signingIn}>
+              Sign in
+            </Commit>
+            <TextBtn disabled={signingIn} onClick={submitReset}>
+              Send a reset link
+            </TextBtn>
+          </div>
+          {signInNote && <p className="lede">{signInNote}</p>}
+        </form>
+      )}
+
       <h2>Your progress</h2>
       <ul className="status">
         <li>
           <span>Where it lives</span>
-          <span className="status-value">{mirroring ? 'this device, and your file' : 'this device'}</span>
+          <span className="status-value">{where}</span>
         </li>
         <li>
           <span>Cards with progress</span>
@@ -185,11 +359,11 @@ export function Account(props: {
         </li>
       </ul>
       <p className="lede status-note">
-        {mirroring
-          ? 'Every answer is written to this browser and to your file as you go, online or off. Nothing is uploaded. Keep that file in a folder iCloud or Dropbox syncs and a second machine stays with you, with no account: opening the app reads the file back and merges it, so whichever machine wrote last does not matter.'
-          : props.mirror.state === 'unsupported'
-            ? 'Every answer is written to this browser as you go, online or off. Nothing is uploaded, because there is no account yet, so a backup file is the only copy that outlives this browser.'
-            : 'Every answer is written to this browser as you go, online or off. Nothing is uploaded, because there is no account yet. Chrome can also keep a file of your own up to date as you work, which is the nearest thing to sync without an account.'}
+        {signedIn
+          ? 'Saved on this browser and on the account.'
+          : mirroring
+            ? 'Saved on this browser and in the file.'
+            : 'Saved on this browser.'}
       </p>
       <div className="account-actions">
         <Commit onClick={backUp}>Back up now</Commit>
@@ -283,7 +457,7 @@ export function Account(props: {
         <input type="range" min={0.5} max={1.2} step={0.05} value={props.doc.settings.audioRate} onChange={(e) => set('audioRate', Number(e.target.value))} />
       </label>
       <p className={voice.ready ? 'lede' : 'warn'}>{voice.ready ? `Thai voice: ${voice.name}` : voice.warning}</p>
-      <p className="lede">Hear uses recorded Thai when a clip exists. The Mac voice is a fallback and is bad at tones.</p>
+      <p className="lede">Clips when they exist. The Mac voice misses tones.</p>
 
       <input
         ref={fileRef}
@@ -322,7 +496,7 @@ export function Account(props: {
         <TextBtn onClick={props.onGlyphs}>Glyph coverage</TextBtn>
       </div>
 
-      <h2>Password</h2>
+      <h2>Course password</h2>
       <p className="lede">Ends the password on this browser. Cards stay on this device.</p>
       <TextBtn
         onClick={() => {
@@ -337,7 +511,7 @@ export function Account(props: {
       <h2>Reset</h2>
       <TextBtn
         onClick={() => {
-          if (confirm('Erase cards and any open sitting.')) props.onReset()
+          if (confirm(ERASE_CONFIRM)) props.onReset()
         }}
       >
         Erase this device

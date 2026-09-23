@@ -136,7 +136,7 @@ export function Trail(props: {
     <nav className="trail">
       <button type="button" className="wordmark" onClick={props.onHome}>
         <span className="wordmark-th">เรียนเก่ง</span>
-        <span className="wordmark-rom">riian gèng</span>
+        <span className="wordmark-rom">rian gèng</span>
       </button>
       <span className="trail-mid">
         {switcher ? (

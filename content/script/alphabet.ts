@@ -59,7 +59,7 @@ export const CONSONANTS: Consonant[] = [
   { char: 'ล', name: 'lɔɔ ling', cls: 'low', initial: 'l', final: 'n' },
   { char: 'ว', name: 'wɔɔ wε̌εn', cls: 'low', initial: 'w', final: 'o' },
   { char: 'ศ', name: 'sɔ̌ɔ sǎa-laa', cls: 'high', initial: 's', final: 't' },
-  { char: 'ษ', name: 'sɔ̌ɔ rụ́ụ-sǐi', cls: 'high', initial: 's', final: 't' },
+  { char: 'ษ', name: 'sɔ̌ɔ rụụ-sǐi', cls: 'high', initial: 's', final: 't' },
   { char: 'ส', name: 'sɔ̌ɔ sụ̌a', cls: 'high', initial: 's', final: 't' },
   { char: 'ห', name: 'hɔ̌ɔ hìip', cls: 'high', initial: 'h', final: '' },
   { char: 'ฬ', name: 'lɔɔ jù-laa', cls: 'low', initial: 'l', final: 'n' },

@@ -7,7 +7,7 @@ export default phrases(19, [
   ['pǒm mâi hěn dûai', 'ผมไม่เห็นด้วย', ['I disagree']],
   ['pǒm chụ̂a kun', 'ผมเชื่อคุณ', ['I believe you']],
   ['mâi chụ̂a rɔ̀k', 'ไม่เชื่อหรอก', ['I do not believe that']],
-  ['sǒng-sǎi wâa jing', 'สงสัยว่าจริง', ['I wonder if it is true']],
+  ['sǒng-sǎi wâa jing rụ̌ụ bplào', 'สงสัยว่าจริงหรือเปล่า', ['I wonder if it is true', 'I wonder whether it is true']],
   ['kun nε̂ε jai mái', 'คุณแน่ใจไหม', ['are you sure']],
   ['mâi nε̂ε jai', 'ไม่แน่ใจ', ['I am not sure']],
   ['yɔɔm-ráp wâa pìt', 'ยอมรับว่าผิด', ['I admit I was wrong']],

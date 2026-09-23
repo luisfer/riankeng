@@ -13,7 +13,7 @@ export default phrases(20, [
   ['rụ̂ang sǎm-kan', 'เรื่องสำคัญ', ['an important matter']],
   ['jai kwâang ná', 'ใจกว้างนะ', ['be generous, yeah']],
   ['yàa jai dam', 'อย่าใจดำ', ['do not be cruel']],
-  ['pǒm sǐa nám jai', 'ผมเสียน้ำใจ', ['you hurt my feelings', 'my feelings are hurt']],
+  ['pǒm sǐa nám jai', 'ผมเสียน้ำใจ', ['I feel let down', 'my feelings are hurt', 'I am hurt']],
   ['waang jai dâi', 'วางใจได้', ['you can rest easy']],
   ['jàp jai mâak', 'จับใจมาก', ['very touching']],
   ['bplɔ̀ɔp jai kun', 'ปลอบใจคุณ', ['I will comfort you']],

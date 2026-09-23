@@ -15,7 +15,7 @@ export default phrases(23, [
   ['nǎng-sụ̌ụ sǎam lêm', 'หนังสือสามเล่ม', ['three books']],
   ['rót sɔ̌ɔng kan', 'รถสองคัน', ['two cars']],
   ['bâan nụ̀ng lǎng', 'บ้านหนึ่งหลัง', ['one house']],
-  ['mii dtôn yài', 'มีต้นใหญ่', ['there is a big tree']],
+  ['dtôn-mái sɔ̌ɔng dtôn', 'ต้นไม้สองต้น', ['two trees']],
   ['táng mòt tâo-rài', 'ทั้งหมดเท่าไร', ['how much altogether', 'how much in total']],
   ['an tîi nụ̀ng dii gwàa', 'อันที่หนึ่งดีกว่า', ['the first one is better']],
 ])

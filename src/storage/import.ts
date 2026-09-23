@@ -176,13 +176,22 @@ export function applyImport(doc: ProgressDoc, incoming: ProgressExport, now = Da
     if (!getEntry(item.id)) continue
     items[item.id] = mergeItem(items[item.id], item)
   }
+  const opened = incoming.opened
   return {
     ...doc,
     updatedAt: now,
     settings: { ...DEFAULT_SETTINGS, ...doc.settings, ...presentSettings(incoming.settings) },
     items,
     sessions: mergeSessions(doc.sessions, incoming.sessions),
+    opened: {
+      voice: Math.max(level(doc.opened?.voice), level(opened?.voice)),
+      script: Math.max(level(doc.opened?.script), level(opened?.script)),
+    },
   }
+}
+
+function level(n: number | undefined): number {
+  return Number.isFinite(n) ? Math.max(0, Math.trunc(n as number)) : 0
 }
 
 function mergeSessions(a: ProgressDoc['sessions'], b: ProgressDoc['sessions']): ProgressDoc['sessions'] {

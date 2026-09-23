@@ -26,7 +26,7 @@ export default words(24, [
   ['win', 'วิน', ['motorbike rank', 'motorbike taxi stand'], 'n', ['travel'], 'The orange vests at the mouth of a soi.'],
   // the phone words
   ['lai', 'ไลน์', ['LINE', 'the LINE app'], 'n', ['phone'], 'How Thailand actually messages.'],
-  ['ὲεp', 'แอป', ['app'], 'n', ['phone']],
+  ['έp', 'แอป', ['app'], 'n', ['phone'], 'Said short and high, whatever the spelling suggests.'],
   ['sà-gεεn', 'สแกน', ['scan', 'to scan'], 'v', ['phone']],
   // paperwork
   ['bprai-sà-nii', 'ไปรษณีย์', ['post office', 'post'], 'n', ['errand']],

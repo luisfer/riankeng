@@ -2,7 +2,7 @@ import { words } from '../build'
 
 export default words(23, [
   // the four grandparents. Thai names the side.
-  ['bpùu', 'ปู่', ['grandfather', "(father's) grandfather"], 'n', ['family'], "Father's father. Mother's father is dtaa."],
+  ['bpùu', 'ปู่', ['grandfather', '(paternal) grandfather', "father's father"], 'n', ['family'], "Father's father. Mother's father is dtaa."],
   ['dtaa#2', 'ตา', ['grandfather', "(maternal) grandfather", "mother's father"], 'n', ['family'], 'Same letters as the eye you already read.'],
   ['yaai', 'ยาย', ['grandmother', "(maternal) grandmother", "mother's mother"], 'n', ['family'], "Mother's mother. Father's mother is yâa."],
   // aunts and uncles, by side and by age
@@ -25,9 +25,10 @@ export default words(23, [
   ['lûuk#2', 'ลูก', ['classifier for fruit', 'classifier for round things'], 'clf', ['classifier'], 'glûai hâa lûuk: five bananas.'],
   ['lêm', 'เล่ม', ['classifier for books'], 'clf', ['classifier']],
   ['krụ̂ang', 'เครื่อง', ['machine', 'classifier for machines'], 'n', ['classifier']],
-  ['pὲεn', 'แผ่น', ['sheet', 'classifier for flat things'], 'clf', ['classifier']],
+  ['pὲn', 'แผ่น', ['sheet', 'classifier for flat things'], 'clf', ['classifier']],
   ['lǎng#2', 'หลัง', ['classifier for houses'], 'clf', ['classifier'], 'bâan nụ̀ng lǎng: one house.'],
-  ['dtôn', 'ต้น', ['tree', 'classifier for trees', 'plant'], 'n', ['classifier']],
+  ['dtôn-mái', 'ต้นไม้', ['tree', 'a tree'], 'n', ['classifier'], 'Counted with dtôn: dtôn-mái sɔ̌ɔng dtôn.'],
+  ['dtôn', 'ต้น', ['classifier for trees', 'plant', 'trunk'], 'clf', ['classifier'], 'A tree on its own is dtôn-mái.'],
   ['gɔ̂ɔn', 'ก้อน', ['lump', 'classifier for lumps'], 'clf', ['classifier']],
   ['duang', 'ดวง', ['classifier for lights', 'classifier for stars'], 'clf', ['classifier']],
   ['táng mòt', 'ทั้งหมด', ['altogether', 'all of it', 'in total'], 'adv', ['classifier']],

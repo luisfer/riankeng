@@ -14,7 +14,7 @@ export default words(13, [
   ['wép', 'เว็บ', ['web', 'website'], 'n', ['work']],
   ['kom-piw-dtəə', 'คอมพิวเตอร์', ['computer'], 'n', ['work']],
   ['dtaam', 'ตาม', ['follow', 'according to'], 'v', ['work']],
-  ['waang', 'วาง', ['put down', 'place', 'plan'], 'v', ['work']],
+  ['waang', 'วาง', ['put down', 'place', 'set down'], 'v', ['work']],
   ['waang pε̌εn', 'วางแผน', ['to plan', 'make a plan'], 'v', ['work']],
   ['pε̌εn', 'แผน', ['plan'], 'n', ['work']],
   ['hǔa nâa', 'หัวหน้า', ['boss', 'head', 'chief'], 'n', ['work']],

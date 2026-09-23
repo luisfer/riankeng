@@ -18,8 +18,6 @@ import { canonicalRom, expandAlternatives } from '../src/engine/normalize'
 
 const MAX_WORD_TOKENS = 4
 const PUNCT = new Set(['…', ',', '?', '!', '-', '.'])
-/** Proper names that may appear in example phrases. */
-const NAMES = new Set(['luis'])
 
 /** Split a rom string into comparable tokens: hyphens count as spaces. */
 export function romTokens(rom: string): string[] {
@@ -81,10 +79,6 @@ export function decompose(rom: string, level: number, lex: Map<string, Lexeme>):
     if (late) {
       misses.push({ token: tokens.slice(i, i + late.n).join(' '), firstLevel: late.lex.level })
       i += late.n
-      continue
-    }
-    if (NAMES.has(tokens[i]!)) {
-      i += 1
       continue
     }
     misses.push({ token: tokens[i]!, firstLevel: null })

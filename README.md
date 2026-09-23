@@ -1,4 +1,4 @@
-# riian gèng, เรียนเก่ง
+# rian gèng, เรียนเก่ง
 
 A local-first Thai primer. **Voice** is romanization. **Script** is the letters, on words you already say.
 

@@ -101,7 +101,7 @@ export default defineConfig(({ mode }) => {
         includeAssets: ['favicon.svg', 'icons/icon-192.png', 'icons/icon-512.png'],
         manifest: {
           id: '/',
-          name: 'riian gèng',
+          name: 'rian gèng',
           short_name: 'riankeng',
           description: 'Learn Thai as Thais speak it.',
           theme_color: '#f2ead8',

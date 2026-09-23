@@ -56,6 +56,6 @@ export default words(5, [
   ['dtɔɔn yen', 'ตอนเย็น', ['in the evening', 'evening time'], 'n', ['time']],
   ['wan', 'วัน', ['day', 'days'], 'n', ['time']],
   ['wâang', 'ว่าง', ['free', 'available', 'empty'], 'adj', ['time']],
-  ['tɔɔn', 'ทอน', ['change', 'change (money)'], 'n', ['money']],
+  ['tɔɔn', 'ทอน', ['give change', 'to give change', 'change (money)'], 'v', ['money'], 'mâi dtɔ̂ng tɔɔn: keep the change.'],
   ['jà', 'จะ', ['will', 'going to', 'about to'], 'adv', ['aspect']],
 ])

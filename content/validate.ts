@@ -55,7 +55,7 @@ export function validateEntries(
         problems.push({ id: e.id, message: `character U+${ch.codePointAt(0)!.toString(16).toUpperCase().padStart(4, '0')} "${ch}" not in the system` })
       }
     }
-    if (/[A-Z]/.test(e.rom) && !/luis/i.test(e.rom)) problems.push({ id: e.id, message: 'uppercase in rom' })
+    if (/[A-Z]/.test(e.rom)) problems.push({ id: e.id, message: 'uppercase in rom' })
 
     const a = analyseRom(e.rom)
     if (!a.valid) problems.push({ id: e.id, message: 'rom does not parse: tone mark off a vowel or two tone marks in one syllable' })

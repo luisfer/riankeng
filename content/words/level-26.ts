@@ -34,7 +34,7 @@ export default words(26, [
   ['bai dεεng', 'ใบแดง', ['red card'], 'n', ['football']],
   // the small words that soften a sentence
   ['mâi kɔ̂i', 'ไม่ค่อย', ['not very', 'not really', 'hardly'], 'adv', ['degree'], 'mâi kɔ̂i chɔ̂ɔp: I do not really like it.'],
-  ['gùap', 'เกือบ', ['almost', 'nearly'], 'adv', ['degree']],
+  ['gụ̀ap', 'เกือบ', ['almost', 'nearly'], 'adv', ['degree']],
   ['bprà-maan', 'ประมาณ', ['about', 'approximately', 'around'], 'adv', ['degree']],
   ['pɔɔ dii', 'พอดี', ['just right', 'exactly', 'it fits'], 'adv', ['degree']],
   ['baang tii', 'บางที', ['sometimes', 'maybe', 'perhaps'], 'adv', ['degree']],

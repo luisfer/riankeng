@@ -1,10 +1,10 @@
 /**
  * Ids are `${prefix}:${rom}`, so correcting a romanization renames the entry.
  * Saved progress is keyed by id, so a rename would orphan the card's history.
- * This maps every id retired by the romanization pass onto its replacement.
+ * This maps every id retired by the romanization passes onto its replacement.
  * Applied on load and on import; see `src/storage/import.ts`.
  *
- * `w:châi rɔ̀k` is deliberately absent: ใช่หรอก was removed, not renamed.
+ * `w:châi rɔ̀k` and `p:pǒm chụ̂ụ luis` are deliberately absent: they were removed, not renamed.
  */
 export const ID_ALIASES: Record<string, string> = {
   'i:jai dàm': 'i:jai dam',
@@ -13,12 +13,14 @@ export const ID_ALIASES: Record<string, string> = {
   'p:bpai bàa nít-nɔ̀i': 'p:bpai baa nít-nɔ̀i',
   'p:bpai dtàang prà-têet': 'p:bpai dtàang bprà-têet',
   'p:bɔ̀ɔk bpen prà-yòok': 'p:bɔ̀ɔk bpen bprà-yòok',
+  'p:dii ná kun': 'p:kun jai dii ná',
   'p:dtàam tîi kun bɔ̀ɔk': 'p:dtaam tîi kun bɔ̀ɔk',
   'p:dtòk sɔ̌ɔp': 'p:sɔ̀ɔp dtòk',
   'p:dtɔ̂ng tam-ngaan náan': 'p:dtɔ̂ng tam-ngaan naan',
   'p:dôoi rót fai': 'p:dooi rót fai',
   'p:fan jèp': 'p:bpùat fan',
   'p:gìi moong jà bpai': 'p:jà bpai gìi moong',
+  'p:gùap lụụm lέεo': 'p:gụ̀ap lụụm lέεo',
   'p:in-təə-nét dtòk': 'p:in-təə-nét chái mâi dâi',
   'p:jà bpai prung-níi': 'p:jà bpai prûng-níi',
   'p:jà sɔ̌ɔp prung-níi': 'p:jà sɔ̀ɔp prûng-níi',
@@ -26,13 +28,16 @@ export const ID_ALIASES: Record<string, string> = {
   'p:kâp bpai': 'p:káp bpai',
   'p:kǎo bpen krùu': 'p:kǎo bpen kruu',
   'p:kɔ̌ɔ laa wan nụ̀ng': 'p:kɔ̌ɔ laa nụ̀ng wan',
+  'p:kε̂ε nîi tâo nán': 'p:kε̂ε níi tâo nán',
   'p:maa rɔ̀k': 'p:mâi maa rɔ̀k',
+  'p:mii dtôn yài': 'p:dtôn-mái sɔ̌ɔng dtôn',
   'p:mii lóm mâak': 'p:mii lom mâak',
   'p:mii sǐi ụ̂ụn mái': 'p:mii sǐi ụ̀ụn mái',
   'p:mii sǔan lót mái': 'p:mii sùan lót mái',
   'p:mii tɔɔn mái': 'p:mii ngən tɔɔn mái',
   'p:mâi dtɔ̂ng pûut pεεng': 'p:mâi dtɔ̂ng pûut yâak',
   'p:nám jai mâak': 'p:mii nám jai mâak',
+  'p:nîi kε̂ε nîi': 'p:ao kε̂ε níi',
   'p:nîi tâo-rài bàat': 'p:nîi gìi bàat',
   'p:nɔ́k jàak níi': 'p:nɔ̂ɔk jàak níi',
   'p:nε̂ε nɔɔn dâi': 'p:dâi nε̂ε nɔɔn',
@@ -40,6 +45,7 @@ export const ID_ALIASES: Record<string, string> = {
   'p:prung-níi pǒm wâang': 'p:prûng-níi pǒm wâang',
   'p:prà-yòok níi kâo jai ngâai': 'p:bprà-yòok níi kâo jai ngâai',
   'p:prà-yòok sɔ̌ɔng prà-yòok': 'p:bprà-yòok sɔ̌ɔng bprà-yòok',
+  'p:pûut dâi dtὲε yang nít-nɔ̀i': 'p:pûut dâi dtὲε yang mâi gèng',
   'p:pε̂ε à-rai': 'p:pέε à-rai',
   'p:rao nát gan prung-níi': 'p:rao nát gan prûng-níi',
   'p:rian gàp krùu': 'p:rian gàp kruu',
@@ -48,6 +54,7 @@ export const ID_ALIASES: Record<string, string> = {
   'p:sèt náan lέεo': 'p:sèt naan lέεo',
   'p:sǎm-nuan tai mâak': 'p:bpen sǎm-nuan tai',
   'p:sǐa nám jai pǒm': 'p:pǒm sǐa nám jai',
+  'p:sǒng-sǎi wâa jing': 'p:sǒng-sǎi wâa jing rụ̌ụ bplào',
   'p:sǔan nɔ́ɔi tîi pìt': 'p:sùan nɔ́ɔi tîi pìt',
   'p:sǔan yài kâo jai': 'p:sùan yài kâo jai',
   'p:waang pεεn gan': 'p:waang pε̌εn gan',
@@ -59,12 +66,16 @@ export const ID_ALIASES: Record<string, string> = {
   'w:dtàam tîi': 'w:dtaam tîi',
   'w:dtàang prà-têet': 'w:dtàang bprà-têet',
   'w:dôoi': 'w:dooi',
+  'w:glua': 'w:glụa',
+  'w:gùap': 'w:gụ̀ap',
   'w:gɔ̂ dtàam': 'w:gɔ̂ dtaam',
   'w:jai dàm': 'w:jai dam',
   'w:jâ': 'w:jâa',
+  'w:jùut': 'w:jụ̀ụt',
   'w:kaan': 'w:kan',
   'w:krùu': 'w:kruu',
   'w:kâp': 'w:káp',
+  'w:kε̂ε nîi': 'w:kε̂ε níi',
   'w:lóm': 'w:lom',
   'w:lóm rεεng': 'w:lom rεεng',
   'w:lûam': 'w:lǔam',
@@ -79,7 +90,9 @@ export const ID_ALIASES: Record<string, string> = {
   'w:pε̂ε': 'w:pέε',
   'w:pεεn': 'w:pε̌εn',
   'w:pεεn-tîi': 'w:pε̌εn-tîi',
+  'w:pὲεn': 'w:pὲn',
   'w:sì-lǒm': 'w:sǐi-lom',
+  'w:sǐi nám ngəən': 'w:sǐi nám ngən',
   'w:sǐi sǒm': 'w:sǐi sôm',
   'w:sǔan lót': 'w:sùan lót',
   'w:sǔan nɔ́ɔi': 'w:sùan nɔ́ɔi',
@@ -94,6 +107,7 @@ export const ID_ALIASES: Record<string, string> = {
   'w:yìam': 'w:yîam',
   'w:ún': 'w:ùn',
   'w:ụ̂ụn': 'w:ụ̀ụn',
+  'w:ὲεp': 'w:έp',
 }
 
 /** The id an old saved item should be filed under now. */

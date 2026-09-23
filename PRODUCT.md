@@ -12,7 +12,7 @@ Primary: English-speaking adults learning everyday spoken Thai first, then the T
 
 ## Product Purpose
 
-riian gèng (เรียนเก่ง, "learn well") is a local-first Thai primer in two tracks. **Voice** teaches spoken Thai written in a fixed textbook romanization. **Script** teaches the Thai letters on words the learner already says. Success means a learner can say and type everyday phrases with the right tones, then read and write the same words in Thai script.
+rian gèng (เรียนเก่ง, "learn well") is a local-first Thai primer in two tracks. **Voice** teaches spoken Thai written in a fixed textbook romanization. **Script** teaches the Thai letters on words the learner already says. Success means a learner can say and type everyday phrases with the right tones, then read and write the same words in Thai script.
 
 ## Positioning
 
@@ -36,7 +36,7 @@ riian gèng (เรียนเก่ง, "learn well") is a local-first Thai pr
 
 ## Brand Commitments
 
-- Name: riian gèng / เรียนเก่ง. The wordmark's Thai is set in Fahkwang.
+- Name: rian gèng / เรียนเก่ง. The wordmark's Thai is set in Fahkwang.
 - Paper, ink and one lacquer red. See DESIGN.md.
 - Type roles chosen by Luis (September 2026): Brygada 1918 for headlines, Onest for the interface, Didact Gothic for romanization.
 - Comic scenes of one woman's day speaking Thai, in a single drawn style.

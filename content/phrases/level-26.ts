@@ -15,10 +15,10 @@ export default phrases(26, [
   ['bpai sà-nǎam prûng-níi', 'ไปสนามพรุ่งนี้', ['going to the ground tomorrow']],
   ['dtὲ bɔn tîi sà-nǎam', 'เตะบอลที่สนาม', ['play football at the ground']],
   ['pǒm mâi kɔ̂i chɔ̂ɔp', 'ผมไม่ค่อยชอบ', ['I do not really like it']],
-  ['gùap lụụm lέεo', 'เกือบลืมแล้ว', ['I almost forgot']],
+  ['gụ̀ap lụụm lέεo', 'เกือบลืมแล้ว', ['I almost forgot']],
   ['bprà-maan hâa-sìp bàat', 'ประมาณห้าสิบบาท', ['about fifty baht']],
   ['pɔɔ dii ləəi', 'พอดีเลย', ['just right', 'that is exactly it']],
   ['baang tii kǎo mâi maa', 'บางทีเขาไม่มา', ['sometimes they do not come']],
-  ['kε̂ε nîi tâo nán', 'แค่นี้เท่านั้น', ['only this much', 'that is all']],
+  ['kε̂ε níi tâo nán', 'แค่นี้เท่านั้น', ['only this much', 'that is all']],
   ['kɔ̂i kɔ̂i pûut', 'ค่อยๆพูด', ['speak gently', 'say it slowly']],
 ])

@@ -302,11 +302,11 @@ export const DEMO: DemoCard[] = [
   {
     stem: 'bill',
     id: 'p:gèp dtang dûai',
-    thai: 'เก็บตังด้วย',
+    thai: 'เก็บตังค์ด้วย',
     rom: 'gèp dtang dûai',
     en: 'the bill please',
     alt: 'Seated at a table with two bowls, a woman calls over a grey-haired waiter with a notepad.',
-    balloon: { lines: ['เก็บตังด้วย'], em: 5.05 },
+    balloon: { lines: ['เก็บตังค์ด้วย'], em: 5.77 },
   },
   {
     stem: 'toilet',

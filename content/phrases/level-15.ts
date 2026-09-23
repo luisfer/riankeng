@@ -4,7 +4,7 @@ export default phrases(15, [
   ['tâa pǒm wâang pǒm jà maa', 'ถ้าผมว่างผมจะมา', ['if I am free I will come']],
   ['prɔ́ wâa fǒn dtòk', 'เพราะว่าฝนตก', ['because it is raining']],
   ['pǒm yàak bpai dtὲε mâi wâang', 'ผมอยากไปแต่ไม่ว่าง', ['I want to go but I am not free']],
-  ['gin kâao lέ glàp bâan', 'กินข้าวและกลับบ้าน', ['eat and go home']],
+  ['gin kâao lέ glàp bâan', 'กินข้าวและกลับบ้าน', ['eat and go home'], 'Written style. Speech joins two actions with lέεo: gin kâao lέεo glàp bâan.'],
   ['gɔ̂ dâi', 'ก็ได้', ['fine', 'alright', 'that works']],
   ['mâi bpai ləəi', 'ไม่ไปเลย', ['I am not going at all']],
   ['kít wâa dii', 'คิดว่าดี', ['I think it is good']],

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { entriesForLevel, getEntry } from '../content/index'
+import { ENTRIES, entriesForLevel, getEntry } from '../content/index'
 import { allLevelStatus, chooseModality, fromVoiceKnown, hereLevel, pairRoms, pickChoices, reviewEntries, seenEntries, unlockCount, type LevelStatus } from '../src/engine/scheduler'
 import { applyMeet, newItemProgress, type ItemProgress } from '../src/engine/srs'
 import { emptyDoc } from '../src/storage/progress-schema'
@@ -104,6 +104,18 @@ describe('pickChoices', () => {
     expect(choices.every((t) => !/^[่้๊๋]$/.test(t))).toBe(true)
     const earlier = entriesForLevel(0, 'script').map((e) => e.thai)
     expect(choices.some((t) => t === 'ม้า' || earlier.includes(t))).toBe(true)
+  })
+
+  it('never offers a second letter the prompt fits', () => {
+    expect(getEntry('s:kɔɔ#2')!.en[0]).toBe(getEntry('s:kɔɔ')!.en[0])
+    expect(pickChoices(getEntry('s:kɔɔ#2')!)).not.toContain('ค')
+    expect(pickChoices(getEntry('s:ai#2')!)).not.toContain('ไ')
+    for (const id of ['s:sɔ̌ɔ#3', 's:tɔɔ#4', 's:kɔ̌ɔ#2', 's:chɔɔ#2']) {
+      const entry = getEntry(id)!
+      const twins = ENTRIES.filter((e) => e.track === 'script' && e.thai !== entry.thai && e.en[0] === entry.en[0])
+      expect(twins.length, id).toBeGreaterThan(0)
+      for (const t of twins) expect(pickChoices(entry), id).not.toContain(t.thai)
+    }
   })
 })
 

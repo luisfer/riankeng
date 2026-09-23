@@ -204,6 +204,7 @@ export interface ProgressExport {
   settings: Settings
   items: ItemProgress[]
   sessions: SessionLog[]
+  opened?: { voice: number; script: number }
 }
 
 export type { ItemProgress, Modality }

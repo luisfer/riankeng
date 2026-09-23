@@ -10,7 +10,7 @@ export default phrases(11, [
   ['yài bpai', 'ใหญ่ไป', ['too big']],
   ['káp bpai', 'คับไป', ['too tight']],
   ['lɔɔng sài dâi mái', 'ลองใส่ได้ไหม', ['can I try it on']],
-  ['nîi kε̂ε nîi', 'นี่แค่นี้', ['just this', 'only this']],
+  ['ao kε̂ε níi', 'เอาแค่นี้', ['just this', 'that is all', 'only this much']],
   ['mii sùan lót mái', 'มีส่วนลดไหม', ['is there a discount']],
   ['ao sɔ̌ɔng kûu', 'เอาสองคู่', ['I will take two pairs']],
   ['sǐi nǎi sǔai', 'สีไหนสวย', ['which colour is nice', 'which color is pretty']],

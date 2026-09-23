@@ -25,7 +25,7 @@ export default words(15, [
   ['kụụ', 'คือ', ['is', 'namely', 'that is'], 'v', ['link']],
   ['rà-wàang', 'ระหว่าง', ['between'], 'prep', ['link']],
   ['táng níi', 'ทั้งนี้', ['in this regard'], 'adv', ['link']],
-  ['táng nán', 'ทั้งนั้น', ['even so'], 'adv', ['link']],
+  ['táng nán', 'ทั้งนั้น', ['all of them', 'every one', 'without exception'], 'adv', ['link'], 'dii táng nán: they are all good.'],
   ['tîi jà', 'ที่จะ', ['that will'], 'conj', ['link']],
   ['jàak tîi', 'จากที่', ['from what'], 'conj', ['link']],
   ['pɔɔ tîi', 'พอที่', ['enough to'], 'conj', ['link']],

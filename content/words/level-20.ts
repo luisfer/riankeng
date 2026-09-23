@@ -4,7 +4,7 @@ export default words(20, [
   ['jai yen', 'ใจเย็น', ['calm', 'cool-hearted', 'patient'], 'adj', ['heart']],
   ['nám jai', 'น้ำใจ', ['kindness', 'generosity'], 'n', ['heart']],
   ['tam bun', 'ทำบุญ', ['make merit'], 'v', ['heart']],
-  ['sǐa nám jai', 'เสียน้ำใจ', ['hurt someone\'s feelings'], 'v', ['heart']],
+  ['sǐa nám jai', 'เสียน้ำใจ', ['feel let down', 'be hurt', 'lose heart'], 'v', ['heart'], 'When the kindness you gave is not returned.'],
   ['waang jai', 'วางใจ', ['trust', 'put one\'s heart down'], 'v', ['heart']],
   ['wái jai', 'ไว้ใจ', ['trust'], 'v', ['heart']],
   ['dtòk jai', 'ตกใจ', ['be startled', 'shocked'], 'v', ['heart']],

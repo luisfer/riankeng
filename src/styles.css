@@ -564,7 +564,7 @@ li.quiet-row { cursor: default; }
 
 .field, .check { display: grid; gap: 8px; margin: 0 0 20px; color: var(--ink-2); }
 .check { grid-template-columns: auto 1fr; align-items: center; }
-.field input[type="text"], .field .roman-field.en {
+.field input[type="text"], .field input[type="email"], .field input[type="password"], .field .roman-field.en {
   font-size: 20px;
   border-bottom: 1px solid var(--hair);
 }

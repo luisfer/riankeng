@@ -8,7 +8,6 @@ export default phrases(1, [
   ['mâi bpen rai', 'ไม่เป็นไร', ['never mind', 'it is okay', 'no problem', 'you are welcome', 'do not worry about it', 'it does not matter'], 'The most Thai sentence there is. Answer to thanks and to apologies alike.'],
   ['sà-baai dii mái', 'สบายดีไหม', ['how are you', 'are you well', 'how are you doing'], 'Literally "well, yes?"'],
   ['sà-baai dii kráp/kâ', 'สบายดีครับ/ค่ะ', ['I am fine', 'fine thanks', 'I am well', 'I am good']],
-  ['pǒm chụ̂ụ luis', 'ผมชื่อหลุยส์', ['my name is Luis', 'I am Luis', 'I am called Luis'], 'pǒm for a man; chǎn for a woman.'],
   ['pǒm mâi kâo jai', 'ผมไม่เข้าใจ', ['I do not understand'], 'chǎn mâi kâo jai for a woman.'],
   ['kâo jai lέεo', 'เข้าใจแล้ว', ['I understand now', 'got it', 'I understand', 'understood']],
   ['pûut cháa cháa nɔ̀i', 'พูดช้าๆหน่อย', ['speak slowly please', 'please speak slowly', 'slower please', 'can you speak slowly']],

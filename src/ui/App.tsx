@@ -28,6 +28,8 @@ import { emptyDoc, stampDoc, type ProgressDoc } from '@/storage/progress-schema'
 import { resetDoc } from '@/storage/import'
 import { exportJson } from '@/storage/export'
 import { mergeWork } from '@/storage/sync'
+import { readAccount, signOutAccount, takeRecoverySession, type AccountSession } from '@/storage/auth'
+import { syncAccount } from '@/storage/account-sync'
 import { mirrorWrittenAt, setMirrorWrittenAt } from '@/storage/device'
 import * as mirrorFile from '@/storage/mirror-file'
 import type { MirrorState } from '@/storage/mirror-file'
@@ -53,6 +55,12 @@ export function App() {
     mirrorFile.supported() ? 'off' : 'unsupported',
   )
   const [mirrorAt, setMirrorAt] = useState(() => mirrorWrittenAt())
+  const [boot] = useState(() => {
+    const recovered = takeRecoverySession()
+    return { session: recovered ?? readAccount(), recovery: Boolean(recovered) }
+  })
+  const [account, setAccount] = useState<AccountSession | null>(boot.session)
+  const [recovery, setRecovery] = useState(boot.recovery)
   const mirrorRead = useRef(false)
   const persistOk = useRef(false)
   const skipSave = useRef(false)
@@ -151,6 +159,23 @@ export function App() {
     if (loadState !== 'ready') return
     void saveSession(session)
   }, [session, loadState])
+
+  useEffect(() => {
+    if (loadState !== 'ready' || !account) return
+    let cancelled = false
+    const timer = setTimeout(() => {
+      void syncAccount(docRef.current).then((next) => {
+        if (cancelled || !next) return
+        if (sameDocPayload(next, docRef.current)) return
+        skipSave.current = false
+        setDoc(next)
+      })
+    }, 400)
+    return () => {
+      cancelled = true
+      clearTimeout(timer)
+    }
+  }, [doc, loadState, account])
 
   useEffect(() => {
     const applyRemote = (incoming: ProgressDoc) => {
@@ -264,6 +289,9 @@ export function App() {
   }
 
   const eraseDevice = () => {
+    signOutAccount()
+    setAccount(null)
+    setRecovery(false)
     void mirrorFile.forget()
     setMirror(null)
     setMirrorState(mirrorFile.supported() ? 'off' : 'unsupported')
@@ -407,6 +435,10 @@ export function App() {
             mirror={mirrorActions}
             onGlyphs={() => go({ name: 'glyphs' })}
             onReset={eraseDevice}
+            account={account}
+            onAccount={setAccount}
+            recovery={recovery}
+            onRecoveryDone={() => setRecovery(false)}
           />
         )}
         {loadState === 'ready' && route.name === 'glyphs' && <Glyphs />}

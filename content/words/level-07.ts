@@ -22,7 +22,7 @@ export default words(7, [
   ['dtɔɔn rε̂εk', 'ตอนแรก', ['at first', 'in the beginning'], 'adv', ['time']],
   ['lǎng jàak', 'หลังจาก', ['after'], 'prep', ['time']],
   ['gɔ̀ɔn nâa', 'ก่อนหน้า', ['previously', 'beforehand'], 'adv', ['time']],
-  ['dǐao níi', 'เดี๋ยวนี้', ['right now', 'just now'], 'adv', ['time']],
+  ['dǐao níi', 'เดี๋ยวนี้', ['right now', 'nowadays', 'these days'], 'adv', ['time']],
   ['dǐao', 'เดี๋ยว', ['in a moment', 'wait', 'soon'], 'adv', ['time']],
   ['kráng nâa', 'ครั้งหน้า', ['next time'], 'adv', ['time']],
   ['kráng gɔ̀ɔn', 'ครั้งก่อน', ['last time', 'the previous time'], 'adv', ['time']],

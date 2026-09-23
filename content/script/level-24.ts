@@ -1,7 +1,7 @@
 import { scriptWords } from '../build'
 
 export default scriptWords(24, [
-  ['tɔ̌ɔ#2', 'ฐ', ['th', 'the letter th (tɔ̌ɔ tǎan)'], 'n', ['letter'], 'Same sound as ถ. รัฐบาล.'],
+  ['tɔ̌ɔ#2', 'ฐ', ['high-class t', 'the letter t (tɔ̌ɔ tǎan)'], 'n', ['letter'], 'Same sound as ถ. รัฐบาล.'],
   ['rát-tà-baan', 'รัฐบาล', ['government'], 'n', ['bridge', 'voice:w:rát-tà-baan', 'parts:ร+ั+ฐ+บ+า+ล']],
   ['dtɔɔ#2', 'ฏ', ['dt', 'the letter dt (dtɔɔ bpà-dtàk)'], 'n', ['letter'], 'Same sound as ต. ปฏิเสธ.'],
   ['bpà-dtì-sèet', 'ปฏิเสธ', ['refuse', 'deny'], 'v', ['bridge', 'voice:w:bpà-dtì-sèet', 'parts:ป+ฏ+ิ+เ+ส+ธ']],

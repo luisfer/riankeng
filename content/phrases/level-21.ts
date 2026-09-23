@@ -16,7 +16,7 @@ export default phrases(21, [
   ['kít bpen paa-sǎa tai', 'คิดเป็นภาษาไทย', ['think in Thai']],
   ['mâi dtɔ̂ng pûut yâak', 'ไม่ต้องพูดยาก', ['no need to say it the hard way', 'no need for hard words']],
   ['bpen sǎm-nuan tai', 'เป็นสำนวนไทย', ['that is a Thai saying', 'very Thai phrasing']],
-  ['pûut dâi dtὲε yang nít-nɔ̀i', 'พูดได้แต่ยังนิดหน่อย', ['I can speak but only a little']],
+  ['pûut dâi dtὲε yang mâi gèng', 'พูดได้แต่ยังไม่เก่ง', ['I can speak but not well yet', 'I can speak, just not well yet']],
   ['bprà-yòok sɔ̌ɔng bprà-yòok', 'ประโยคสองประโยค', ['two sentences']],
   ['kâo jai táng bprà-yòok', 'เข้าใจทั้งประโยค', ['I understand the whole sentence']],
   ['sùan nɔ́ɔi tîi pìt', 'ส่วนน้อยที่ผิด', ['only a little is wrong']],

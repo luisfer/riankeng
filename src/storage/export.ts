@@ -12,6 +12,7 @@ export function toExport(doc: ProgressDoc, now = Date.now()): ProgressExport {
     settings: doc.settings,
     items: Object.values(doc.items),
     sessions: doc.sessions,
+    opened: doc.opened,
   }
 }
 

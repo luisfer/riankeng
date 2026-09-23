@@ -13,7 +13,7 @@ export default words(17, [
   ['ná kráp', 'นะครับ', ['polite softener (male)', 'okay? (male)'], 'particle', ['particle']],
   ['kráp pǒm', 'ครับผม', ['yes sir', 'certainly (male)'], 'particle', ['particle']],
   ['bpà', 'ปะ', ['right? (casual)', 'or not? (casual)'], 'particle', ['particle'], 'Short for rụ̌ụ bplào. Friends only.'],
-  ['sì ná', 'สินะ', ['see?', 'I told you'], 'particle', ['particle']],
+  ['sì ná', 'สินะ', ['I guess', 'must be', 'so that is it'], 'particle', ['particle'], 'nụ̀ai sì ná: you must be tired.'],
   ['ná sì', 'นะสิ', ['see? of course'], 'particle', ['particle']],
   ['ləəi ná', 'เลยนะ', ['really, you know'], 'particle', ['particle']],
   ['mâi rɔ̀k', 'ไม่หรอก', ['no, not at all'], 'expr', ['particle']],

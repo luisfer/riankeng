@@ -15,7 +15,7 @@ export default words(18, [
   ['jà-dtù-jàk', 'จตุจักร', ['Chatuchak'], 'n', ['city']],
   ['tε̌εo', 'แถว', ['area', 'row', 'neighbourhood'], 'n', ['city']],
   ['pûak', 'พวก', ['group', 'bunch'], 'n', ['city']],
-  ['dtà-làat nát', 'ตลาดนัด', ['weekend market'], 'n', ['city']],
+  ['dtà-làat nát', 'ตลาดนัด', ['weekly market', 'weekend market', 'market fair'], 'n', ['city'], 'nát is the appointment: a market that meets on set days.'],
   ['kui lên', 'คุยเล่น', ['chat for fun'], 'v', ['city']],
   ['dtà-làat náam', 'ตลาดน้ำ', ['floating market'], 'n', ['city']],
   ['tîao glaang kụụn', 'เที่ยวกลางคืน', ['go out at night'], 'v', ['city']],

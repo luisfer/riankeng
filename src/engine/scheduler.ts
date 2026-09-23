@@ -2,6 +2,7 @@ import { ENTRIES, entryTrack, entriesForLevel, getEntry, levelsFor } from '@cont
 import type { TrackId } from '@content/types'
 import type { Entry } from '@content/types'
 import type { ProgressDoc } from '@/storage/progress-schema'
+import { cleanGloss } from './grader-en'
 import { isoDay, isDue, isMastered, newItemProgress, type ItemProgress, type Modality } from './srs'
 
 export interface LevelStatus {
@@ -322,9 +323,16 @@ export function fromVoiceKnown(doc: ProgressDoc, entry: Entry): boolean {
 
 const LONE_TONE_MARK = /^[่้๊๋]$/
 
-/** Four Thai spellings: the right one plus three from this Script level and earlier ones. */
+/**
+ * Four Thai spellings: the right one plus three from this Script level and earlier ones.
+ * Never one the prompt fits as well, such as ฆ beside ค (both low-class k) or ใ beside ไ.
+ */
 export function pickChoices(entry: Entry): string[] {
+  const prompt = cleanGloss(entry.en[0] ?? '').toLowerCase()
   const seenThai = new Set<string>([entry.thai])
+  for (const e of ENTRIES) {
+    if (entryTrack(e) === 'script' && cleanGloss(e.en[0] ?? '').toLowerCase() === prompt) seenThai.add(e.thai)
+  }
   const others: string[] = []
   for (const e of ENTRIES) {
     if (entryTrack(e) !== 'script') continue

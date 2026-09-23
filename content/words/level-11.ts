@@ -3,7 +3,7 @@ import { words } from '../build'
 export default words(11, [
   ['sǐi', 'สี', ['colour', 'color'], 'n', ['shop']],
   ['sǐi dεεng', 'สีแดง', ['red'], 'adj', ['colour']],
-  ['sǐi nám ngəən', 'สีน้ำเงิน', ['blue'], 'adj', ['colour']],
+  ['sǐi nám ngən', 'สีน้ำเงิน', ['blue'], 'adj', ['colour']],
   ['sǐi kǐao', 'สีเขียว', ['green'], 'adj', ['colour']],
   ['sǐi lụ̌ang', 'สีเหลือง', ['yellow'], 'adj', ['colour']],
   ['sǐi sôm', 'สีส้ม', ['orange'], 'adj', ['colour']],
@@ -29,7 +29,7 @@ export default words(11, [
   ['kan', 'คัน', ['classifier for vehicles'], 'clf', ['shop']],
   ['bai', 'ใบ', ['classifier for leaves, bags, sheets'], 'clf', ['shop']],
   ['kûu', 'คู่', ['pair', 'classifier for pairs'], 'clf', ['shop']],
-  ['kε̂ε nîi', 'แค่นี้', ['just this', 'only this much'], 'expr', ['shop']],
+  ['kε̂ε níi', 'แค่นี้', ['just this', 'only this much'], 'expr', ['shop']],
   ['lɔɔng sài', 'ลองใส่', ['try on'], 'v', ['shop']],
   ['pεεng bpai', 'แพงไป', ['too expensive'], 'expr', ['shop']],
   ['tùuk', 'ถูก', ['cheap', 'correct'], 'adj', ['shop']],

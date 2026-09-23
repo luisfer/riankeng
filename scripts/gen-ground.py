@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate the painted-light ground for riian gèng.
+"""Generate the painted-light ground for rian gèng.
 
 One continuous colour field: Bangkok dawn over the river.
 indigo -> plum -> apricot -> pale gold, with a few soft light pools,
@@ -90,7 +90,7 @@ def render(w: int, h: int, name: str, rng: random.Random) -> None:
         "JPEG",
         quality=86,
         optimize=True,
-        comment=f"riian geng ground, procedurally generated, seed {SEED}, {w}x{h}".encode(),
+        comment=f"rian geng ground, procedurally generated, seed {SEED}, {w}x{h}".encode(),
     )
     print(f"wrote {out} ({w}x{h})")
 

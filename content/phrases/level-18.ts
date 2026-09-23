@@ -11,7 +11,7 @@ export default phrases(18, [
   ['bpai duu nǎng', 'ไปดูหนัง', ['go see a film']],
   ['yùu tε̌εo sǐi-lom', 'อยู่แถวสีลม', ['around Silom']],
   ['bpai kâao sǎn mái', 'ไปข้าวสารไหม', ['shall we go to Khao San']],
-  ['dtà-làat nát wan sǎo', 'ตลาดนัดวันเสาร์', ['the weekend market on Saturday']],
+  ['dtà-làat nát wan sǎo', 'ตลาดนัดวันเสาร์', ['the Saturday market']],
   ['pûak rao tîao glaang kụụn', 'พวกเราเที่ยวกลางคืน', ['we go out at night']],
   ['mâi rúu-jàk', 'ไม่รู้จัก', ['I do not know them']],
   ['nát wee-laa bàai sɔ̌ɔng', 'นัดเวลาบ่ายสอง', ['set the time for 2 p.m.']],

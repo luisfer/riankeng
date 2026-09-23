@@ -3,6 +3,7 @@ import { loadEnv, type Connect, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 import { fileURLToPath, URL } from 'node:url'
+import { accountMayPass } from './src/gate-account'
 import { GATE_COOKIE, gateToken, readCookie } from './src/gate-token'
 import { handleWaitlist, type WaitlistEnv } from './src/waitlist-join'
 
@@ -22,7 +23,7 @@ function readBody(req: Connect.IncomingMessage): Promise<string> {
  * inside Vite, dev and preview. With SITE_PASSWORD empty any password passes
  * and the session is always in.
  */
-function gateDev(secret: string, waitlist: WaitlistEnv): Plugin {
+function gateDev(secret: string, waitlist: WaitlistEnv, account: { url: string; anon: string }): Plugin {
   const handle: Connect.NextHandleFunction = (req, res, next) => {
     const url = new URL(req.url ?? '/', 'http://local')
     if (url.pathname === '/learn') {
@@ -55,7 +56,8 @@ function gateDev(secret: string, waitlist: WaitlistEnv): Plugin {
         } catch {
           password = new URLSearchParams(raw).get('password') ?? ''
         }
-        if (secret && password !== secret) return json(401, { ok: false })
+        const openedByAccount = await accountMayPass(req.headers.authorization ?? null, account)
+        if (!openedByAccount && secret && password !== secret) return json(401, { ok: false })
         const token = await gateToken(secret || 'open')
         return json(200, { ok: true }, `${GATE_COOKIE}=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=2592000`)
       }
@@ -154,10 +156,17 @@ export default defineConfig(({ mode }) => {
           ],
         },
       }),
-      gateDev(env.SITE_PASSWORD ?? '', {
-        url: env.SUPABASE_URL ?? '',
-        key: env.SUPABASE_SERVICE_ROLE_KEY ?? '',
-      }),
+      gateDev(
+        env.SITE_PASSWORD ?? '',
+        {
+          url: env.SUPABASE_URL ?? '',
+          key: env.SUPABASE_SERVICE_ROLE_KEY ?? '',
+        },
+        {
+          url: env.VITE_SUPABASE_URL || env.SUPABASE_URL || '',
+          anon: env.VITE_SUPABASE_ANON_KEY ?? '',
+        },
+      ),
     ],
     resolve: {
       alias: {

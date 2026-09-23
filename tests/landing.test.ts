@@ -102,6 +102,8 @@ describe('the landing page', () => {
   it('has one password form in the title panel, and a waitlist at the close', () => {
     expect(doc.querySelector('.cell.title form[data-signin]')?.id).toBe('gate')
     expect(doc.querySelector('.cell.title form[data-signin] input[name="password"]')?.id).toBe('password')
+    expect(doc.querySelector('.cell.title form[data-signin] input[name="email"]')?.id).toBe('gate-email')
+    expect(text(doc.querySelector('.cell.title form[data-signin] button[type="submit"]') ?? null)).toBe('Log in')
     expect(doc.querySelector('[data-nav-sign]')?.getAttribute('href')).toBe('#gate')
     expect(text(doc.querySelector('[data-nav-sign]'))).toBe('Log in')
     expect(doc.querySelectorAll('form[data-signin]')).toHaveLength(1)
@@ -118,8 +120,7 @@ describe('the landing page', () => {
 
   it('keeps the English of the name under the wordmark', () => {
     expect(text(doc.querySelector('.nav .wordmark-en'))).toBe('learn well')
-    expect(text(doc.querySelector('.nav .wordmark-rom'))).toBe('rian gèng')
-    expect(text(doc.querySelector('.nav .wordmark-th'))).toBe('เรียนเก่ง')
+    expect(doc.querySelector('.nav .wordmark')?.getAttribute('aria-label')).toBe('rian gèng, เรียนเก่ง')
   })
 
   it('credits the romanization in the footer', () => {

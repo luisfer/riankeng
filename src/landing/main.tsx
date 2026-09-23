@@ -1,5 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { signInAccount } from '../storage/auth'
 import { COMIC_SLOTS, fillClose, mountComic, pickComic, pickLayout, pickPhone, placeComic } from './comic'
 import { landing } from './copy'
 import { bindWaitlist } from './waitlist'
@@ -64,7 +65,9 @@ for (const form of forms) {
   form.addEventListener('submit', async (e) => {
     e.preventDefault()
     if (html.dataset.session === 'in') return openCourse()
+    const emailField = form.querySelector<HTMLInputElement>('input[name="email"]')
     const field = form.querySelector<HTMLInputElement>('input[name="password"]')
+    const email = emailField?.value.trim() ?? ''
     const password = field?.value ?? ''
     missLine(form, '')
     if (!password) {
@@ -73,6 +76,21 @@ for (const form of forms) {
       return
     }
     try {
+      if (email) {
+        const session = await signInAccount(email, password)
+        if (!session) {
+          missLine(form, landing.couldNot)
+          field?.select()
+          return
+        }
+        const res = await fetch('/api/gate', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${session.accessToken}` },
+        })
+        if (res.ok) return openCourse()
+        missLine(form, res.status === 503 ? landing.unset : landing.couldNot)
+        return
+      }
       const res = await fetch('/api/gate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

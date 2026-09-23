@@ -10,6 +10,7 @@ export const landing = {
   open: 'Open the course',
   typePassword: 'Type the password.',
   wrong: 'Wrong password.',
+  couldNot: 'Could not sign in.',
   unset: 'Password is not set.',
   offline: 'No connection.',
   right: 'Right.',

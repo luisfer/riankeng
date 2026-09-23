@@ -37,10 +37,12 @@
           <div class="cell title">
             <h1>Learn Thai as Thais speak it.</h1>
             <form id="gate" class="signin" data-signin method="post" action="/api/gate">
+              <label class="signin-label" for="gate-email">Email</label>
+              <input class="signin-field" id="gate-email" name="email" type="email" autocomplete="username" inputmode="email" />
               <label class="signin-label" for="password">Password</label>
               <div class="signin-row">
                 <input class="signin-field" id="password" name="password" type="password" autocomplete="current-password" />
-                <button class="btn commit" type="submit">Open the course</button>
+                <button class="btn commit" type="submit">Log in</button>
               </div>
               <p class="signin-miss" data-miss role="status"></p>
             </form>

@@ -1,4 +1,4 @@
-import { GATE_COOKIE, gateToken, readCookie } from '../src/gate-token'
+import { GATE_COOKIE, gateToken, readCookie } from '../src/gate-token.js'
 
 /** Is this browser signed in? The landing page asks, so it can say Open the course. */
 export async function GET(request: Request): Promise<Response> {

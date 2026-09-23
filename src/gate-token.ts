@@ -1,5 +1,5 @@
-import { clipUrl } from './audio/clip-url'
-import { DEMO_IDS } from './landing/demo'
+import { clipUrl } from './audio/clip-url.js'
+import { DEMO_IDS } from './landing/demo.js'
 
 export const GATE_COOKIE = 'rk_gate'
 

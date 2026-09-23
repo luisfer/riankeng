@@ -1,4 +1,4 @@
-import { GATE_COOKIE } from '../src/gate-token'
+import { GATE_COOKIE } from '../src/gate-token.js'
 
 /** Clears the site password on this browser. Cards stay on the device. */
 export async function POST(): Promise<Response> {

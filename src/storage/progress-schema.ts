@@ -16,6 +16,7 @@ export interface Settings {
   newPerSession: number
   /** Learner's display name (used in the app and in exports). */
   name: string
+  /** Stored leftover. The course has one look; this is never applied. */
   theme: 'light' | 'dark' | 'system'
   /**
    * When the learner last wrote a backup file, epoch ms, 0 for never. State

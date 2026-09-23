@@ -1,35 +1,23 @@
-import { next, rewrite } from '@vercel/functions'
-import { GATE_COOKIE, gateToken, readCookie } from './src/gate-token'
-
-const OPEN = [
-  /^\/gate\.html$/,
-  /^\/api\/gate$/,
-  /^\/favicon\.svg$/,
-  /^\/fonts\//,
-  /^\/icons\//,
-  /^\/sw\.js$/,
-  /^\/manifest\.webmanifest$/,
-  /^\/workbox-.*\.js$/,
-]
+import { next } from '@vercel/functions'
+import { decideGate } from './src/gate-token'
 
 const SHELL = { 'X-Riankeng-Shell': '1' }
 
+/** The course at /learn/ and its audio sit behind the password. The landing at / is public. */
 export default async function middleware(request: Request) {
-  const { pathname } = new URL(request.url)
-  if (OPEN.some((re) => re.test(pathname))) return next()
-
-  const secret = process.env.SITE_PASSWORD
-  if (!secret) {
-    if (process.env.VERCEL) return rewrite(new URL('/gate.html', request.url))
-    return next({ headers: SHELL })
-  }
-
-  const got = readCookie(request.headers.get('cookie'), GATE_COOKIE)
-  if (got && got === (await gateToken(secret))) return next({ headers: SHELL })
-  return rewrite(new URL('/gate.html', request.url))
+  const url = new URL(request.url)
+  const decision = await decideGate(
+    url.pathname,
+    request.headers.get('cookie'),
+    process.env.SITE_PASSWORD,
+    Boolean(process.env.VERCEL),
+  )
+  if (decision.kind === 'pass') return next()
+  if (decision.kind === 'shell') return next({ headers: SHELL })
+  return Response.redirect(new URL(decision.to, request.url), 307)
 }
 
 export const config = {
   runtime: 'edge',
-  matcher: ['/((?!assets/).*)'],
+  matcher: ['/learn', '/learn/:path*', '/audio/:path*'],
 }

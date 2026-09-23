@@ -1,16 +1,11 @@
-export type ThemePref = 'light' | 'dark' | 'system'
+/** The one look. Paper, never Night. */
+export const PAPER = '#f2ead8'
 
-export function resolvedTheme(pref: ThemePref | undefined): 'light' | 'dark' {
-  const p = pref ?? 'light'
-  if (p === 'light' || p === 'dark') return p
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-}
-
-export function applyTheme(pref: ThemePref | undefined): 'light' | 'dark' {
-  const resolved = resolvedTheme(pref)
-  document.documentElement.dataset.theme = resolved
-  document.documentElement.style.colorScheme = resolved
+/** Pin the course to paper so a stored Night pref cannot flip the field. */
+export function lockPaper(): void {
+  const root = document.documentElement
+  delete root.dataset.theme
+  root.style.colorScheme = 'light'
   const meta = document.querySelector('meta[name="theme-color"]')
-  if (meta) meta.setAttribute('content', resolved === 'dark' ? '#1c1710' : '#f2ead8')
-  return resolved
+  if (meta) meta.setAttribute('content', PAPER)
 }

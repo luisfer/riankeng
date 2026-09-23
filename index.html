@@ -4,15 +4,231 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#f2ead8" />
-    <meta name="description" content="riian gèng. Thai in romanization, then the letters." />
-    <meta name="riankeng-shell" content="1" />
+    <meta
+      name="description"
+      content="riian gèng. Learn Thai as Thais speak it."
+    />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+    <link rel="preload" href="/fonts/onest/onest.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/brygada-1918/brygada-1918-roman.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="stylesheet" href="/fonts/faces.css" />
-    <title>riian gèng</title>
+    <link rel="stylesheet" href="/src/landing/landing.css" />
+    <title>riian gèng, Learn Thai as Thais speak it</title>
   </head>
   <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <header class="wrap">
+      <nav class="nav" aria-label="Site">
+        <a class="wordmark" href="/">
+          <span class="wordmark-th" lang="th">เรียนเก่ง</span>
+          <span class="wordmark-rom" lang="th-Latn">riian <b>gèng</b></span>
+        </a>
+        <div class="nav-links">
+          <a href="#try">Try a card</a>
+          <a class="ghost" href="#gate" data-nav-sign aria-controls="gate" aria-expanded="false">Sign in</a>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="wrap" aria-label="A day of speaking Thai">
+        <div class="comic">
+          <div class="cell title" style="--i: 0">
+            <h1>Learn Thai as Thais speak it.</h1>
+            <form id="gate" class="signin" data-signin method="post" action="/api/gate">
+              <label class="signin-label" for="password">Password</label>
+              <div class="signin-row">
+                <input class="signin-field" id="password" name="password" type="password" autocomplete="current-password" />
+                <button class="btn commit" type="submit">Open the course</button>
+              </div>
+              <p class="signin-miss" data-miss role="status"></p>
+            </form>
+          </div>
+
+          <div class="cell" data-slot="0" data-wide style="--i: 1">
+            <a class="panel" href="#try" data-scene="coffee" data-entry="p:kɔ̌ɔ gaa-fεε yen nụ̀ng gε̂εo">
+              <img
+                src="/scenes/coffee-980.webp"
+                srcset="/scenes/coffee-490.webp 490w, /scenes/coffee-980.webp 980w"
+                sizes="(max-width: 599px) calc(100vw - 40px), (max-width: 1199px) calc(25vw - 20px), 476px"
+                width="980"
+                height="980"
+                alt="At a wooden counter, a woman orders from a grey-haired man in an apron. An iced coffee sits between them."
+                fetchpriority="high"
+              />
+              <span class="balloon" lang="th" style="--em: 5.72; --lines: 2">ขอกาแฟเย็น<br />หนึ่งแก้ว</span>
+              <span class="caption"><span class="rom" lang="th-Latn">kɔ̌ɔ gaa-fεε yen nụ̀ng gε̂εo</span><span class="en">one iced coffee please</span></span>
+            </a>
+          </div>
+
+          <div class="cell" data-slot="1" style="--i: 2">
+            <a class="panel" href="#try" data-scene="jasmine" data-entry="p:ao an níi">
+              <img
+                src="/scenes/jasmine-980.webp"
+                srcset="/scenes/jasmine-490.webp 490w, /scenes/jasmine-980.webp 980w"
+                sizes="(max-width: 599px) calc(50vw - 25px), (max-width: 1199px) calc(25vw - 20px), 232px"
+                width="980"
+                height="980"
+                alt="A woman holds up a jasmine garland at a flower stall."
+              />
+              <span class="balloon" lang="th" style="--em: 3.75; --lines: 1">เอาอันนี้</span>
+              <span class="caption"><span class="rom" lang="th-Latn">ao an níi</span><span class="en">I will take this one</span></span>
+            </a>
+          </div>
+
+          <div class="cell" data-slot="2" style="--i: 3">
+            <a class="panel" href="#try" data-scene="door" data-entry="w:sà-wàt-dii">
+              <img
+                src="/scenes/door-980.webp"
+                srcset="/scenes/door-490.webp 490w, /scenes/door-980.webp 980w"
+                sizes="(max-width: 599px) calc(50vw - 25px), (max-width: 1199px) calc(25vw - 20px), 232px"
+                width="980"
+                height="980"
+                alt="A woman greets an older neighbour at her door, both with hands pressed together."
+              />
+              <span class="balloon" lang="th" style="--em: 2.74; --lines: 1">สวัสดี</span>
+              <span class="caption"><span class="rom" lang="th-Latn">sà-wàt-dii</span><span class="en">hello</span></span>
+            </a>
+          </div>
+
+          <div class="cell" data-slot="3" style="--i: 4">
+            <a class="panel" href="#try" data-scene="mango" data-entry="w:má-mûang">
+              <img
+                src="/scenes/mango-980.webp"
+                srcset="/scenes/mango-490.webp 490w, /scenes/mango-980.webp 980w"
+                sizes="(max-width: 599px) calc(50vw - 25px), (max-width: 1199px) calc(25vw - 20px), 232px"
+                width="980"
+                height="980"
+                alt="A fruit seller bags mangoes while a woman holds up two fingers."
+              />
+              <span class="balloon" lang="th" style="--em: 3.05; --lines: 1">มะม่วง</span>
+              <span class="caption"><span class="rom" lang="th-Latn">má-mûang</span><span class="en">mango</span></span>
+            </a>
+          </div>
+
+          <div class="cell" data-slot="4" style="--i: 5">
+            <a class="panel" href="#try" data-scene="tea" data-entry="w:chaa yen">
+              <img
+                src="/scenes/tea-980.webp"
+                srcset="/scenes/tea-490.webp 490w, /scenes/tea-980.webp 980w"
+                sizes="(max-width: 599px) calc(50vw - 25px), (max-width: 1199px) calc(25vw - 20px), 232px"
+                width="980"
+                height="980"
+                alt="A woman orders from a tea seller at a cart under a hanging lamp."
+              />
+              <span class="balloon" lang="th" style="--em: 2.94; --lines: 1">ชาเย็น</span>
+              <span class="caption"><span class="rom" lang="th-Latn">chaa yen</span><span class="en">Thai iced tea</span></span>
+            </a>
+          </div>
+
+          <div class="cell" data-slot="5" data-wide style="--i: 6">
+            <a class="panel" href="#try" data-scene="stairs" data-entry="p:dèk kon níi nâa rák">
+              <img
+                src="/scenes/stairs-980.webp"
+                srcset="/scenes/stairs-490.webp 490w, /scenes/stairs-980.webp 980w"
+                sizes="(max-width: 599px) calc(50vw - 25px), (max-width: 1199px) calc(25vw - 20px), 232px"
+                width="980"
+                height="980"
+                alt="On a stairway, a woman speaks to a mother holding a small child."
+              />
+              <span class="balloon" lang="th" style="--em: 4.1; --lines: 2">เด็กคนนี้<br />น่ารัก</span>
+              <span class="caption"><span class="rom" lang="th-Latn">dèk kon níi nâa rák</span><span class="en">this child is cute</span></span>
+            </a>
+          </div>
+
+          <div class="cell" data-slot="6" data-wide style="--i: 7">
+            <a class="panel" href="#try" data-scene="umbrella" data-entry="p:wan níi fǒn dtòk">
+              <img
+                src="/scenes/umbrella-980.webp"
+                srcset="/scenes/umbrella-490.webp 490w, /scenes/umbrella-980.webp 980w"
+                sizes="(max-width: 599px) calc(50vw - 25px), (max-width: 1199px) calc(25vw - 20px), 232px"
+                width="980"
+                height="980"
+                alt="In the rain, a woman shares her umbrella with a passer-by."
+              />
+              <span class="balloon" lang="th" style="--em: 5.06; --lines: 1">วันนี้ฝนตก</span>
+              <span class="caption"><span class="rom" lang="th-Latn">wan níi fǒn dtòk</span><span class="en">it is raining today</span></span>
+            </a>
+          </div>
+
+          <div class="cell" data-slot="7" style="--i: 8">
+            <a class="panel" href="#try" data-scene="passenger" data-entry="p:dtrong bpai">
+              <img
+                src="/scenes/passenger-980.webp"
+                srcset="/scenes/passenger-490.webp 490w, /scenes/passenger-980.webp 980w"
+                sizes="(max-width: 599px) calc(50vw - 25px), (max-width: 1199px) calc(25vw - 20px), 232px"
+                width="980"
+                height="980"
+                alt="Riding pillion on a motorbike, a woman points the way ahead."
+              />
+              <span class="balloon" lang="th" style="--em: 3.15; --lines: 1">ตรงไป</span>
+              <span class="caption"><span class="rom" lang="th-Latn">dtrong bpai</span><span class="en">go straight</span></span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section class="wrap section" id="try" aria-labelledby="try-h">
+        <div class="section-head">
+          <h2 id="try-h">Try one card.</h2>
+          <p class="lede">
+            A Voice card. Look, then write the romanization. The keys under the field write ε, ɔ, ə, ụ and the four
+            tone marks.
+          </p>
+        </div>
+        <div id="try-card">
+          <div class="try" data-stem="tea" data-phase="look">
+            <div class="try-panel" data-scene="tea">
+              <img
+                class="try-art"
+                src="/scenes/tea-980.webp"
+                srcset="/scenes/tea-490.webp 490w, /scenes/tea-980.webp 980w"
+                sizes="(max-width: 720px) calc(100vw - 48px), 420px"
+                width="980"
+                height="980"
+                alt="A woman orders from a tea seller at a cart under a hanging lamp."
+                loading="lazy"
+              />
+              <span class="balloon" lang="th" style="--em: 2.94; --lines: 1">ชาเย็น</span>
+            </div>
+            <div class="try-desk">
+              <p class="prompt">Look.</p>
+              <p class="try-rom rom" lang="th-Latn">chaa yen</p>
+              <p class="try-en">Thai iced tea</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="close" aria-labelledby="close-h">
+        <div class="wrap">
+          <div class="close-grid">
+            <img
+              class="night-art"
+              src="/scenes/night-980.webp"
+              srcset="/scenes/night-490.webp 490w, /scenes/night-980.webp 980w"
+              sizes="(max-width: 720px) calc(100vw - 40px), 420px"
+              width="980"
+              height="980"
+              alt="A woman walks home past a closed shutter at night, a dog asleep on the step."
+              loading="lazy"
+            />
+            <div class="close-copy">
+              <h2 class="close-line" id="close-h">Speak with Thainess.</h2>
+              <a class="btn commit" href="mailto:luisfer.romero.calero@gmail.com?subject=riian%20g%C3%A8ng%20waitlist">Join the waitlist</a>
+            </div>
+          </div>
+          <footer class="footer">
+            <span class="wordmark">
+              <span class="wordmark-th" lang="th">เรียนเก่ง</span>
+              <span class="wordmark-rom" lang="th-Latn">riian <b>gèng</b></span>
+            </span>
+            <span>Made by <a href="https://lfrc.me">Luisfer Romero Calero</a>.</span>
+            <p class="footer-note">Romanization adapted from the Paiboon system of Benjawan Poomsan Becker.</p>
+          </footer>
+        </div>
+      </section>
+    </main>
+    <script type="module" src="/src/landing/main.tsx"></script>
   </body>
 </html>

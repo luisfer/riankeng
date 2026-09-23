@@ -23,7 +23,7 @@ export function TrackPage(props: {
             const locked = Boolean(s && s.total > 0 && !s.unlocked)
             const at = here === lvl.n
             const done = s ? unlockCount(s, props.track) : 0
-            const meta = !s || s.total === 0 ? 'soon' : locked ? '' : done > 0 ? `${done} of ${s.total}` : String(s.total)
+            const meta = !s || s.total === 0 ? 'soon' : locked ? '' : `${done} of ${s.total}`
             return (
               <li key={`${props.track}-${lvl.n}`}>
                 <button

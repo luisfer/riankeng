@@ -257,17 +257,6 @@ export function Account(props: {
       </ol>
 
       <h2>Settings</h2>
-      <div className="account-actions">
-        <TextBtn current={props.doc.settings.theme === 'light'} onClick={() => set('theme', 'light')}>
-          Day
-        </TextBtn>
-        <TextBtn current={props.doc.settings.theme === 'dark'} onClick={() => set('theme', 'dark')}>
-          Night
-        </TextBtn>
-        <TextBtn current={props.doc.settings.theme === 'system'} onClick={() => set('theme', 'system')}>
-          System
-        </TextBtn>
-      </div>
       <label className="field">
         <span>Your name</span>
         <input className="roman-field en" value={props.doc.settings.name} onChange={(e) => set('name', e.target.value)} placeholder="optional" />
@@ -332,6 +321,18 @@ export function Account(props: {
       <div className="account-actions">
         <TextBtn onClick={props.onGlyphs}>Glyph coverage</TextBtn>
       </div>
+
+      <h2>Password</h2>
+      <p className="lede">Ends the password on this browser. Cards stay on this device.</p>
+      <TextBtn
+        onClick={() => {
+          void fetch('/api/logout', { method: 'POST' }).then((res) => {
+            if (res.ok) window.location.assign('/')
+          })
+        }}
+      >
+        Log out
+      </TextBtn>
 
       <h2>Reset</h2>
       <TextBtn

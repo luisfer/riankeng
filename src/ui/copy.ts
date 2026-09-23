@@ -5,6 +5,7 @@ export const chrome = {
   yoursSub: 'words you have seen',
   trackDone: 'every level cleared',
   alphabetSub: 'every letter, and where it is taught',
+  systemSource: 'The romanization is adapted from the Paiboon system of Benjawan Poomsan Becker. It writes ụ where Paiboon writes ʉ.',
   meet: 'Look.',
   retype: 'Retype the romanization.',
   pick: 'Which one is this?',

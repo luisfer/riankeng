@@ -1,45 +1,13 @@
-:root {
-  --paper: #f2ead8;
-  --lacquer: #9a2b1f;
-  --ink: #1c1710;
-  --ink-2: #5a5146;
-  --ink-3: #8a8074;
-  --hair: rgba(28, 23, 16, 0.14);
-  --display: "Fraunces", "Iowan Old Style", Georgia, serif;
-  --phonetic: "Charis SIL", "Times New Roman", serif;
-  --thai: "Noto Serif Thai", "Charis SIL", serif;
-  --ease: cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-html[data-theme="dark"] {
-  --paper: #1c1710;
-  --lacquer: #9a2b1f;
-  --ink: #f2ead8;
-  --ink-2: #c9bfae;
-  --ink-3: #8a8074;
-  --hair: rgba(242, 234, 216, 0.16);
-  color-scheme: dark;
-}
-
-/* Wordmark Thai only. Fahkwang OFL — BSRU Pro is commercial (YWFT) and is not bundled. */
-@font-face {
-  font-family: "Fahkwang";
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url("/fonts/fahkwang/Fahkwang-Regular.woff2") format("woff2"),
-       url("/fonts/fahkwang/Fahkwang-Regular.ttf") format("truetype");
-  unicode-range: U+02D7, U+0303, U+0331, U+0E01-0E5B, U+200C-200D, U+25CC;
-}
+@import "./tokens.css";
+@import "./card.css";
+@import "./landing/scenes.css";
 
 * { box-sizing: border-box; }
 html, body, #root { min-height: 100%; }
 body {
   margin: 0;
   color: var(--ink);
-  font-family: var(--display);
-  font-optical-sizing: none;
-  letter-spacing: 0.01em;
+  font-family: var(--ui);
   font-size: 18px;
   line-height: 1.45;
   background-color: var(--paper);
@@ -55,11 +23,36 @@ body::before {
   background: var(--lacquer);
   z-index: 4;
 }
-button, input { font: inherit; color: inherit; }
-button { background: none; border: 0; padding: 0; cursor: pointer; }
-button:disabled { cursor: default; opacity: 0.4; }
 
-.app { min-height: 100vh; padding: calc(32px + env(safe-area-inset-top, 0px)) 24px calc(80px + env(safe-area-inset-bottom, 0px)); }
+/*
+ * One living sheet for the hub and the course. Cream to a peach wash, a pale
+ * river-green at the foot, a faint lacquer bloom under the top-right. Static.
+ * Type stays ink on paper. No gradient text, no glass, no motion.
+ */
+.app {
+  min-height: 100vh;
+  padding: calc(32px + env(safe-area-inset-top, 0px)) 24px calc(80px + env(safe-area-inset-bottom, 0px));
+  background-color: var(--paper);
+  background-image:
+    radial-gradient(
+      ellipse 70% 55% at 100% 0%,
+      color-mix(in srgb, var(--lacquer) 8%, transparent),
+      color-mix(in srgb, var(--lacquer) 2.5%, transparent) 42%,
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 85% 60% at 0% 100%,
+      color-mix(in srgb, #6d7a52 12%, transparent),
+      transparent 68%
+    ),
+    linear-gradient(
+      156deg,
+      #f8e0c6 0%,
+      #f4e8d4 36%,
+      var(--paper) 58%,
+      #e4ecd0 100%
+    );
+}
 .app.in-session {
   min-height: 100dvh;
   padding: calc(28px + env(safe-area-inset-top, 0px)) 24px calc(36px + env(safe-area-inset-bottom, 0px));
@@ -67,6 +60,21 @@ button:disabled { cursor: default; opacity: 0.4; }
   flex-direction: column;
 }
 .shell { max-width: 640px; margin: 0 auto; }
+.app.home .shell { max-width: none; width: 100%; }
+/* The hub opens on one quiet drawing. No balloon, no strip. */
+.splash {
+  margin: 0 0 36px;
+  max-width: 420px;
+  aspect-ratio: 1;
+  border: 2px solid var(--ink);
+  overflow: hidden;
+}
+.splash img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 .app.in-session .shell {
   flex: 1;
   display: flex;
@@ -105,7 +113,8 @@ button:disabled { cursor: default; opacity: 0.4; }
   color: var(--ink);
 }
 .wordmark-rom {
-  font-style: italic;
+  font-family: var(--phonetic);
+  font-synthesis: none;
   font-size: 16px;
   color: var(--ink);
 }
@@ -120,6 +129,7 @@ button:disabled { cursor: default; opacity: 0.4; }
   font-variant-numeric: tabular-nums;
 }
 .trail-mid-copy { line-height: 1.2; }
+.trail-tracks { display: flex; gap: 16px; align-items: baseline; }
 .trail-left {
   line-height: 1.2;
   color: var(--ink-3);
@@ -145,6 +155,7 @@ button:disabled { cursor: default; opacity: 0.4; }
   left: 0;
   right: 0;
   bottom: -1px;
+  height: 2px;
   background: transparent;
 }
 .trail-meter { width: 48px; height: 2px; }
@@ -161,13 +172,10 @@ button:disabled { cursor: default; opacity: 0.4; }
 }
 .trail-end { justify-self: end; display: flex; gap: 16px; align-items: baseline; }
 
-.text-btn {
-  color: var(--ink-2);
-  text-underline-offset: 3px;
-}
-.text-btn:hover, .text-btn.current { color: var(--ink); text-decoration: underline; }
-
 .page { max-width: 640px; }
+.page.journey { max-width: none; }
+.journey .contents { max-width: 640px; }
+.journey .contents.hub { max-width: none; }
 .page.session {
   flex: 1;
   max-width: none;
@@ -184,13 +192,14 @@ button:disabled { cursor: default; opacity: 0.4; }
 }
 
 h1 {
-  font-weight: 300;
-  font-optical-sizing: auto;
+  font-family: var(--display);
+  font-weight: 400;
   font-size: clamp(32px, 6vw, 44px);
   line-height: 1.15;
   margin: 0 0 16px;
 }
 h2 {
+  font-family: var(--display);
   font-weight: 400;
   font-size: 22px;
   margin: 40px 0 16px;
@@ -222,8 +231,6 @@ h2 {
   font-size: 15px;
 }
 .lede { margin: 0 0 40px; color: var(--ink-2); max-width: 28em; }
-.rom { font-family: var(--phonetic); }
-.thai { font-family: var(--thai); }
 
 .contents { list-style: none; padding: 0; margin: 0; }
 .contents li { border-top: 1px solid var(--hair); }
@@ -242,9 +249,9 @@ h2 {
 }
 .contents-n {
   text-align: right;
+  font-family: var(--display);
   font-size: 28px;
-  font-weight: 300;
-  font-optical-sizing: auto;
+  font-weight: 400;
   font-variant-numeric: tabular-nums;
   line-height: 1;
 }
@@ -272,18 +279,6 @@ h2 {
   font-variant-numeric: tabular-nums;
 }
 
-.btn.commit {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: 36px;
-  padding: 0 14px;
-  background: var(--lacquer);
-  color: var(--paper);
-  border-radius: 2px;
-  font-size: 16px;
-  font-weight: 500;
-}
 .intro h2 { margin: 0 0 16px; }
 .intro h2.quiet {
   font-size: 16px;
@@ -319,8 +314,9 @@ h2 {
   margin-top: 2px;
   color: var(--ink-2);
   font-size: 16px;
-  font-family: var(--display);
+  font-family: var(--ui);
 }
+.system-source { margin: 14px 0 0; color: var(--ink-2); font-size: 15px; }
 .preview li { padding: 8px 0; border-bottom: 1px solid var(--hair); color: var(--ink-2); }
 .quiet-row {
   display: grid;
@@ -389,7 +385,7 @@ li.quiet-row { cursor: default; }
 
 .prompt {
   font-size: 20px;
-  font-weight: 300;
+  font-weight: 400;
   margin: 0 0 8px;
 }
 .session-prompt {
@@ -429,15 +425,6 @@ li.quiet-row { cursor: default; }
   text-decoration-thickness: 3px;
   text-underline-offset: 0.28em;
 }
-.pair-line {
-  margin: 0;
-  color: var(--lacquer);
-  font-size: 26px;
-  font-weight: 300;
-  line-height: 1.2;
-}
-.pair-line.rom { font-family: var(--phonetic); }
-.pair-line.thai { font-size: 32px; }
 .session-desk {
   width: 100%;
 }
@@ -458,9 +445,9 @@ li.quiet-row { cursor: default; }
   margin: 0 0 24px;
 }
 .prompt-en {
+  font-family: var(--display);
   font-size: 44px;
-  font-weight: 300;
-  font-optical-sizing: auto;
+  font-weight: 400;
   line-height: 1.15;
   margin: 0;
 }
@@ -470,7 +457,6 @@ li.quiet-row { cursor: default; }
   font-size: 48px;
 }
 .prompt-rom {
-  font-family: var(--phonetic);
   font-size: 48px;
   line-height: 1.2;
   margin: 0;
@@ -490,7 +476,6 @@ li.quiet-row { cursor: default; }
 }
 .glyph-pick:hover { color: var(--lacquer); }
 .reveal {
-  font-family: var(--phonetic);
   font-size: 40px;
   margin: 0;
 }
@@ -499,95 +484,13 @@ li.quiet-row { cursor: default; }
 .tone-word { color: var(--ink-2); text-underline-offset: 4px; }
 .tone-word:hover { color: var(--ink); text-decoration: underline; }
 
-.answer-form {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  column-gap: 16px;
-  align-items: end;
-  position: relative;
-}
-.roman { display: contents; }
-.roman-line { grid-column: 1; grid-row: 1; min-height: 48px; }
-.answer-form > .btn.commit {
-  grid-column: 2;
-  grid-row: 1;
-  align-self: end;
-}
-.roman-field {
-  width: 100%;
-  background: transparent;
-  border: 0;
-  border-bottom: 1px solid var(--ink);
-  padding: 0 0 6px;
-  font-family: var(--phonetic);
-  font-size: 36px;
-  line-height: 1.1;
-  outline: none;
-}
-.roman-field:focus-visible,
-.text-btn:focus-visible,
-.btn.commit:focus-visible,
 .contents-row:focus-visible,
 .tone-word:focus-visible,
-.glyph-pick:focus-visible {
+.glyph-pick:focus-visible,
+.alpha-cell:focus-visible {
   outline: 2px solid var(--lacquer);
   outline-offset: 3px;
 }
-.roman-field.en { font-family: var(--display); font-size: 28px; font-weight: 300; }
-.roman-field:focus { border-bottom-color: var(--lacquer); }
-.roman-field::placeholder { color: var(--ink-3); }
-
-.popover {
-  display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
-  padding: 8px 0 4px;
-  grid-column: 1 / -1;
-  position: absolute;
-  left: 0;
-  top: 3.4rem;
-  z-index: 2;
-  background: var(--paper);
-}
-.pop-opt {
-  display: inline-flex;
-  gap: 6px;
-  align-items: baseline;
-  color: var(--ink-2);
-}
-.pop-opt:hover { color: var(--ink); }
-.pop-k { font-size: 14px; font-variant-numeric: tabular-nums; }
-
-.strip {
-  display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
-  margin-top: 12px;
-  grid-column: 1 / -1;
-  min-height: 28px;
-}
-.strip-k {
-  font-family: var(--phonetic);
-  font-size: 28px;
-  color: var(--ink-2);
-  line-height: 1;
-}
-.strip-k:hover { color: var(--ink); }
-
-.feedback { margin-top: 24px; color: var(--ink-2); }
-.session-feedback { margin-top: 0; }
-.session-feedback.ok { color: var(--ink); }
-.session-feedback.ok::before {
-  content: '';
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  margin-right: 10px;
-  background: var(--lacquer);
-  vertical-align: 0.1em;
-}
-.session-feedback.miss { color: var(--lacquer); }
-.hear-warn { color: var(--lacquer); font-size: 15px; }
 
 @media (prefers-reduced-motion: reduce) {
   .tone-chart-path { animation: none; transition: none; }
@@ -671,14 +574,14 @@ li.quiet-row { cursor: default; }
 .tbl { width: 100%; border-collapse: collapse; font-size: 16px; }
 .tbl th { text-align: left; color: var(--ink-3); font-weight: 400; padding: 6px 8px 6px 0; }
 .tbl td { padding: 8px 8px 8px 0; border-top: 1px solid var(--hair); }
-.glyphs-tbl td { font-family: var(--phonetic); font-size: 24px; }
+.glyphs-tbl td { font-size: 24px; }
 
 /* The whole script: one cell per letter, lacquer once met. */
 .alpha-block { margin: 0 0 36px; }
 .alpha-block h2.quiet { font-size: 16px; color: var(--ink-2); margin: 0 0 10px; }
 .alpha-note { margin: 0 0 16px; font-size: 15px; }
 /* Body copy that carries a dotted circle: let the Thai font draw it. */
-.thai-inline { font-family: var(--thai), var(--display); }
+.thai-inline { font-family: var(--thai), var(--ui); }
 .alpha-grid {
   list-style: none;
   padding: 0;
@@ -731,15 +634,13 @@ li.quiet-row { cursor: default; }
   color: var(--ink-3);
 }
 
-::selection { background: var(--lacquer); color: var(--paper); }
-
 @media (max-width: 520px) {
   .app { padding: calc(28px + env(safe-area-inset-top, 0px)) 16px calc(64px + env(safe-area-inset-bottom, 0px)); }
   .app.in-session { padding: calc(24px + env(safe-area-inset-top, 0px)) 16px calc(28px + env(safe-area-inset-bottom, 0px)); }
   .contents-n { font-size: 22px; }
   .contents-row.here::before { left: -8px; }
   .prompt-en { font-size: 34px; }
-  .prompt-rom, .prompt-thai, .prompt-listen, .roman-field, .reveal { font-size: 28px; }
+  .prompt-rom, .prompt-thai, .prompt-listen, .reveal { font-size: 28px; }
   .tone-charts-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px 12px; }
   .tone-chart-name { font-size: 12px; }
   .tone-chart-rom { font-size: 15px; }
@@ -756,4 +657,5 @@ li.quiet-row { cursor: default; }
   .alpha-grid { grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); }
   .alpha-char { font-size: 28px; }
   .tone-mark-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .splash { margin-bottom: 28px; }
 }

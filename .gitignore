@@ -8,6 +8,7 @@ dist
 .env.*
 !.env.example
 scripts/__pycache__
+art/candidates/
 public/audio/catalog.json
 public/audio/*.part.mp3
 public/audio/catalog.json

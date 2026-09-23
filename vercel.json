@@ -1,14 +1,12 @@
 {
   "framework": "vite",
-  "rewrites": [
-    {
-      "source": "/((?!api/|gate\\.html|sw\\.js|manifest\\.webmanifest|workbox-|icons/|fonts/|favicon\\.svg).*)",
-      "destination": "/index.html"
-    }
+  "redirects": [
+    { "source": "/gate.html", "destination": "/", "permanent": true },
+    { "source": "/learn", "destination": "/learn/", "permanent": false }
   ],
   "headers": [
     {
-      "source": "/index.html",
+      "source": "/learn/(.*)",
       "headers": [{ "key": "X-Riankeng-Shell", "value": "1" }]
     }
   ]

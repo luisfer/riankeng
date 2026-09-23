@@ -2,6 +2,7 @@ import { entriesForLevel, levelsFor } from '@content/index'
 import type { TrackId } from '@content/types'
 import { unlockSpeech } from '@/audio/tts'
 import { Commit, Meter, lessonRatio, startLabel, TextBtn } from './bits'
+import { chrome } from './copy'
 import { ToneCharts } from './ToneCharts'
 import { showParts, showThai } from './thai'
 
@@ -87,6 +88,7 @@ export function LevelIntro(props: {
             )
           })}
         </ul>
+        {voiceSound && <p className="system-source">{chrome.systemSource}</p>}
       </section>
       {script && all.some((e) => e.compose?.length) && (
         <section className="examples">

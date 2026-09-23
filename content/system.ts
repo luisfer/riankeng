@@ -2,6 +2,9 @@
  * The romanization system from "Getting to Know Thai, Level 1", as used in
  * Luis's notes: tones by diacritic, doubled letters for long vowels,
  * g/bp/dt for unaspirated stops, ε ɔ ə for the open/mid vowels and ụ for อึ/อือ.
+ * That is the Paiboon system of Benjawan Poomsan Becker with ụ for its ʉ. Voice 0
+ * (chrome.systemSource) and the landing footer credit it, so a further departure
+ * from Paiboon has to change those lines too.
  *
  * Everything here works on NFD (decomposed) strings so that ǔ, έ, ụ̀ etc.
  * are always "base letter + combining marks".

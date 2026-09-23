@@ -113,6 +113,7 @@ export function Trail(props: {
   lessonTotal?: number
   onPause?: () => void
   place?: string
+  onSwitchTrack?: (track: 'voice' | 'script') => void
 }) {
   const place =
     props.place ??
@@ -129,6 +130,7 @@ export function Trail(props: {
     remaining: props.remaining,
     correct: props.correct,
   })
+  const switcher = Boolean(props.onSwitchTrack && props.track)
 
   return (
     <nav className="trail">
@@ -137,7 +139,18 @@ export function Trail(props: {
         <span className="wordmark-rom">riian gèng</span>
       </button>
       <span className="trail-mid">
-        {place && <span className="trail-mid-copy">{place}</span>}
+        {switcher ? (
+          <span className="trail-tracks">
+            <TextBtn current={props.track === 'voice'} onClick={() => props.onSwitchTrack!('voice')}>
+              Voice
+            </TextBtn>
+            <TextBtn current={props.track === 'script'} onClick={() => props.onSwitchTrack!('script')}>
+              Script
+            </TextBtn>
+          </span>
+        ) : (
+          place && <span className="trail-mid-copy">{place}</span>
+        )}
         {meter && <Meter className="trail-meter" value={meter.value} label={meter.label} />}
         {inSitting && <span className="trail-left">{props.remaining} left</span>}
       </span>

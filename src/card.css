@@ -1,0 +1,176 @@
+/*
+ * One card: the answer field, the tone popover, the key strip, the commit key,
+ * the feedback line. The course and the landing page both import this.
+ */
+button, input { font: inherit; color: inherit; }
+button { background: none; border: 0; padding: 0; cursor: pointer; }
+button:disabled { cursor: default; opacity: 0.4; }
+
+.rom,
+.prompt-rom,
+.roman-field,
+.reveal,
+.strip-k,
+.pair-line.rom,
+.glyphs-tbl td,
+.tone-chart-rom {
+  font-family: var(--phonetic);
+  font-synthesis: none;
+  font-size-adjust: var(--rom-adjust);
+}
+.thai { font-family: var(--thai); }
+
+.text-btn {
+  color: var(--ink-2);
+  text-underline-offset: 3px;
+}
+.text-btn:hover, .text-btn.current { color: var(--ink); text-decoration: underline; }
+
+.btn.commit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  padding: 0 14px;
+  background: var(--lacquer);
+  color: var(--paper);
+  border-radius: 2px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.answer-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 16px;
+  align-items: center;
+  position: relative;
+}
+.roman { display: contents; }
+.roman-line { grid-column: 1; grid-row: 1; min-width: 0; }
+.answer-form > .btn.commit {
+  grid-column: 2;
+  grid-row: 1;
+  align-self: center;
+}
+.roman-field {
+  appearance: none;
+  width: 100%;
+  box-sizing: border-box;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--ink);
+  padding: 12px 16px 14px;
+  font-size: 36px;
+  line-height: 1.25;
+  outline: none;
+}
+.roman-field:focus-visible,
+.text-btn:focus-visible,
+.btn.commit:focus-visible,
+.pop-opt:focus-visible,
+.strip-k:focus-visible {
+  outline: 2px solid var(--lacquer);
+  outline-offset: 3px;
+}
+/* An English answer is interface text, not romanization. */
+.roman-field.en { font-family: var(--ui); font-size-adjust: none; font-size: 28px; font-weight: 400; }
+.roman-field:focus { border-bottom-color: var(--lacquer); }
+.roman-field::placeholder { color: var(--ink-3); }
+
+.popover {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 8px 0 4px;
+  grid-column: 1 / -1;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 4.6rem;
+  z-index: 2;
+  background: var(--paper);
+}
+.pop-opt {
+  display: inline-flex;
+  gap: 6px;
+  align-items: baseline;
+  color: var(--ink-2);
+}
+.pop-opt:hover { color: var(--ink); }
+.pop-k { font-size: 14px; font-variant-numeric: tabular-nums; }
+
+.strip {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+  grid-column: 1 / -1;
+  min-height: 28px;
+}
+.strip-k {
+  font-size: 28px;
+  color: var(--ink-2);
+  line-height: 1;
+}
+.strip-k:hover { color: var(--ink); }
+
+/*
+ * A drawn panel with its phrase lettered into the empty balloon. The panel is a
+ * square container; the balloon's box comes from landing/scenes.css, in % of it.
+ */
+.balloon {
+  position: absolute;
+  left: calc(var(--bx) * 1%);
+  top: calc(var(--by) * 1%);
+  /* The flood-fill box is the oval's bounding rectangle. Its corners sit
+     outside the ink. This inset keeps the lettering rectangle inside. */
+  width: calc(var(--bw) * 0.74%);
+  height: calc(var(--bh) * 0.66%);
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  white-space: nowrap;
+  font-family: "Mali", var(--thai);
+  font-weight: 500;
+  line-height: 1.35;
+  color: #1a1612;
+  font-size: min(
+    calc(var(--bw) * 0.70cqw / var(--em, 4)),
+    calc(var(--bh) * 0.58cqw / var(--lines, 1) / 1.35)
+  );
+  pointer-events: none;
+}
+
+/* A right answer: the pair, laid in lacquer. */
+.pair-line {
+  margin: 0;
+  color: var(--lacquer);
+  font-family: var(--display);
+  font-size: 26px;
+  font-weight: 400;
+  line-height: 1.2;
+}
+.pair-line.thai { font-family: var(--thai); font-size: 32px; }
+
+.feedback { margin-top: 24px; color: var(--ink-2); }
+.session-feedback { margin: 0; min-height: 1.5em; }
+.session-feedback.ok { color: var(--ink); }
+.session-feedback.ok::before {
+  content: '';
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 10px;
+  background: var(--lacquer);
+  vertical-align: 0.1em;
+}
+.session-feedback.miss { color: var(--lacquer); }
+.hear-warn { color: var(--lacquer); font-size: 15px; }
+
+@media (max-width: 520px) {
+  .roman-field { font-size: 28px; }
+  .roman-field.en { font-size: 24px; }
+}

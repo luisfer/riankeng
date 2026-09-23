@@ -1,7 +1,8 @@
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { LEVELS, SCRIPT_LEVELS } from '@content/index'
 import type { LevelMeta, TrackId } from '@content/types'
 import { hereLevel, unlockCount, type LevelStatus } from '@/engine/scheduler'
+import { QUIET, sceneSrc, sceneSrcSet } from '@/landing/demo'
 import { Meter } from './bits'
 import { chrome } from './copy'
 
@@ -34,6 +35,7 @@ function Row(props: {
   title: string
   sub: string
   rom?: boolean
+  here?: boolean
   meta: ReactNode
   /** Laid over the row's own divider, so progress needs no column of its own. */
   meter?: ReactNode
@@ -41,7 +43,7 @@ function Row(props: {
 }) {
   return (
     <li>
-      <button type="button" className="contents-row" onClick={props.onOpen}>
+      <button type="button" className={props.here ? 'contents-row here' : 'contents-row'} onClick={props.onOpen}>
         <span className="contents-n">{props.n ?? ''}</span>
         <span>
           <span className="contents-title">{props.title}</span>
@@ -62,18 +64,26 @@ function TrackRow(props: {
   onOpen: () => void
 }) {
   const place = trackPlace(props.statuses, props.levels)
-  const { done, total } = trackTally(props.statuses, props.track)
+  const here = props.statuses[place.n]
+  const levelDone = here ? unlockCount(here, props.track) : 0
+  const levelTotal = here?.total ?? 0
+  const frac = place.done ? 1 : levelTotal ? levelDone / levelTotal : 0
   return (
     <Row
       n={place.n}
-      title={props.title}
-      sub={place.done ? chrome.trackDone : `Level ${place.n}, ${place.title}`}
-      meta={done > 0 ? `${done} of ${total}` : String(total)}
+      title={place.title}
+      sub={place.done ? `${props.title}. ${chrome.trackDone}` : props.title}
+      here={!place.done}
+      meta={place.done ? '' : `${levelDone} of ${levelTotal}`}
       meter={
         <Meter
           className="row-meter"
-          value={total ? done / total : 0}
-          label={`${done} of ${total} done on ${props.title}`}
+          value={frac}
+          label={
+            place.done
+              ? `${props.title}, every level cleared`
+              : `${levelDone} of ${levelTotal} in ${place.title}`
+          }
         />
       }
       onOpen={props.onOpen}
@@ -88,8 +98,20 @@ export function Journey(props: {
   onReview: () => void
   onAlphabet: () => void
 }) {
+  const [scene] = useState(() => QUIET[Math.floor(Math.random() * QUIET.length)]!)
   return (
     <main className="page journey">
+      <figure className="splash">
+        <img
+          src={sceneSrc(scene.stem)}
+          srcSet={sceneSrcSet(scene.stem)}
+          sizes="(max-width: 520px) calc(100vw - 48px), 420px"
+          width={980}
+          height={980}
+          alt={scene.alt}
+          decoding="async"
+        />
+      </figure>
       <ol className="contents hub">
         <TrackRow
           title="Voice"

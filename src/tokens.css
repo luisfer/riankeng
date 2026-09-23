@@ -1,0 +1,28 @@
+/*
+ * The river primer, in variables. Paper, ink, one lacquer. Shared by the course
+ * (styles.css) and the landing page (landing/landing.css).
+ *
+ * Type roles. Brygada 1918 sets headlines and big numbers. Onest sets the
+ * interface and English body. Didact Gothic sets every romanization: it has
+ * ε ɔ ə ụ with anchors for all four tone marks. Onest has no Greek ε, so its
+ * stack falls to Didact, and romanization is never set in Onest.
+ */
+:root {
+  --paper: #f2ead8;
+  --lacquer: #9a2b1f;
+  --ink: #1c1710;
+  --ink-2: #5a5146;
+  --ink-3: #8a8074;
+  --hair: rgba(28, 23, 16, 0.14);
+  color-scheme: light;
+  /* Noto Serif Thai's face is range-limited to Thai, so it sits in every stack and only ever draws Thai. */
+  --display: "Brygada 1918", "Noto Serif Thai", "Iowan Old Style", Georgia, serif;
+  --ui: "Onest", "Didact Gothic", "Noto Serif Thai", system-ui, sans-serif;
+  --phonetic: "Didact Gothic", "Onest", "Noto Serif Thai", sans-serif;
+  --thai: "Noto Serif Thai", serif;
+  /* Didact's x-height is 468 to Onest's 527. This lifts it to sit with the interface. */
+  --rom-adjust: 0.5;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+::selection { background: var(--lacquer); color: var(--paper); }

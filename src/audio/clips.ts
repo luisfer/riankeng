@@ -1,16 +1,10 @@
 import manifest from './clip-manifest.json'
+import { clipUrl } from './clip-url'
+
+export { clipStem, clipUrl } from './clip-url'
 
 const cache = new Map<string, boolean>()
 const shipped = new Set(manifest.ids)
-
-/** Slash is a path and # is a URL fragment. Both become underscores on disk. */
-export function clipStem(id: string): string {
-  return id.replaceAll('/', '_').replaceAll('#', '_')
-}
-
-export function clipUrl(id: string): string {
-  return `/audio/${encodeURI(clipStem(id))}.mp3`
-}
 
 export function clipCached(id: string): boolean | undefined {
   return cache.get(id)

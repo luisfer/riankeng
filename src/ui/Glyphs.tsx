@@ -7,7 +7,7 @@ export function Glyphs() {
   return (
     <main className="page glyphs">
       <h1>Glyphs</h1>
-      <p className="lede">If a cell looks broken, Charis SIL is not stacking that mark.</p>
+      <p className="lede">If a cell looks broken, Didact Gothic is not stacking that mark.</p>
       <table className="tbl glyphs-tbl">
         <thead>
           <tr>

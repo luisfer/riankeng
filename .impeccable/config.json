@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "cramped-padding",
+        "value": "*",
+        "files": [
+          "index.html"
+        ],
+        "createdAt": "2026-09-22T14:53:50.016Z",
+        "reason": "Comic frames. The drawing fills each 2px ink frame edge to edge, as a printed panel does; the lettering sits inside the drawn balloon, and the title cell carries 6% padding."
+      }
+    ]
+  }
+}

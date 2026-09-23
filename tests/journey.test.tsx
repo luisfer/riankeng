@@ -3,6 +3,7 @@ import { act } from 'react'
 import { createRoot } from 'react-dom/client'
 import { LEVELS, SCRIPT_LEVELS } from '../content/index'
 import { allLevelStatus, type LevelStatus } from '../src/engine/scheduler'
+import { QUIET, sceneSrc } from '../src/landing/demo'
 import { emptyDoc } from '../src/storage/progress-schema'
 import { Journey, trackPlace, trackTally } from '../src/ui/Journey'
 import { TrackPage } from '../src/ui/TrackPage'
@@ -73,29 +74,42 @@ describe('the landing page', () => {
     return host
   }
 
+  it('opens on one quiet drawing, with no lettering', () => {
+    const host = render()
+    const imgs = [...host.querySelectorAll('.splash img')]
+    expect(imgs).toHaveLength(1)
+    const scene = QUIET.find((q) => imgs[0]!.getAttribute('src') === sceneSrc(q.stem))
+    expect(scene, imgs[0]!.getAttribute('src') ?? '').toBeDefined()
+    expect(imgs[0]!.getAttribute('alt')).toBe(scene!.alt)
+    expect(host.querySelector('.splash .balloon')).toBeNull()
+    expect(host.querySelector('.splash')?.textContent?.trim()).toBe('')
+  })
+
   it('is four rows, not a list of every level', () => {
     const host = render()
     const rows = [...host.querySelectorAll('.contents-row')]
     expect(rows).toHaveLength(4)
     expect(rows.map((r) => r.querySelector('.contents-title')?.textContent)).toEqual([
-      'Voice',
-      'Script',
+      LEVELS[0]!.title,
+      SCRIPT_LEVELS[0]!.title,
       'Already yours',
       'The whole script',
     ])
   })
 
-  it('names the level reached on each track, and counts the cards', () => {
+  it('names the level you are on, and counts that lesson', () => {
     const host = render()
     const rows = [...host.querySelectorAll('.contents-row')]
-    expect(rows[0]!.querySelector('.contents-rom')?.textContent).toBe(`Level 0, ${LEVELS[0]!.title}`)
-    expect(rows[1]!.querySelector('.contents-rom')?.textContent).toBe(`Level 0, ${SCRIPT_LEVELS[0]!.title}`)
+    const voice = allLevelStatus(emptyDoc(), Date.now(), 'voice')
+    const script = allLevelStatus(emptyDoc(), Date.now(), 'script')
+    expect(rows[0]!.querySelector('.contents-title')?.textContent).toBe(LEVELS[0]!.title)
+    expect(rows[0]!.querySelector('.contents-rom')?.textContent).toBe('Voice')
     expect(rows[0]!.querySelector('.contents-n')?.textContent).toBe('0')
-    // untouched: the meta is the bare catalog count, and the pie is empty
-    const doc = emptyDoc()
-    const voiceCards = trackTally(allLevelStatus(doc, Date.now(), 'voice'), 'voice').total
-    expect(voiceCards).toBeGreaterThan(0)
-    expect(rows[0]!.querySelector('.contents-meta')?.textContent).toBe(String(voiceCards))
+    expect(rows[0]!.querySelector('.contents-meta')?.textContent).toBe(`0 of ${voice[0]!.total}`)
+    expect(rows[0]!.className).toContain('here')
+    expect(rows[1]!.querySelector('.contents-title')?.textContent).toBe(SCRIPT_LEVELS[0]!.title)
+    expect(rows[1]!.querySelector('.contents-rom')?.textContent).toBe('Script')
+    expect(rows[1]!.querySelector('.contents-meta')?.textContent).toBe(`0 of ${script[0]!.total}`)
     expect(rows[0]!.querySelector('.row-meter')?.getAttribute('aria-valuenow')).toBe('0')
   })
 
@@ -129,6 +143,18 @@ describe('a track page', () => {
     expect(rows[0]!.className).toContain('here')
     expect((rows[0] as HTMLButtonElement).disabled).toBe(false)
     expect((rows[1] as HTMLButtonElement).disabled).toBe(true)
+  })
+
+  it('writes progress inside the open level, not a bare total', () => {
+    const host = renderTrack('voice')
+    const rows = [...host.querySelectorAll('.contents-row')]
+    const total = allLevelStatus(emptyDoc(), Date.now(), 'voice')[0]!.total
+    expect(rows[0]!.querySelector('.contents-meta')?.textContent).toBe(`0 of ${total}`)
+    expect(rows[0]!.querySelector('.row-meter')?.getAttribute('aria-valuenow')).toBe('0')
+    expect(rows[0]!.querySelector('.row-meter')?.getAttribute('aria-label')).toBe(
+      `0 of ${total} done in ${LEVELS[0]!.title}`,
+    )
+    expect(rows[1]!.querySelector('.contents-meta')?.textContent).toBe('')
   })
 
   it('names the track once, at the top', () => {

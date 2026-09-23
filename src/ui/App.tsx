@@ -32,7 +32,6 @@ import * as mirrorFile from '@/storage/mirror-file'
 import type { MirrorState } from '@/storage/mirror-file'
 import { onVoices } from '@/audio/tts'
 import { go, parseHash, replace, type Route } from './hash'
-import { applyTheme } from './theme'
 import { Account } from './Account'
 import { Alphabet } from './Alphabet'
 import { Glyphs } from './Glyphs'
@@ -184,17 +183,6 @@ export function App() {
     }
   }, [])
 
-  useEffect(() => {
-    applyTheme(doc.settings.theme)
-  }, [doc.settings.theme])
-
-  useEffect(() => {
-    const mq = window.matchMedia('(prefers-color-scheme: dark)')
-    const sync = () => applyTheme(doc.settings.theme)
-    mq.addEventListener('change', sync)
-    return () => mq.removeEventListener('change', sync)
-  }, [doc.settings.theme])
-
   useEffect(() => onVoices(() => undefined), [])
 
   const voiceStatuses = allLevelStatus(doc, Date.now(), 'voice')
@@ -313,20 +301,21 @@ export function App() {
   }
 
   return (
-    <div className={`app${inSession ? ' in-session' : ''}`}>
+    <div className={`app${inSession ? ' in-session' : ''}${loadState === 'ready' && route.name === 'journey' ? ' home' : ''}`}>
       <div className="shell">
         <Trail
           onHome={inSession ? leaveSitting : () => go({ name: 'journey' })}
           accountLabel={accountLabel}
           onAccount={!inSession && !inIntro && loadState === 'ready' ? () => go({ name: 'account' }) : undefined}
-          track={trailTrack}
           level={trailLevel}
           remaining={inSession && session ? remaining(session) : undefined}
           correct={inSession && session ? session.correct : undefined}
           lessonDone={lessonStatus ? unlockCount(lessonStatus, trailTrack ?? 'voice') : undefined}
           lessonTotal={lessonStatus?.total}
           onPause={inSession || inIntro ? leaveSitting : undefined}
-          place={trailPlace}
+          place={route.name === 'track' ? undefined : trailPlace}
+          track={route.name === 'track' ? route.track : trailTrack}
+          onSwitchTrack={route.name === 'track' ? (track) => go({ name: 'track', track }) : undefined}
         />
         {loadState === 'pending' && <main className="page" />}
         {loadState === 'failed' && (

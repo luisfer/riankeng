@@ -129,7 +129,10 @@ html:not([data-comic]) .comic { visibility: hidden; }
 .wrap:has(> .comic) {
   container-type: inline-size;
   container-name: comic;
+  /* The day of panels uses the viewport. The card and the close stay in the column. */
+  max-width: none;
 }
+header.wrap { max-width: none; }
 .comic {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -258,16 +261,29 @@ html:not([data-comic]) .comic { visibility: hidden; }
 }
 .cell.title .waitlist .btn.commit:hover:not([data-waitlist-open]) { filter: brightness(0.92); }
 .cell.title [data-waitlist-open] {
-  position: relative;
-  overflow: hidden;
   width: 100%;
   height: 80px;
   padding: 0 32px;
   font-size: 26px;
 }
-.cell.title [data-waitlist-open]:hover,
-.cell.title [data-waitlist-open]:focus-visible { background: var(--ink); }
-.waitlist { display: grid; gap: 8px; justify-items: start; }
+.waitlist-label { display: grid; place-items: center; }
+.waitlist-label > span { grid-area: 1 / 1; }
+.waitlist-rom,
+.waitlist-th { opacity: 0; }
+.waitlist-rom {
+  font-family: var(--phonetic);
+  font-synthesis: none;
+  font-size-adjust: var(--rom-adjust);
+}
+.waitlist-th { font-family: var(--thai); }
+.waitlist { display: grid; gap: 8px; justify-items: start; position: relative; }
+.waitlist-trap {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
 .waitlist-row { display: none; width: 100%; }
 .waitlist[data-open] { width: 100%; }
 .waitlist[data-open] [data-waitlist-open] { display: none; }
@@ -476,20 +492,34 @@ html[data-session="in"] .signin-row { grid-template-columns: auto; justify-conte
     filter: blur(0);
     transform: none;
   }
-  /* Ink wipes across the lacquer. Reduced motion keeps the plain color change. */
-  .cell.title [data-waitlist-open]::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: var(--ink);
-    transform: scaleX(0);
-    transform-origin: left center;
-    transition: transform 480ms var(--ease);
+  .waitlist-label > span {
+    transition: opacity 420ms var(--ease), filter 420ms var(--ease);
   }
-  .cell.title [data-waitlist-open]:hover,
-  .cell.title [data-waitlist-open]:focus-visible { background: var(--lacquer); }
-  .cell.title [data-waitlist-open]:hover::before,
-  .cell.title [data-waitlist-open]:focus-visible::before { transform: scaleX(1); }
+  [data-waitlist-open]:hover .waitlist-en,
+  [data-waitlist-open]:focus-visible .waitlist-en {
+    opacity: 0;
+    filter: blur(6px);
+  }
+  [data-waitlist-open]:hover .waitlist-rom,
+  [data-waitlist-open]:focus-visible .waitlist-rom {
+    transition: none;
+    animation: waitlist-rom 2.2s var(--ease) forwards;
+  }
+  [data-waitlist-open]:hover .waitlist-th,
+  [data-waitlist-open]:focus-visible .waitlist-th {
+    transition: none;
+    animation: waitlist-th 2.2s var(--ease) forwards;
+  }
+}
+@keyframes waitlist-rom {
+  0% { opacity: 0; filter: blur(6px); }
+  16% { opacity: 1; filter: none; }
+  42% { opacity: 1; filter: none; }
+  62%, 100% { opacity: 0; filter: blur(6px); }
+}
+@keyframes waitlist-th {
+  0%, 42% { opacity: 0; filter: blur(6px); }
+  66%, 100% { opacity: 1; filter: none; }
 }
 @keyframes ink-in {
   from { opacity: 0; transform: scale(0.985); }
@@ -500,6 +530,12 @@ html[data-session="in"] .signin-row { grid-template-columns: auto; justify-conte
   to { opacity: 1; }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  [data-waitlist-open]:hover .waitlist-en,
+  [data-waitlist-open]:focus-visible .waitlist-en { opacity: 0; }
+  [data-waitlist-open]:hover .waitlist-th,
+  [data-waitlist-open]:focus-visible .waitlist-th { opacity: 1; }
+}
 @media (max-width: 1199px) {
   .cell.title .signin { max-width: 520px; }
   .try, .close-grid { grid-template-columns: minmax(0, 1fr); }

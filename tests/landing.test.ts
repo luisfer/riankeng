@@ -27,7 +27,9 @@ describe('the landing page', () => {
       expect(slot.querySelector('img')?.getAttribute('src')).toBeNull()
     }
     const waitlist = doc.querySelector('.cell.title form.waitlist')
-    expect(text(waitlist?.querySelector('[data-waitlist-open]') ?? null)).toBe('Join the waitlist')
+    expect(text(waitlist?.querySelector('.waitlist-en') ?? null)).toBe('Join the waitlist')
+    expect(text(waitlist?.querySelector('.waitlist-rom') ?? null)).toBe('long chụ̂ụ rɔɔ')
+    expect(text(waitlist?.querySelector('.waitlist-th') ?? null)).toBe('ลงชื่อรอ')
     expect(waitlist?.querySelector('input[name="email"]')).not.toBeNull()
     expect(text(waitlist?.querySelector('button[type="submit"]') ?? null)).toBe('Join')
   })
@@ -108,7 +110,9 @@ describe('the landing page', () => {
     expect(doc.querySelector('#tracks, a[href="#tracks"]')).toBeNull()
     expect(text(doc.querySelector('#close-h'))).toBe('Speak with Thainess.')
     const waitlist = doc.querySelector('.close-copy form.waitlist')
-    expect(text(waitlist?.querySelector('[data-waitlist-open]') ?? null)).toBe('Join the waitlist')
+    expect(text(waitlist?.querySelector('.waitlist-en') ?? null)).toBe('Join the waitlist')
+    expect(text(waitlist?.querySelector('.waitlist-rom') ?? null)).toBe('long chụ̂ụ rɔɔ')
+    expect(text(waitlist?.querySelector('.waitlist-th') ?? null)).toBe('ลงชื่อรอ')
     expect(waitlist?.querySelector('input[name="email"]')).not.toBeNull()
   })
 

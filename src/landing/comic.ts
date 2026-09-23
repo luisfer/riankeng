@@ -12,8 +12,8 @@ export const PHONES = ['top', 'after'] as const
 export type PhoneTitle = (typeof PHONES)[number]
 export const COMIC_SLOTS = 8
 
-const HERO_SIZES = '(max-width: 599px) calc(100vw - 40px), (max-width: 899px) calc(66vw - 40px), (max-width: 1199px) calc(25vw - 20px), 476px'
-const PIC_SIZES = '(max-width: 599px) calc(50vw - 25px), (max-width: 899px) calc(33vw - 28px), (max-width: 1199px) calc(25vw - 20px), 232px'
+const HERO_SIZES = '(max-width: 599px) calc(100vw - 40px), (max-width: 899px) calc(66vw - 40px), (max-width: 1199px) calc(25vw - 20px), calc((100vw - 112px) * 0.4 + 12px)'
+const PIC_SIZES = '(max-width: 599px) calc(50vw - 25px), (max-width: 899px) calc(33vw - 28px), (max-width: 1199px) calc(25vw - 20px), calc((100vw - 112px) / 5)'
 
 const SMALLS = ['1', '2', '3', '4', '5', '6', '7'] as const
 

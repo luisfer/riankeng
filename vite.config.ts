@@ -4,6 +4,7 @@ import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 import { fileURLToPath, URL } from 'node:url'
 import { GATE_COOKIE, gateToken, readCookie } from './src/gate-token'
+import { handleWaitlist, type WaitlistEnv } from './src/waitlist-join'
 
 function readBody(req: Connect.IncomingMessage): Promise<string> {
   return new Promise((resolve) => {
@@ -16,11 +17,12 @@ function readBody(req: Connect.IncomingMessage): Promise<string> {
 }
 
 /**
- * The gate, served locally. On Vercel these are api/gate.ts, api/session.ts and
- * api/logout.ts. Here the same three routes run inside Vite, dev and preview.
- * With SITE_PASSWORD empty any password passes and the session is always in.
+ * The gate and the waitlist, served locally. On Vercel these are api/gate.ts,
+ * api/session.ts, api/logout.ts and api/waitlist.ts. Here the same routes run
+ * inside Vite, dev and preview. With SITE_PASSWORD empty any password passes
+ * and the session is always in.
  */
-function gateDev(secret: string): Plugin {
+function gateDev(secret: string, waitlist: WaitlistEnv): Plugin {
   const handle: Connect.NextHandleFunction = (req, res, next) => {
     const url = new URL(req.url ?? '/', 'http://local')
     if (url.pathname === '/learn') {
@@ -56,6 +58,22 @@ function gateDev(secret: string): Plugin {
         if (secret && password !== secret) return json(401, { ok: false })
         const token = await gateToken(secret || 'open')
         return json(200, { ok: true }, `${GATE_COOKIE}=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=2592000`)
+      }
+      if (url.pathname === '/api/waitlist' && req.method === 'POST') {
+        const raw = await readBody(req)
+        const response = await handleWaitlist(
+          new Request('http://local/api/waitlist', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: raw,
+          }),
+          waitlist,
+        )
+        res.statusCode = response.status
+        res.setHeader('Content-Type', 'application/json')
+        res.setHeader('Cache-Control', 'no-store')
+        res.end(await response.text())
+        return
       }
       next()
     })().catch(() => json(500, { ok: false }))
@@ -136,7 +154,10 @@ export default defineConfig(({ mode }) => {
           ],
         },
       }),
-      gateDev(env.SITE_PASSWORD ?? ''),
+      gateDev(env.SITE_PASSWORD ?? '', {
+        url: env.SUPABASE_URL ?? '',
+        key: env.SUPABASE_SERVICE_ROLE_KEY ?? '',
+      }),
     ],
     resolve: {
       alias: {

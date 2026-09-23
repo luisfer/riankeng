@@ -8,8 +8,11 @@ const t0 = Date.UTC(2026, 0, 1, 12)
 describe('mergeItem', () => {
   it('unions history and keeps the higher stage', () => {
     let laptop = newItemProgress('w:maa')
+    let when = t0
     for (let i = 0; i < 6; i++) {
-      laptop = applyAttempt(laptop, { t: t0 + i * 86_400_000, ok: true, v: 'exact', m: 'th-en' })
+      const t = laptop.due === 0 ? when : Math.max(when, laptop.due)
+      laptop = applyAttempt(laptop, { t, ok: true, v: 'exact', m: 'th-en' })
+      when = t + 86_400_000
     }
     expect(laptop.stage).toBe(6)
     const phone = applyAttempt(newItemProgress('w:maa'), {
@@ -22,6 +25,31 @@ describe('mergeItem', () => {
     expect(merged.stage).toBe(6)
     expect(merged.days.length).toBeGreaterThanOrEqual(laptop.days.length)
     expect(merged.history.some((h) => h.t === phone.lastSeen)).toBe(true)
+  })
+
+  it('does not replay attempts older than a capped local history', () => {
+    const have = {
+      ...newItemProgress('w:maa'),
+      stage: 6,
+      reps: 50,
+      due: t0 + 35 * 86_400_000,
+      lastSeen: t0 + 200,
+      days: ['2026-01-01'],
+      history: [
+        { t: t0 + 100, ok: true, v: 'exact', m: 'th-en' as const },
+        { t: t0 + 200, ok: true, v: 'exact', m: 'th-en' as const },
+      ],
+    }
+    const incoming = {
+      ...newItemProgress('w:maa'),
+      stage: 1,
+      reps: 1,
+      lastSeen: t0,
+      history: [{ t: t0, ok: true, v: 'exact', m: 'th-en' as const }],
+    }
+    const merged = mergeItem(have, incoming)
+    expect(merged.stage).toBe(6)
+    expect(merged.reps).toBe(50)
   })
 })
 

@@ -21,6 +21,7 @@ describe('silent mode', () => {
     const sit = startSession(docWith(true), t0, 0, 'voice')
     expect(sit.queue.length).toBeGreaterThan(0)
     expect(sit.queue.map((q) => q.modality)).not.toContain('listen')
+    expect(sit.queue.map((q) => q.modality)).not.toContain('tone')
   })
 
   it('keeps them when it is off, so the switch is what changed it', () => {
@@ -33,6 +34,7 @@ describe('silent mode', () => {
     const quiet = startReviewSession(docWith(true), t0, ids, 'voice')
     expect(quiet.queue.length).toBeGreaterThan(0)
     expect(quiet.queue.map((q) => q.modality)).not.toContain('listen')
+    expect(quiet.queue.map((q) => q.modality)).not.toContain('tone')
   })
 
   it('defaults to off, so nothing changes for anyone who has not asked', () => {

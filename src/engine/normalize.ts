@@ -10,6 +10,7 @@ import {
 /** Lowercase, NFD, apply character aliases, collapse whitespace. */
 export function canonicalRom(input: string): string {
   let s = input.normalize('NFD').toLowerCase()
+  s = s.replace(/u\u0308/g, 'u' + DOT_BELOW).replace(/u\u0324/g, 'u' + DOT_BELOW)
   let out = ''
   for (const ch of s) out += CHAR_ALIASES[ch] ?? ch
   // A learner might type the dot-below after a tone mark; canonical order is dot first.
@@ -105,7 +106,7 @@ export function analyseRom(input: string): RomAnalysis {
       const next = chars[idx + 1]
       const nextIsVowel = next !== undefined && isVowelBase(next)
       if (!nextIsVowel) {
-        const glide = ch === 'y' ? 'i' : 'o'
+        const glide = ch === 'y' ? 'i' : current.letters.endsWith('i') ? 'u' : 'o'
         current.letters += glide
         skeleton += glide
         continue

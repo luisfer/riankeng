@@ -18,26 +18,18 @@ function text(el: Element | null): string {
 }
 
 describe('the landing page', () => {
-  it('letters every panel with a real entry, as stored', () => {
-    const panels = [...doc.querySelectorAll<HTMLElement>('[data-entry]')]
-    expect(panels.length).toBeGreaterThanOrEqual(8)
-    for (const panel of panels) {
-      const id = panel.dataset.entry!
-      const entry = getEntry(id)
-      expect(entry, id).toBeDefined()
-      expect(id).toBe(id.normalize('NFC'))
-      expect(text(panel.querySelector('[lang="th"]')), id).toBe(entry!.thai)
-      expect(text(panel.querySelector('[lang="th-Latn"]')), id).toBe(entry!.rom)
-      expect(text(panel.querySelector('.en')), id).toBe(cleanGloss(entry!.en[0] ?? ''))
-      expect(hasShippedClip(id), id).toBe(true)
-
-      const card = demoByStem(panel.dataset.scene!)
-      expect(card?.id, panel.dataset.scene).toBe(id)
-      const balloon = panel.querySelector<HTMLElement>('.balloon')!
-      expect(balloon.style.getPropertyValue('--em').trim()).toBe(String(card!.balloon.em))
-      expect(balloon.style.getPropertyValue('--lines').trim()).toBe(String(card!.balloon.lines.length))
-      expect(panel.querySelector('img')?.getAttribute('alt')).toBe(card!.alt)
+  it('leaves the comic slots empty so the script can paint once', () => {
+    expect(text(doc.querySelector('.cell.title h1'))).toBe('Learn Thai as Thais speak it.')
+    const slots = [...doc.querySelectorAll<HTMLElement>('.cell[data-slot]')]
+    expect(slots).toHaveLength(8)
+    for (const slot of slots) {
+      expect(slot.querySelector('a.panel')?.getAttribute('data-entry')).toBeNull()
+      expect(slot.querySelector('img')?.getAttribute('src')).toBeNull()
     }
+    const waitlist = doc.querySelector('.cell.title form.waitlist')
+    expect(text(waitlist?.querySelector('[data-waitlist-open]'))).toBe('Join the waitlist')
+    expect(waitlist?.querySelector('input[name="email"]')).not.toBeNull()
+    expect(text(waitlist?.querySelector('button[type="submit"]'))).toBe('Join')
   })
 
   it('draws from the demo data, which itself matches the course', () => {
@@ -70,9 +62,16 @@ describe('the landing page', () => {
     expect(slopHits(QUIET.map((q) => q.alt))).toEqual([])
   })
 
+  it('leaves the close drawing empty so the script can pick a quiet one', () => {
+    const close = doc.querySelector<HTMLImageElement>('.night-art')
+    expect(close).not.toBeNull()
+    expect(close?.getAttribute('src')).toBeNull()
+    expect(close?.getAttribute('alt')).toBe('')
+  })
+
   it('ships every drawing it shows, square, with its size declared', () => {
-    const imgs = [...doc.querySelectorAll('img')]
-    expect(imgs.length).toBeGreaterThan(8)
+    const imgs = [...doc.querySelectorAll('img')].filter((img) => img.getAttribute('src'))
+    expect(imgs.length).toBeGreaterThanOrEqual(1)
     for (const img of imgs) {
       const sources = [img.getAttribute('src')!, ...(img.getAttribute('srcset') ?? '').split(',').map((s) => s.trim().split(' ')[0]!)].filter(Boolean)
       for (const src of sources) {
@@ -92,21 +91,31 @@ describe('the landing page', () => {
     expect(html).not.toMatch(/[—·]/)
   })
 
+  it('names the extra vowels on the try card, without coaching the sitting', () => {
+    expect(text(doc.querySelector('#try .lede'))).toBe(
+      'Thai has more vowels than English, and four tones. The keys write ε, ɔ, ə, ụ and the marks.',
+    )
+  })
+
   it('has one password form in the title panel, and a waitlist at the close', () => {
-    expect(doc.querySelectorAll('.cell[data-slot]')).toHaveLength(8)
     expect(doc.querySelector('.cell.title form[data-signin]')?.id).toBe('gate')
     expect(doc.querySelector('.cell.title form[data-signin] input[name="password"]')?.id).toBe('password')
     expect(doc.querySelector('[data-nav-sign]')?.getAttribute('href')).toBe('#gate')
+    expect(text(doc.querySelector('[data-nav-sign]'))).toBe('Log in')
     expect(doc.querySelectorAll('form[data-signin]')).toHaveLength(1)
     expect(doc.querySelector('.close form[data-signin]')).toBeNull()
     expect(doc.querySelector('#device')).toBeNull()
     expect(doc.querySelector('#tracks, a[href="#tracks"]')).toBeNull()
     expect(text(doc.querySelector('#close-h'))).toBe('Speak with Thainess.')
-    const waitlist = doc.querySelector('.close-copy a.btn')
-    expect(text(waitlist)).toBe('Join the waitlist')
-    expect(waitlist?.getAttribute('href')).toBe(
-      'mailto:luisfer.romero.calero@gmail.com?subject=riian%20g%C3%A8ng%20waitlist',
-    )
+    const waitlist = doc.querySelector('.close-copy form.waitlist')
+    expect(text(waitlist?.querySelector('[data-waitlist-open]'))).toBe('Join the waitlist')
+    expect(waitlist?.querySelector('input[name="email"]')).not.toBeNull()
+  })
+
+  it('keeps the English of the name under the wordmark', () => {
+    expect(text(doc.querySelector('.nav .wordmark-en'))).toBe('learn well')
+    expect(text(doc.querySelector('.nav .wordmark-rom'))).toBe('riian gèng')
+    expect(text(doc.querySelector('.nav .wordmark-th'))).toBe('เรียนเก่ง')
   })
 
   it('credits the romanization in the footer', () => {

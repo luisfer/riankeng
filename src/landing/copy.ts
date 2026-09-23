@@ -1,6 +1,11 @@
 /** The landing page's own words, where the markup is not static. Name the work. Do not coach. */
 export const landing = {
-  signIn: 'Sign in',
+  signIn: 'Log in',
+  waitlist: 'Join the waitlist',
+  waitlistJoin: 'Join',
+  waitlistJoined: 'Joined.',
+  waitlistThanks: "Thanks for joining the waitlist! We'll send you an email when this app is fully ready for you.",
+  waitlistNeed: 'Type an email.',
   open: 'Open the course',
   typePassword: 'Type the password.',
   wrong: 'Wrong password.',

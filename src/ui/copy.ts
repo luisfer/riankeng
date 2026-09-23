@@ -16,5 +16,9 @@ export const chrome = {
   toneThis: 'What tone is this syllable?',
   toneFirst: 'What tone is the first syllable?',
   emptySitting: 'This sitting is empty. Come back when a level has words.',
+  typeAnswer: 'Type your answer.',
+  typeIt: 'Type it.',
+  hearFirst: 'Hear it first.',
+  right: 'Right.',
   yoursEmpty: 'Clear a few cards. They will land here.',
 }

@@ -1,8 +1,9 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { COMIC_SLOTS, fillComic, pickComic, placeComic } from './comic'
+import { COMIC_SLOTS, fillClose, mountComic, pickComic, pickLayout, pickPhone, placeComic } from './comic'
 import { landing } from './copy'
-import { DEMO, TRY_ORDER } from './demo'
+import { bindWaitlist } from './waitlist'
+import { DEMO, QUIET, TRY_ORDER } from './demo'
 import { TRY_EVENT, TryCard } from './TryCard'
 
 // Old app URLs carried the route in the hash at /. The course lives at /learn/ now.
@@ -31,7 +32,7 @@ function markSignedIn() {
   html.dataset.session = 'in'
   delete html.dataset.gate
   if (navSign) {
-    navSign.textContent = landing.open
+    navSign.textContent = landing.signIn
     navSign.href = '/learn/'
     navSign.removeAttribute('aria-expanded')
     navSign.removeAttribute('aria-controls')
@@ -46,6 +47,9 @@ function openGate() {
   if (html.dataset.session === 'in') return
   html.dataset.gate = 'open'
   navSign?.setAttribute('aria-expanded', 'true')
+  for (const form of document.querySelectorAll<HTMLFormElement>('form[data-waitlist]')) {
+    if (!form.dataset.sent) delete form.dataset.open
+  }
   heroField?.focus()
 }
 
@@ -91,14 +95,24 @@ if (params.has('signin')) {
   history.replaceState(null, '', '/')
 }
 
-// The nav's Sign in opens the title-panel form.
+// The nav's Log in opens the title-panel form.
 navSign?.addEventListener('click', (e) => {
   if (html.dataset.session === 'in') return
   e.preventDefault()
   openGate()
 })
 
-fillComic(document, placeComic(pickComic(DEMO, COMIC_SLOTS)))
+for (const form of document.querySelectorAll<HTMLFormElement>('form[data-waitlist]')) {
+  bindWaitlist(form, () => {
+    delete html.dataset.gate
+    navSign?.setAttribute('aria-expanded', 'false')
+  })
+}
+
+const layout = pickLayout()
+mountComic(document, placeComic(pickComic(DEMO, COMIC_SLOTS)), layout, pickPhone())
+fillClose(document, pickComic(QUIET, 1)[0]!)
+document.documentElement.dataset.comic = 'in'
 
 // Every drawn panel is a card. Clicking one loads its phrase into the live card.
 for (const panel of document.querySelectorAll<HTMLAnchorElement>('a.panel[data-scene]')) {

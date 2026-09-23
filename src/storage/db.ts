@@ -1,6 +1,6 @@
 import { get, set } from 'idb-keyval'
 import type { LiveSession } from '@/engine/session'
-import { DEFAULT_SETTINGS, emptyDoc, type ProgressDoc } from './progress-schema'
+import { DEFAULT_SETTINGS, emptyDoc, sanitizeDoc, type ProgressDoc } from './progress-schema'
 import { aliasItems } from './import'
 
 const PROGRESS_KEY = 'riankeng:progress:v1'
@@ -52,8 +52,9 @@ export function isDoc(value: unknown): value is ProgressDoc {
   return v.app === 'riankeng' && v.version === 1
 }
 
-function normalizeDoc(doc: ProgressDoc): ProgressDoc {
-  return { ...doc, settings: { ...DEFAULT_SETTINGS, ...doc.settings }, items: aliasItems(doc.items ?? {}) }
+export function normalizeDoc(doc: ProgressDoc): ProgressDoc {
+  const clean = sanitizeDoc(doc)
+  return { ...clean, settings: { ...DEFAULT_SETTINGS, ...clean.settings }, items: aliasItems(clean.items ?? {}) }
 }
 
 export type LoadDocResult =
@@ -65,6 +66,10 @@ export type LoadDocResult =
 /** Timeout is never treated as an empty document. */
 export function resolveLoad(idb: Timed<ProgressDoc | undefined>, mirror: ProgressDoc | null): LoadDocResult {
   if (!idb.ok) return { status: 'timeout', doc: mirror }
+  if (isDoc(idb.value) && mirror) {
+    const stored = normalizeDoc(idb.value)
+    return { status: 'ready', doc: mirror.updatedAt > stored.updatedAt ? mirror : stored }
+  }
   if (isDoc(idb.value)) return { status: 'ready', doc: normalizeDoc(idb.value) }
   if (mirror) return { status: 'ready', doc: mirror }
   return { status: 'empty', doc: emptyDoc() }

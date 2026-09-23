@@ -24,8 +24,8 @@ export function trackTally(statuses: LevelStatus[], track: TrackId): { done: num
  * The level you are on. hereLevel is the first unlocked level still open, so
  * every level before it is finished: it is the highest you have reached.
  */
-export function trackPlace(statuses: LevelStatus[], levels: LevelMeta[]): { n: number; title: string; done: boolean } {
-  const here = hereLevel(statuses)
+export function trackPlace(statuses: LevelStatus[], levels: LevelMeta[], track: TrackId = 'voice'): { n: number; title: string; done: boolean } {
+  const here = hereLevel(statuses, track)
   const n = here ?? Math.max(0, levels.length - 1)
   return { n, title: levels[n]?.title ?? '', done: here === null }
 }
@@ -63,7 +63,7 @@ function TrackRow(props: {
   levels: LevelMeta[]
   onOpen: () => void
 }) {
-  const place = trackPlace(props.statuses, props.levels)
+  const place = trackPlace(props.statuses, props.levels, props.track)
   const here = props.statuses[place.n]
   const levelDone = here ? unlockCount(here, props.track) : 0
   const levelTotal = here?.total ?? 0

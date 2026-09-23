@@ -11,10 +11,12 @@ import {
   markMissMove,
   markMissStay,
   markScored,
+  normalizeSession,
   pauseSession,
   requeueCurrent,
   REVIEW_TAIL,
   SESSION_SIZE,
+  sittingModality,
   startReviewSession,
   startSession,
 } from '../src/engine/session'
@@ -56,6 +58,29 @@ describe('session transitions', () => {
     expect(missed.answered).toBe(1)
     const next = requeueCurrent(missed)
     expect(next.queue.at(-1)?.id).toBe(id)
+  })
+
+  it('can check a missed card when it comes back', () => {
+    const s = startSession(emptyDoc(), 1, 0, 'voice')
+    const id = currentItem(s)!.id
+    const missed = markMissMove(markScored(s, { ok: false, text: 'No.' }))
+    const back = requeueCurrent(missed)
+    expect(currentItem(back)!.id).not.toBe(id)
+    const again = back.queue.find((q) => q.id === id)
+    expect(again?.scored).toBe(false)
+    const current = { ...back, cursor: back.queue.findIndex((q) => q.id === id) }
+    expect(alreadyScored(current)).toBe(false)
+    const scored = markScored(current, { ok: true, text: 'Right.' })
+    expect(scored.pending?.ok).toBe(true)
+  })
+
+  it('afterMeet keeps the cursor on a lone tested card', () => {
+    const s = startSession(emptyDoc(), 1, 0, 'voice')
+    const one = { ...s, queue: [{ ...currentItem(s)!, meet: true }], cursor: 0 }
+    const next = afterMeet(one)
+    expect(next.cursor).toBe(0)
+    expect(currentItem(next)?.meet).toBe(false)
+    expect(currentItem(next)?.id).toBe(currentItem(s)!.id)
   })
 
   it('pick miss waits, then requeues on Next', () => {
@@ -142,6 +167,26 @@ describe('review sitting', () => {
   })
 })
 
+describe('requeue after a Check', () => {
+  it('lets the missed card be checked again', () => {
+    const s = startSession(emptyDoc(), 1, 0, 'voice')
+    const missed = markMissMove(markScored(s, { ok: false, text: 'No.' }))
+    const back = requeueCurrent(missed)
+    expect(alreadyScored(back)).toBe(false)
+    expect(currentItem(back)!.scored).toBeFalsy()
+    const again = markScored(back, { ok: true, text: 'Right.' })
+    expect(again.pending?.ok).toBe(true)
+  })
+
+  it('clears a stale scored flag when pending is gone', () => {
+    const s = startSession(emptyDoc(), 1, 0, 'voice')
+    const stuck = { ...s, queue: s.queue.map((q, i) => (i === 0 ? { ...q, scored: true } : q)) }
+    const next = normalizeSession(stuck)
+    expect(currentItem(next)!.scored).toBe(false)
+    expect(alreadyScored(next)).toBe(false)
+  })
+})
+
 describe('check once', () => {
   it('ignores a second Check and Pause after a correct Check advances', () => {
     const s = startSession(emptyDoc(), 1, 0, 'voice')
@@ -179,6 +224,16 @@ describe('meet then test', () => {
     expect(next.queue.at(-1)?.id).toBe(first.id)
     expect(next.queue.at(-1)?.meet).toBe(false)
     expect(next.answered).toBe(0)
+    expect(next.cursor).toBe(0)
+  })
+
+  it('keeps the cursor on a last-in-queue Look', () => {
+    const s = startSession(emptyDoc(), 1, 0, 'voice')
+    const last = { ...s, queue: [currentItem(s)!], cursor: 0 }
+    const next = afterMeet(last)
+    expect(next.cursor).toBe(0)
+    expect(currentItem(next)?.meet).toBe(false)
+    expect(next.queue).toHaveLength(1)
   })
 })
 
@@ -196,6 +251,36 @@ describe('startSession leftover', () => {
     expect(s.queue.length).toBeLessThanOrEqual(doc.settings.newPerSession)
   })
 
+  it('rotates leftovers from that level by oldest lastSeen', () => {
+    const now = 1_700_000_000_000
+    const doc = emptyDoc(now)
+    const level0 = entriesForLevel(0, 'voice')
+    for (const [i, e] of level0.entries()) {
+      doc.items[e.id] = {
+        ...newItemProgress(e.id),
+        reps: 2,
+        stage: 1,
+        lastSeen: now - (level0.length - i),
+        due: now + 86_400_000,
+      }
+    }
+    const s = startSession(doc, now, 0, 'voice')
+    expect(s.queue).toHaveLength(SESSION_SIZE)
+    expect(s.queue.map((q) => q.id)).toEqual(level0.slice(0, SESSION_SIZE).map((e) => e.id))
+  })
+
+  it('puts due reviews before new cards', () => {
+    const now = 1_700_000_000_000
+    const doc = emptyDoc(now)
+    const level0 = entriesForLevel(0, 'voice')
+    const due = level0.slice(0, 4)
+    for (const e of due) doc.items[e.id] = dueItem(e.id, now - e.id.length)
+    const s = startSession(doc, now, 0, 'voice')
+    const dueIdsOnQ = s.queue.filter((q) => due.some((e) => e.id === q.id)).map((q) => q.id)
+    expect(dueIdsOnQ.length).toBe(4)
+    expect(s.queue.slice(0, 4).every((q) => due.some((e) => e.id === q.id))).toBe(true)
+  })
+
   it('reserves earlier dues instead of stuffing leftovers', () => {
     const now = 1_700_000_000_000
     const doc = emptyDoc(now)
@@ -204,6 +289,15 @@ describe('startSession leftover', () => {
     const s = startSession(doc, now, 4, 'voice')
     const earlyIds = new Set(early.map((e) => e.id))
     expect(s.queue.filter((q) => earlyIds.has(q.id)).length).toBe(REVIEW_TAIL)
+  })
+})
+
+describe('sittingModality', () => {
+  it('renders listen and tone as writing when the card cannot be heard', () => {
+    const s = startSession(emptyDoc(), 1, 0, 'voice')
+    expect(sittingModality({ ...currentItem(s)!, modality: 'listen' }, false)).toBe('th-en')
+    expect(sittingModality({ ...currentItem(s)!, modality: 'tone' }, false)).toBe('th-en')
+    expect(sittingModality({ ...currentItem(s)!, modality: 'tone' }, true)).toBe('tone')
   })
 })
 

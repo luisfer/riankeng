@@ -13,13 +13,14 @@ import {
   markMissStay,
   markScored,
   requeueCurrent,
+  sittingModality,
   type Hold,
   type LiveSession,
 } from '@/engine/session'
 import { applyAttempt, applyMeet, type ItemProgress } from '@/engine/srs'
 import { deviceId } from '@/storage/device'
 import type { ProgressDoc } from '@/storage/progress-schema'
-import { entryOrThrow, fromVoiceKnown, pairRoms, pickChoices, sittingSense } from '@/engine/scheduler'
+import { entryOrThrow, fromVoiceKnown, pairRoms, pickChoices, sittingSense, stampOpened } from '@/engine/scheduler'
 import { entryTrack } from '@content/index'
 import { judgeTonePick, toneBareShow } from '@/engine/tone-step'
 import { prefetchClip } from '@/audio/clips'
@@ -45,6 +46,7 @@ export function SessionView(props: {
   const item = currentItem(props.session)
   const [answer, setAnswer] = useState('')
   const [ack, setAck] = useState<{ ok: boolean; text: string } | null>(null)
+  const [hint, setHint] = useState<string | null>(null)
   const [heard, setHeard] = useState(false)
   const [toneStep, setToneStep] = useState(0)
   const [, setVoiceTick] = useState(0)
@@ -53,13 +55,14 @@ export function SessionView(props: {
   const track = props.session.track ?? 'voice'
   const script = item ? entryTrack(entryOrThrow(item.id)) === 'script' : track === 'script'
   const meeting = Boolean(item?.meet && !props.session.hold)
-  const waitingNext = Boolean(ack && (ack.ok || !props.session.hold))
+  const waitingNext = Boolean(props.session.pending && (props.session.pending.ok || !props.session.hold))
   const canAdvance = meeting || waitingNext
 
   useEffect(() => {
     attemptedRef.current = Boolean(item?.scored || props.session.pending)
     setAnswer('')
     setAck(props.session.pending ?? null)
+    setHint(null)
     setHeard(false)
     setToneStep(0)
   }, [item?.id, item?.modality, item?.meet, item?.scored, props.session.pending])
@@ -112,7 +115,7 @@ export function SessionView(props: {
     if (item.meet && !hold && !ack) {
       const now = Date.now()
       const prev = props.doc.items[entry.id] ?? ({ id: entry.id, stage: 0, due: 0, reps: 0, lapses: 0, lastSeen: 0, days: [], history: [] } satisfies ItemProgress)
-      props.onDoc({ ...props.doc, items: { ...props.doc.items, [entry.id]: applyMeet(prev, now) } })
+      props.onDoc(stampOpened({ ...props.doc, items: { ...props.doc.items, [entry.id]: applyMeet(prev, now) } }))
       props.onSession(afterMeet(props.session))
       return
     }
@@ -130,7 +133,18 @@ export function SessionView(props: {
     attemptedRef.current = true
     const now = Date.now()
     const prev = props.doc.items[entry.id] ?? ({ id: entry.id, stage: 0, due: 0, reps: 0, lapses: 0, lastSeen: 0, days: [], history: [] } satisfies ItemProgress)
-    props.onDoc({ ...props.doc, items: { ...props.doc.items, [entry.id]: applyAttempt(prev, { t: now, ok, v, m: item.modality, d: deviceId() }) } })
+    const practice = !ok && Boolean(item.penalized)
+    const canHearNow = !props.doc.settings.silent && canHearThai(entry.id)
+    const modality = sittingModality(item, canHearNow)
+    props.onDoc(
+      stampOpened({
+        ...props.doc,
+        items: {
+          ...props.doc.items,
+          [entry.id]: applyAttempt(prev, { t: now, ok, v, m: modality, d: deviceId() }, { practice }),
+        },
+      }),
+    )
     let next = markScored(props.session, { ok, text })
     if (miss === 'move') next = markMissMove(next)
     if (miss === 'stay' && holdNext) next = markMissStay(next, holdNext)
@@ -147,12 +161,16 @@ export function SessionView(props: {
       return
     }
     const g = gradeThai(entry.rom, answer)
+    if (g.verdict === 'empty' || g.verdict === 'invalid' || /[\u0E00-\u0E7F]/.test(answer)) {
+      setHint(g.verdict === 'empty' || !answer.trim() ? chrome.typeAnswer : g.verdict === 'invalid' ? g.message : chrome.writeRom)
+      return
+    }
     if (g.correct) {
-      noteAttempt(true, g.verdict, 'Right.')
+      noteAttempt(true, g.verdict, chrome.right)
     } else if (g.verdict === 'tone' || g.verdict === 'length') {
       noteAttempt(false, g.verdict, g.message, 'move')
     } else {
-      if (noteAttempt(false, g.verdict === 'empty' || g.verdict === 'invalid' ? g.verdict : 'wrong', g.message, 'stay', { kind: 'retype-th', id: entry.id, target: g.matchedTarget })) {
+      if (noteAttempt(false, 'wrong', g.message, 'stay', { kind: 'retype-th', id: entry.id, target: g.matchedTarget })) {
         setAnswer('')
       }
     }
@@ -161,7 +179,11 @@ export function SessionView(props: {
   const submitEn = () => {
     if (ack || alreadyScored(props.session)) return
     const g = gradeEnglish(entry.en, answer)
-    if (g.correct) noteAttempt(true, 'en-ok', 'Right.')
+    if (!answer.trim() || /[\u0E00-\u0E7F]/.test(answer)) {
+      setHint(chrome.typeAnswer)
+      return
+    }
+    if (g.correct) noteAttempt(true, 'en-ok', chrome.right)
     else noteAttempt(false, 'en-wrong', g.message, 'move')
   }
 
@@ -180,7 +202,7 @@ export function SessionView(props: {
       return
     }
     if (judged.kind === 'right') {
-      noteAttempt(true, 'exact', 'Right.')
+      noteAttempt(true, 'exact', chrome.right)
       return
     }
     noteAttempt(false, 'tone', judged.line, 'move')
@@ -198,14 +220,15 @@ export function SessionView(props: {
     noteAttempt(ok, ok ? 'exact' : 'wrong', ok ? 'Right.' : `That one is ${showThai(entry.thai)}.`, ok ? undefined : 'move')
   }
 
-  const writeRom =
-    item.modality === 'listen' || (script && (item.modality === 'th-en' || item.modality === 'en-th'))
-  const voiceEn = !script && item.modality === 'th-en'
   const hearable = !props.doc.settings.silent && canHearThai(entry.id)
-  const pairing = item.modality === 'listen' && Boolean(entry.minimalPairOf?.length) && !hold && !meeting
-  const listenLocked = item.modality === 'listen' && !heard && !hold && !meeting && hearable
-  const multiTone = item.modality === 'tone' && analyseRom(entry.rom).nuclei.length > 1
-  const sense = meeting ? null : sittingSense(entry, item.modality)
+  const modality = sittingModality(item, hearable)
+  const writeRom =
+    modality === 'listen' || (script && (modality === 'th-en' || modality === 'en-th'))
+  const voiceEn = !script && modality === 'th-en'
+  const pairing = modality === 'listen' && Boolean(entry.minimalPairOf?.length) && !hold && !meeting
+  const listenLocked = modality === 'listen' && !heard && !hold && !meeting && hearable
+  const multiTone = modality === 'tone' && analyseRom(entry.rom).nuclei.length > 1
+  const sense = meeting ? null : sittingSense(entry, modality)
   const fromVoice = script && fromVoiceKnown(props.doc, entry)
   const right = Boolean(ack?.ok)
 
@@ -214,17 +237,17 @@ export function SessionView(props: {
       ? chrome.meet
       : hold?.kind === 'retype-th'
       ? chrome.retype
-      : item.modality === 'pick'
+      : modality === 'pick'
         ? chrome.pick
         : pairing && heard && hearable
           ? chrome.hearWhich
-        : item.modality === 'en-th'
+        : modality === 'en-th'
           ? chrome.writeRom
-          : item.modality === 'th-en'
+          : modality === 'th-en'
             ? script
               ? chrome.writeRom
               : chrome.writeMeaning
-            : item.modality === 'listen'
+            : modality === 'listen'
               ? chrome.writeHeard
               : multiTone
                 ? chrome.toneThis
@@ -233,9 +256,9 @@ export function SessionView(props: {
   /** The other half of the card, shown in lacquer once the answer is right. */
   const pairLine = (() => {
     if (!right) return null
-    if (item.modality === 'th-en') return cleanGloss(entry.en[0] ?? '')
-    if (item.modality === 'en-th' || item.modality === 'listen' || item.modality === 'tone') return entry.rom
-    if (item.modality === 'pick') return showThai(entry.thai)
+    if (modality === 'th-en') return cleanGloss(entry.en[0] ?? '')
+    if (modality === 'en-th' || modality === 'listen' || modality === 'tone') return entry.rom
+    if (modality === 'pick') return showThai(entry.thai)
     return null
   })()
 
@@ -265,17 +288,17 @@ export function SessionView(props: {
         </p>
       )
     }
-    if (item.modality === 'pick') {
+    if (modality === 'pick') {
       return <p className="prompt-en">{pickPrompt(entry)}</p>
     }
-    if (item.modality === 'listen') return <p className="prompt-listen" />
-    if (item.modality === 'tone') {
+    if (modality === 'listen') return <p className="prompt-listen" />
+    if (modality === 'tone') {
       const shown = multiTone && !ack ? toneBareShow(entry.rom, toneStep) : toneBareShow(entry.rom)
       return <p className="prompt-rom rom">{shown}</p>
     }
-    if (item.modality === 'en-th') return <p className="prompt-en">{cleanGloss(entry.en[0] ?? '')}</p>
-    if (item.modality === 'th-en' && script) return <p className="prompt-thai thai">{showThai(entry.thai)}</p>
-    if (item.modality === 'th-en') {
+    if (modality === 'en-th') return <p className="prompt-en">{cleanGloss(entry.en[0] ?? '')}</p>
+    if (modality === 'th-en' && script) return <p className="prompt-thai thai">{showThai(entry.thai)}</p>
+    if (modality === 'th-en') {
       return (
         <p className="prompt-rom rom">
           {entry.rom}
@@ -287,12 +310,12 @@ export function SessionView(props: {
   })()
 
   const onPaste = () => {
-    if (!ack) setAck({ ok: false, text: 'Type it.' })
+    if (!ack) setHint(chrome.typeIt)
   }
 
   const trySubmitThai = () => {
     if (listenLocked) {
-      setAck({ ok: false, text: 'Hear it first.' })
+      setHint(chrome.hearFirst)
       return
     }
     if (!hold && alreadyScored(props.session)) return
@@ -301,7 +324,7 @@ export function SessionView(props: {
 
   const trySubmitEn = () => {
     if (listenLocked) {
-      setAck({ ok: false, text: 'Hear it first.' })
+      setHint(chrome.hearFirst)
       return
     }
     if (alreadyScored(props.session)) return
@@ -330,7 +353,7 @@ export function SessionView(props: {
         </button>
       ))}
     </div>
-  ) : item.modality === 'pick' && !hold ? (
+  ) : modality === 'pick' && !hold ? (
     <div className="glyph-picks">
       {pickChoices(entry).map((thai, i) => (
         <button key={`${thai}-${i}`} type="button" className="glyph-pick thai" onClick={() => submitPick(thai)}>
@@ -338,7 +361,7 @@ export function SessionView(props: {
         </button>
       ))}
     </div>
-  ) : item.modality === 'tone' && !hold ? (
+  ) : modality === 'tone' && !hold ? (
     <div className="tone-picks">
       {TONE_ORDER.map((t) => (
         <button key={t} type="button" className="tone-word" onClick={() => submitTone(t)}>
@@ -379,14 +402,14 @@ export function SessionView(props: {
       className="answer-form"
       onSubmit={(e) => {
         e.preventDefault()
-        if (writeRom || item.modality === 'en-th' || hold?.kind === 'retype-th') trySubmitThai()
+        if (writeRom || modality === 'en-th' || hold?.kind === 'retype-th') trySubmitThai()
         else trySubmitEn()
       }}
     >
       <RomanInput
         value={answer}
         onChange={setAnswer}
-        onSubmit={writeRom || item.modality === 'en-th' || hold?.kind === 'retype-th' ? trySubmitThai : trySubmitEn}
+        onSubmit={writeRom || modality === 'en-th' || hold?.kind === 'retype-th' ? trySubmitThai : trySubmitEn}
         onPasteBlock={onPaste}
         autoFocus
       />
@@ -406,7 +429,7 @@ export function SessionView(props: {
                   current={listenLocked}
                   onClick={() => {
                     setHeard(true)
-                    if (ack?.text === 'Hear it first.') setAck(null)
+                    if (hint === chrome.hearFirst) setHint(null)
                     void speakThai(entry.thai, entry.id, props.doc.settings.audioRate, { gesture: true })
                   }}
                 >
@@ -415,7 +438,7 @@ export function SessionView(props: {
                 <TextBtn
                   onClick={() => {
                     setHeard(true)
-                    if (ack?.text === 'Hear it first.') setAck(null)
+                    setHint(null)
                     void speakSlower(entry.thai, entry.id, props.doc.settings.audioRate, { gesture: true })
                   }}
                 >
@@ -429,19 +452,16 @@ export function SessionView(props: {
         <div className={`session-stimulus${right ? ' right' : ''}`}>
           {stimulus}
           {pairLine && (
-            <p className={`pair-line${item.modality === 'pick' ? ' thai' : item.modality === 'th-en' ? '' : ' rom'}`}>
+            <p className={`pair-line${modality === 'pick' ? ' thai' : modality === 'th-en' ? '' : ' rom'}`}>
               {pairLine}
             </p>
           )}
           {sense && !right && (
             <p className="sense-line">{sense}</p>
           )}
-          {item.modality === 'listen' && !hearable && !meeting && (
-            <p className="sense-line">No Thai voice on this device.</p>
-          )}
         </div>
-        <p className={`feedback session-feedback${ack ? (ack.ok ? ' ok' : ' miss') : ''}`} role="status">
-          {ack?.text ?? ''}
+        <p className={`feedback session-feedback${ack ? (ack.ok ? ' ok' : ' miss') : hint ? ' miss' : ''}`} role="status">
+          {hint ?? ack?.text ?? ''}
         </p>
         <div className="session-desk">{desk}</div>
       </div>

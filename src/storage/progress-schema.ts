@@ -1,5 +1,5 @@
 import type { TrackId } from '@content/types'
-import type { ItemProgress, Modality } from '@/engine/srs'
+import type { Attempt, ItemProgress, Modality } from '@/engine/srs'
 
 export const PROGRESS_VERSION = 1 as const
 
@@ -54,6 +54,50 @@ export interface ProgressDoc {
   settings: Settings
   items: Record<string, ItemProgress>
   sessions: SessionLog[]
+  /** Highest level that has opened on each track. A miss cannot lower this. */
+  opened?: { voice: number; script: number }
+}
+
+function isIsoDay(value: unknown): value is string {
+  return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value)
+}
+
+export function sanitizeItem(raw: unknown, fallbackId: string): ItemProgress | null {
+  if (!raw || typeof raw !== 'object') return null
+  const r = raw as Partial<ItemProgress>
+  const id = typeof r.id === 'string' && r.id ? r.id : fallbackId
+  const stage = Number.isFinite(r.stage) ? Math.max(0, Math.min(6, Math.trunc(r.stage as number))) : 0
+  const due = Number.isFinite(r.due) ? Number(r.due) : 0
+  const reps = Number.isFinite(r.reps) ? Math.max(0, Math.trunc(r.reps as number)) : 0
+  const lapses = Number.isFinite(r.lapses) ? Math.max(0, Math.trunc(r.lapses as number)) : 0
+  const lastSeen = Number.isFinite(r.lastSeen) ? Number(r.lastSeen) : 0
+  const days = Array.isArray(r.days) ? r.days.filter(isIsoDay) : []
+  const history = Array.isArray(r.history)
+    ? r.history.filter((h): h is Attempt => {
+        if (!h || typeof h !== 'object') return false
+        return typeof h.t === 'number' && typeof h.ok === 'boolean' && typeof h.v === 'string' && typeof h.m === 'string'
+      })
+    : []
+  return { id, stage, due, reps, lapses, lastSeen, days, history }
+}
+
+export function sanitizeDoc(doc: ProgressDoc): ProgressDoc {
+  const items: Record<string, ItemProgress> = {}
+  for (const [id, raw] of Object.entries(doc.items ?? {})) {
+    const item = sanitizeItem(raw, id)
+    if (item) items[item.id] = item
+  }
+  const opened = doc.opened
+  return {
+    ...doc,
+    settings: { ...DEFAULT_SETTINGS, ...doc.settings },
+    items,
+    sessions: Array.isArray(doc.sessions) ? doc.sessions : [],
+    opened: {
+      voice: Number.isFinite(opened?.voice) ? Math.max(0, Math.trunc(opened!.voice)) : 0,
+      script: Number.isFinite(opened?.script) ? Math.max(0, Math.trunc(opened!.script)) : 0,
+    },
+  }
 }
 
 export function emptyDoc(now = Date.now()): ProgressDoc {

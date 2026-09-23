@@ -102,13 +102,15 @@ export function TryCard(props: { deck: DemoCard[] }) {
         )}
       </div>
       <div className="try-desk">
-        <p className="prompt">
-          {look ? chrome.meet : chrome.writeRom}
-          <span className="prompt-tools">
-            <TextBtn onClick={() => play(1)}>{landing.hear}</TextBtn>
-            <TextBtn onClick={() => play(0.75)}>{landing.slower}</TextBtn>
-          </span>
-        </p>
+        {!right && (
+          <p className="prompt">
+            {look ? null : chrome.writeRom}
+            <span className="prompt-tools">
+              <TextBtn onClick={() => play(1)}>{landing.hear}</TextBtn>
+              <TextBtn onClick={() => play(0.75)}>{landing.slower}</TextBtn>
+            </span>
+          </p>
+        )}
         {look && (
           <p className="try-rom rom" lang="th-Latn">
             {card.rom}
@@ -122,8 +124,12 @@ export function TryCard(props: { deck: DemoCard[] }) {
           </div>
         ) : right ? (
           <div className="try-pair">
-            <p className="pair-line rom" lang="th-Latn">
-              {card.rom}
+            <p className="pair-line rom">
+              <span lang="th-Latn">{card.rom}</span>
+              <span className="prompt-tools">
+                <TextBtn onClick={() => play(1)}>{landing.hear}</TextBtn>
+                <TextBtn onClick={() => play(0.75)}>{landing.slower}</TextBtn>
+              </span>
             </p>
             <p className="pair-line thai" lang="th">
               {card.thai}
@@ -155,7 +161,7 @@ export function TryCard(props: { deck: DemoCard[] }) {
         </p>
         {right && (
           <div className="try-next">
-            <TextBtn onClick={next}>{landing.next}</TextBtn>
+            <Commit onClick={next}>{landing.next}</Commit>
           </div>
         )}
       </div>

@@ -89,6 +89,7 @@ export function RomanInput(props: {
 
   const onKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
+      if (e.repeat || e.nativeEvent.isComposing || e.keyCode === 229) return
       e.preventDefault()
       setPop(null)
       props.onSubmit()

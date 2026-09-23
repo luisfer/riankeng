@@ -74,7 +74,11 @@ export function mergeItem(have: ItemProgress | undefined, incoming: ItemProgress
   if (!have) return { ...incoming, days: [...incoming.days] }
 
   const known = new Set(have.history.map(attemptKey))
-  const fresh = unionHistory([], incoming.history).filter((h) => !known.has(attemptKey(h)))
+  let fresh = unionHistory([], incoming.history).filter((h) => !known.has(attemptKey(h)))
+  if (have.reps > have.history.length && have.history.length > 0) {
+    const oldestKept = have.history.reduce((t, h) => Math.min(t, h.t), Infinity)
+    fresh = fresh.filter((h) => h.t >= oldestKept)
+  }
 
   const guarded = (base: ItemProgress): ItemProgress => ({
     ...base,

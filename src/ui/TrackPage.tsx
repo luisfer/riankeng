@@ -11,7 +11,7 @@ export function TrackPage(props: {
   onOpen: (track: TrackId, n: number) => void
 }) {
   const script = props.track === 'script'
-  const here = hereLevel(props.statuses)
+  const here = hereLevel(props.statuses, props.track)
   return (
     <main className="page journey">
       <section className="track-block">

@@ -29,6 +29,10 @@ describe('analyseRom', () => {
   it('accepts alias glyphs', () => {
     expect(analyseRom('pɛɛng').skeleton).toBe('pεεng')
     expect(analyseRom('sʉ́ʉ').skeleton).toBe(analyseRom('sụ́ụ').skeleton)
+    expect(analyseRom('lüüm').skeleton).toBe(analyseRom('lụụm').skeleton)
+  })
+  it('treats -iw as -iu', () => {
+    expect(analyseRom('hǐw').skeleton).toBe(analyseRom('hǐu').skeleton)
   })
   it('flags two tone marks in one syllable', () => {
     expect(analyseRom('kâáo').valid).toBe(false)
@@ -82,6 +86,9 @@ describe('gradeThai', () => {
     expect(expandAlternatives('sà-wàt-dii kráp/kâ')).toEqual(['sà-wàt-dii kráp', 'sà-wàt-dii kâ'])
     expect(gradeThai('sà-wàt-dii kráp/kâ', 'sawàtdii kâ').verdict).toBe('exact')
     expect(gradeThai('sà-wàt-dii kráp/kâ', 'sawàtdii kráp').verdict).toBe('exact')
+    expect(gradeThai('sà-wàt-dii kráp/kâ', 'sà-wàt-dii kráp/kâ').verdict).toBe('exact')
+    expect(gradeThai('lụụm', 'lüüm').verdict).toBe('exact')
+    expect(gradeThai('hǐu', 'hǐw').verdict).toBe('exact')
   })
   it('syllable break mismatch', () => {
     expect(gradeThai('sà-àat', 'saàat').verdict).toBe('tone')
@@ -93,6 +100,8 @@ describe('gradeThai', () => {
     // but a final short a keeps its tone, and other tones still count
     expect(gradeThai('ká', 'ka').verdict).toBe('tone')
     expect(gradeThai('sà-wàt-dii', 'sáwàtdii').verdict).toBe('tone')
+    expect(gradeThai('sà-wàt-dii', 'sawatdii').verdict).toBe('tone')
+    expect(gradeThai('pàt tai', 'pat tai').verdict).toBe('tone')
   })
   it('displayRom is NFC', () => {
     expect(displayRom('ma\u0302i')).toBe('mâi')

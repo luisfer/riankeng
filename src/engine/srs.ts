@@ -71,12 +71,20 @@ export function isoDay(t: number): string {
 const HISTORY_CAP = 40
 
 /** Apply one attempt and return the updated progress (pure). */
-export function applyAttempt(p: ItemProgress, attempt: Attempt): ItemProgress {
+export function applyAttempt(
+  p: ItemProgress,
+  attempt: Attempt,
+  opts?: { practice?: boolean },
+): ItemProgress {
   const history = [...p.history, attempt].slice(-HISTORY_CAP)
   if (attempt.ok) {
-    const stage = Math.min(MAX_STAGE, p.stage + 1)
     const day = isoDay(attempt.t)
     const days = p.days.includes(day) ? p.days : [...p.days, day]
+    const dueNow = p.due === 0 || p.due <= attempt.t
+    if (!dueNow) {
+      return { ...p, reps: p.reps + 1, lastSeen: attempt.t, days, history }
+    }
+    const stage = Math.min(MAX_STAGE, p.stage + 1)
     return {
       ...p,
       stage,
@@ -86,6 +94,9 @@ export function applyAttempt(p: ItemProgress, attempt: Attempt): ItemProgress {
       days,
       history,
     }
+  }
+  if (opts?.practice) {
+    return { ...p, reps: p.reps + 1, lastSeen: attempt.t, history }
   }
   const slip = attempt.v === 'tone' || attempt.v === 'length'
   return {

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { allLevelStatus, reviewEntries, unlockCount } from '@/engine/scheduler'
+import { allLevelStatus, reviewEntries, stampOpened, unlockCount, withOpened } from '@/engine/scheduler'
 import {
   canContinue,
   canResumeReview,
@@ -18,6 +18,7 @@ import {
   loadDoc,
   loadSession,
   MIRROR_KEY,
+  normalizeDoc,
   sameDocPayload,
   saveDoc,
   saveSession,
@@ -86,7 +87,7 @@ export function App() {
         setLoadState('failed')
         return
       }
-      const nextDoc = result.doc ?? emptyDoc()
+      const nextDoc = stampOpened(result.doc ?? emptyDoc())
       setDoc(nextDoc)
       hydratedSnapshot.current = nextDoc
       persistOk.current = true
@@ -118,7 +119,11 @@ export function App() {
     if (loadState !== 'ready' || !mirror || mirrorState !== 'granted') return
     const timer = setTimeout(() => {
       void (async () => {
-        if (await mirrorFile.write(mirror, exportJson(doc))) {
+        const file = await mirrorFile.read(mirror)
+        if (file && Object.keys(doc.items).length === 0 && file.items.length > 0) return
+        const payload = file ? mergeWork(doc, file) : doc
+        if (file && !sameDocPayload(payload, doc)) setDoc(stampDoc(payload))
+        if (await mirrorFile.write(mirror, exportJson(payload))) {
           const t = Date.now()
           setMirrorWrittenAt(t)
           setMirrorAt(t)
@@ -171,7 +176,7 @@ export function App() {
       if (ev.key !== MIRROR_KEY || !ev.newValue) return
       try {
         const parsed = JSON.parse(ev.newValue) as ProgressDoc
-        if (parsed.app === 'riankeng') applyRemote(parsed)
+        if (parsed.app === 'riankeng') applyRemote(normalizeDoc(parsed))
       } catch {
         /* ignore */
       }
@@ -193,6 +198,7 @@ export function App() {
   const beginLevel = (n: number, track: TrackId) => {
     const list = track === 'script' ? scriptStatuses : voiceStatuses
     if (list[n] && !list[n].unlocked) return
+    setDoc((d) => stampDoc(withOpened(d, track, n)))
     const next = startSession(doc, Date.now(), n, track)
     setSession(next)
     go(next.queue.length ? { name: 'session' } : { name: 'journey' })
@@ -204,7 +210,7 @@ export function App() {
     go(next.queue.length ? { name: 'session' } : { name: 'review' })
   }
 
-  const commitDoc = (next: ProgressDoc) => setDoc(stampDoc(next))
+  const commitDoc = (next: ProgressDoc) => setDoc(stampDoc(stampOpened(next)))
 
   const onSession = (s: LiveSession) => {
     if (isFinished(s) && s.answered > 0) {
@@ -249,11 +255,18 @@ export function App() {
     },
     onAuthorise: async () => {
       if (!mirror) return
-      setMirrorState(await mirrorFile.permission(mirror, true))
+      const state = await mirrorFile.permission(mirror, true)
+      setMirrorState(state)
+      if (state !== 'granted') return
+      const file = await mirrorFile.read(mirror)
+      if (file) setDoc((d) => stampDoc(mergeWork(d, file)))
     },
   }
 
   const eraseDevice = () => {
+    void mirrorFile.forget()
+    setMirror(null)
+    setMirrorState(mirrorFile.supported() ? 'off' : 'unsupported')
     const next = resetDoc()
     persistOk.current = true
     setLoadState('ready')

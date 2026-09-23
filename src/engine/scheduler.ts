@@ -57,12 +57,38 @@ export function levelStatus(doc: ProgressDoc, n: number, now = Date.now(), track
   }
 }
 
+export function openedFloor(doc: ProgressDoc, track: TrackId): number {
+  return doc.opened?.[track] ?? 0
+}
+
+export function withOpened(doc: ProgressDoc, track: TrackId, n: number): ProgressDoc {
+  const have = openedFloor(doc, track)
+  if (n <= have) return doc
+  return {
+    ...doc,
+    opened: { voice: doc.opened?.voice ?? 0, script: doc.opened?.script ?? 0, [track]: n },
+  }
+}
+
+/** Remember every level that has opened, so a later miss cannot lock it again. */
+export function stampOpened(doc: ProgressDoc, now = Date.now()): ProgressDoc {
+  let next = doc
+  for (const track of ['voice', 'script'] as const) {
+    for (const lvl of levelsFor(track)) {
+      const s = levelStatus(doc, lvl.n, now, track)
+      if (scriptLevelOpened(s, track)) next = withOpened(next, track, lvl.n + 1)
+    }
+  }
+  return next
+}
+
 export function allLevelStatus(doc: ProgressDoc, now = Date.now(), track: TrackId = 'voice'): LevelStatus[] {
   const out: LevelStatus[] = []
   let prevComplete = true
+  const floor = openedFloor(doc, track)
   for (const lvl of levelsFor(track)) {
     const s = levelStatus(doc, lvl.n, now, track)
-    s.unlocked = prevComplete
+    s.unlocked = lvl.n === 0 || lvl.n <= floor || prevComplete
     out.push(s)
     prevComplete = scriptLevelOpened(s, track)
   }
@@ -79,11 +105,13 @@ export function currentLevel(doc: ProgressDoc, now = Date.now(), track: TrackId 
   return levelsFor(track).length - 1
 }
 
-/** First unlocked, incomplete level that has cards. Null if the track is finished. */
-export function hereLevel(statuses: LevelStatus[]): number | null {
+/** First unlocked level that is not yet finished. Script finishes on passed, Voice on mastery. */
+export function hereLevel(statuses: LevelStatus[], track: TrackId = 'voice'): number | null {
   for (const s of statuses) {
     if (s.total === 0) continue
-    if (s.unlocked && !s.complete) return s.n
+    if (!s.unlocked) continue
+    const done = track === 'script' ? s.passed >= s.total : s.complete
+    if (!done) return s.n
   }
   return null
 }
@@ -262,7 +290,7 @@ export function chooseModality(entry: Entry, p: ItemProgress, salt: string, canH
   else if (r < 0.7) next = 'en-th'
   else if (r < 0.85) next = 'listen'
   else next = 'tone'
-  if (next === 'listen' && !canHear) return 'th-en'
+  if ((next === 'listen' || next === 'tone') && !canHear) return 'th-en'
   return next
 }
 

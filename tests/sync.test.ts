@@ -241,9 +241,12 @@ describe('a card whose history has outgrown the forty-attempt cap', () => {
   /** Climbs to six, then lives between four and six: a band a fresh seed never reaches. */
   function stubborn(): ProgressDoc {
     let doc = emptyDoc(t0)
-    let i = 0
+    let t = t0
     const push = (ok: boolean) => {
-      doc = answer(doc, 'w:maa', t0 + i++ * DAY, ok, 'aaa')
+      const card = doc.items['w:maa']
+      const stamp = ok && card && card.due > 0 ? Math.max(t, card.due) : t
+      doc = answer(doc, 'w:maa', stamp, ok, 'aaa')
+      t = stamp + DAY
     }
     for (let k = 0; k < 6; k++) push(true)
     for (let r = 0; r < 14; r++) {
@@ -296,7 +299,7 @@ describe('a card whose history has outgrown the forty-attempt cap', () => {
 
   it('carries on exactly when the other machine only adds later answers', () => {
     const laptop = stubborn()
-    const later = t0 + 100 * DAY
+    const later = laptop.items['w:maa']!.lastSeen + 10 * DAY
     let phone = emptyDoc(t0)
     phone = answer(phone, 'w:maa', later, false, 'bbb')
     phone = answer(phone, 'w:maa', later + DAY, true, 'bbb')
@@ -307,6 +310,13 @@ describe('a card whose history has outgrown the forty-attempt cap', () => {
     expected = answer(expected, 'w:maa', later + DAY, true, 'bbb')
     expect(merged.stage).toBe(expected.items['w:maa']!.stage)
     expect(merged.due).toBe(expected.items['w:maa']!.due)
+  })
+
+  it('does not demote a capped card when the file still holds an older attempt', () => {
+    const file = fileOf(stubborn())
+    const live = stubborn()
+    const after = answer(live, 'w:maa', live.items['w:maa']!.lastSeen + DAY, false, 'aaa')
+    expect(mergeWork(after, file).items['w:maa']!.stage).toBe(after.items['w:maa']!.stage)
   })
 
   it('never moves any card when you read back your own file, over many shapes of history', () => {

@@ -1,5 +1,5 @@
-import { TONE_LABEL, type Tone } from '@content/system'
-import { analyseRom, displayRom, expandAlternatives, type RomAnalysis } from './normalize'
+import { TONE_LABEL, VOWEL_BASES, type Tone } from '@content/system'
+import { analyseRom, displayRom, expandAlternatives, toUnits, type RomAnalysis } from './normalize'
 
 export type ThaiVerdict = 'exact' | 'tone' | 'length' | 'wrong' | 'empty' | 'invalid'
 
@@ -46,8 +46,13 @@ function compare(target: RomAnalysis, answer: RomAnalysis): Omit<ThaiGrade, 'tar
       const a = answer.nuclei[i]!
       // Unstressed short "a" before another syllable (sà-wàt-dii, dtà-làat) loses
       // its tone in speech; the textbook itself writes it both ways. Low vs mid there is not a slip.
+      const open = isOpenSyllable(target.syllables[i] ?? n.letters)
       const unstressed =
-        n.letters === 'a' && i < last && (n.tone === 'low' || n.tone === 'mid') && (a.tone === 'low' || a.tone === 'mid')
+        n.letters === 'a' &&
+        i < last &&
+        open &&
+        (n.tone === 'low' || n.tone === 'mid') &&
+        (a.tone === 'low' || a.tone === 'mid')
       if (n.tone !== a.tone && !unstressed) {
         toneSlips.push({
           syllable: i,
@@ -68,22 +73,31 @@ function compare(target: RomAnalysis, answer: RomAnalysis): Omit<ThaiGrade, 'tar
 const RANK: Record<ThaiVerdict, number> = { exact: 5, tone: 4, length: 3, wrong: 1, invalid: 0, empty: 0 }
 
 /** Grade a typed romanization against the canonical target (which may hold "/" alternatives). */
+function isOpenSyllable(syllable: string): boolean {
+  const units = toUnits(analyseRom(syllable).skeleton)
+  const last = units[units.length - 1]
+  return Boolean(last && VOWEL_BASES.has(last[0]!))
+}
+
 export function gradeThai(targetRom: string, answerRaw: string): ThaiGrade {
-  const answer = analyseRom(answerRaw)
+  const answers = expandAlternatives(displayRom(answerRaw))
   const alternatives = expandAlternatives(displayRom(targetRom))
   let best: ThaiGrade | null = null
   for (const alt of alternatives) {
     const t = analyseRom(alt)
-    const r = compare(t, answer)
-    const grade: ThaiGrade = {
-      ...r,
-      target: displayRom(targetRom),
-      matchedTarget: displayRom(alt),
-      answer: displayRom(answerRaw),
-      message: '',
+    for (const ans of answers) {
+      const r = compare(t, analyseRom(ans))
+      const grade: ThaiGrade = {
+        ...r,
+        target: displayRom(targetRom),
+        matchedTarget: displayRom(alt),
+        answer: displayRom(answerRaw),
+        message: '',
+      }
+      if (!best || RANK[grade.verdict] > RANK[best.verdict]) best = grade
+      if (grade.verdict === 'exact') break
     }
-    if (!best || RANK[grade.verdict] > RANK[best.verdict]) best = grade
-    if (grade.verdict === 'exact') break
+    if (best?.verdict === 'exact') break
   }
   best!.message = describe(best!)
   return best!

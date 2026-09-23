@@ -14,6 +14,8 @@ export interface QueueItem {
   meet?: boolean
   /** This sitting already recorded a Check for this card. */
   scored?: boolean
+  /** A miss in this sitting already dropped the stage. */
+  penalized?: boolean
 }
 
 /**
@@ -68,20 +70,32 @@ export function startSession(doc: ProgressDoc, now = Date.now(), level?: number,
 
   const tailIds: string[] = []
   for (const id of dueIds(doc, now, track)) {
-    if (tailIds.length >= REVIEW_TAIL) break
     const entry = getEntry(id)
     if (!entry || entry.level >= target) continue
     tailIds.push(id)
   }
 
   const introducing = fresh.slice(0, newCap)
-  const levelCap = SESSION_SIZE - tailIds.length
-  for (const e of introducing) push(e.id, levelCap)
-  for (const e of dueHere) push(e.id, levelCap)
-  for (const id of tailIds) push(id)
-  // Not-due leftovers only when the sitting would otherwise be empty (Sit again, nothing due).
-  if (queue.length === 0) {
-    for (const e of leftover) push(e.id)
+  const dueSorted = dueHere.slice().sort((a, b) => progressFor(doc, a.id).due - progressFor(doc, b.id).due)
+  const leftoverSorted = leftover
+    .filter((e) => !isDue(progressFor(doc, e.id), now))
+    .slice()
+    .sort((a, b) => progressFor(doc, a.id).lastSeen - progressFor(doc, b.id).lastSeen)
+  const onLevelIds = new Set(onLevel.map((e) => e.id))
+
+  for (const e of dueSorted) push(e.id)
+  for (const e of introducing) push(e.id)
+  const hasLevel = queue.some((q) => onLevelIds.has(q.id))
+  if (fresh.length <= newCap || !hasLevel) {
+    for (const e of leftoverSorted) push(e.id)
+  }
+  const tailRoom = Math.max(0, SESSION_SIZE - queue.length)
+  let tailAdded = 0
+  for (const id of tailIds) {
+    if (tailAdded >= tailRoom) break
+    const before = queue.length
+    push(id)
+    if (queue.length > before) tailAdded++
   }
 
   return {
@@ -134,10 +148,21 @@ export function startReviewSession(
 }
 
 export function normalizeSession(session: LiveSession): LiveSession {
+  const queue = session.queue.map((q, i) => {
+    if (i === session.cursor && q.scored && !session.pending) return { ...q, scored: false }
+    return q
+  })
   return {
     ...session,
     track: session.track ?? 'voice',
+    queue,
   }
+}
+
+/** Listen and tone become writing when the card cannot be heard. */
+export function sittingModality(item: QueueItem, canHear: boolean): QueueItem['modality'] {
+  if ((item.modality === 'listen' || item.modality === 'tone') && !canHear) return 'th-en'
+  return item.modality
 }
 
 function sittingOpen(session: LiveSession | null): session is LiveSession {
@@ -177,7 +202,7 @@ export function afterMeet(session: LiveSession): LiveSession {
   if (!item?.meet) return session
   const tested = { ...item, meet: false }
   const rest = session.queue.slice(session.cursor + 1)
-  if (rest.length === 0) return { ...session, queue: [tested] }
+  if (rest.length === 0) return { ...session, queue: [tested], cursor: 0 }
   return { ...session, queue: [...rest, tested], cursor: 0 }
 }
 
@@ -212,9 +237,14 @@ export function pauseSession(session: LiveSession): LiveSession {
 }
 
 /** Missed a typed card: stay on it and force a retype. */
+function withPenalized(session: LiveSession): LiveSession {
+  const queue = session.queue.map((q, i) => (i === session.cursor ? { ...q, penalized: true } : q))
+  return { ...session, queue }
+}
+
 export function markMissStay(session: LiveSession, hold: Hold): LiveSession {
   return {
-    ...session,
+    ...withPenalized(session),
     answered: session.answered + 1,
     hold,
   }
@@ -223,7 +253,7 @@ export function markMissStay(session: LiveSession, hold: Hold): LiveSession {
 /** Missed a pick/tone card: count the attempt, wait for Next, then requeue. */
 export function markMissMove(session: LiveSession): LiveSession {
   return {
-    ...session,
+    ...withPenalized(session),
     answered: session.answered + 1,
   }
 }
@@ -239,7 +269,7 @@ export function requeueCurrent(session: LiveSession): LiveSession {
   const rest = session.queue.slice(session.cursor + 1)
   return {
     ...session,
-    queue: [...rest, item],
+    queue: [...rest, { ...item, scored: false }],
     cursor: 0,
     hold: null,
     pending: undefined,

@@ -121,7 +121,7 @@ export function LevelIntro(props: {
         </section>
       )}
       <div className="intro-actions">
-        {props.locked ? (
+        {props.locked && !props.canContinue ? (
           <p className="warn">
             {props.track === 'voice' ? 'Master the previous level first.' : 'Get every card on the previous level right first.'}
           </p>

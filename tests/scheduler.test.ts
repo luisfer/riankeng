@@ -45,11 +45,13 @@ describe('chooseModality', () => {
     expect(['pick', 'th-en', 'en-th']).toContain(m)
   })
 
-  it('does not pick listen when the page cannot hear', () => {
+  it('does not pick listen or tone when the page cannot hear', () => {
     const entry = getEntry('w:maa')!
     const p = { ...newItemProgress(entry.id), reps: 2, stage: 2 }
     for (let i = 0; i < 200; i++) {
-      expect(chooseModality(entry, p, String(i), false)).not.toBe('listen')
+      const m = chooseModality(entry, p, String(i), false)
+      expect(m).not.toBe('listen')
+      expect(m).not.toBe('tone')
     }
   })
 
@@ -191,6 +193,40 @@ describe('hereLevel', () => {
         status({ n: 2, total: 3, unlocked: true }),
       ]),
     ).toBe(2)
+  })
+
+  it('on Script, a passed level is no longer here', () => {
+    expect(
+      hereLevel(
+        [
+          status({ n: 0, total: 3, seen: 3, passed: 3, mastered: 0, unlocked: true, complete: false }),
+          status({ n: 1, total: 4, unlocked: true, passed: 0 }),
+        ],
+        'script',
+      ),
+    ).toBe(1)
+  })
+
+  it('moves Script on when every card has been right once', () => {
+    const doc = emptyDoc()
+    for (const e of entriesForLevel(0, 'script')) {
+      doc.items[e.id] = { ...newItemProgress(e.id), reps: 1, stage: 1, days: ['2026-01-01'] }
+    }
+    const script = allLevelStatus(doc, Date.now(), 'script')
+    expect(hereLevel(script, 'script')).toBe(1)
+  })
+
+  it('keeps Voice open after a later miss on a mastered level', () => {
+    const now = 1_700_000_000_000
+    const doc = emptyDoc(now)
+    doc.opened = { voice: 1, script: 0 }
+    for (const e of entriesForLevel(0, 'voice')) {
+      doc.items[e.id] = { ...newItemProgress(e.id), reps: 3, stage: 3, days: ['2026-01-01', '2026-01-02', '2026-01-03'] }
+    }
+    const one = entriesForLevel(0, 'voice')[0]!
+    doc.items[one.id] = { ...doc.items[one.id]!, stage: 1, days: ['2026-01-01'] }
+    const voice = allLevelStatus(doc, now, 'voice')
+    expect(voice[1]!.unlocked).toBe(true)
   })
 
   it('is null when every authored level is complete', () => {

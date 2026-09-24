@@ -1,6 +1,7 @@
 import { readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
+import { getEntry } from '../content/index'
 import voice1 from '../content/words/level-01'
 import { clipUrl } from '../src/audio/clip-url'
 import { decideGate } from '../src/gate-token'
@@ -60,5 +61,17 @@ describe('public sitting', () => {
     expect(await decideGate(clipUrl('w:glai'), null, 'pristine', true)).toEqual({ kind: 'redirect', to: '/?signin' })
     expect(await decideGate('/preview/', null, 'pristine', true)).toEqual({ kind: 'pass' })
     expect(slopHits(previewSources())).toEqual([])
+  })
+
+  it('copies every word from the course, with one of its own glosses and no two alike', () => {
+    for (const card of PREVIEW_VOICE) {
+      const entry = getEntry(card.id)
+      expect(entry, card.id).toBeDefined()
+      expect(card.thai, card.id).toBe(entry!.thai)
+      expect(card.rom, card.id).toBe(entry!.rom)
+      expect(entry!.en, card.id).toContain(card.en[0])
+    }
+    const glosses = PREVIEW_VOICE.map((card) => card.en[0])
+    expect(new Set(glosses).size).toBe(glosses.length)
   })
 })

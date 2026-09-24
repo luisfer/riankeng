@@ -83,14 +83,62 @@ function spliceCluster(value: string, caret: number, next: string): { value: str
   return { value: merged.normalize('NFC'), caret: caretAfter(merged, cluster.start + piece.length) }
 }
 
-/** Put `mark` on the vowel at the caret. With no vowel, insert à/â/á/ǎ there. */
+/** One syllable's vowel: every vowel letter in a row, as in aa, ʉa, iao. */
+function nuclei(nfd: string): Cluster[] {
+  const out: Cluster[] = []
+  let i = 0
+  while (i < nfd.length) {
+    if (!VOWEL_BASES.has(nfd[i]!)) {
+      i++
+      continue
+    }
+    const start = i
+    let end = clusterEnd(nfd, i)
+    while (end < nfd.length && VOWEL_BASES.has(nfd[end]!)) end = clusterEnd(nfd, end)
+    out.push({ start, end })
+    i = end
+  }
+  return out
+}
+
+/** The syllable the caret is in or just after, else the next one. */
+function nucleusAt(nfd: string, pos: number): Cluster | null {
+  const all = nuclei(nfd)
+  const before = [...all].reverse().find((c) => c.start < pos)
+  return before ?? all.find((c) => c.start >= pos) ?? null
+}
+
+/** Where a caret inside the old vowel sits in the new one: after the same letters, and after any mark on the last. */
+function caretInside(old: string, offset: number, next: string): number {
+  let letters = 0
+  for (let i = 0; i < offset; i++) if (!TONE_MARK_SET.has(old[i]!)) letters++
+  let j = 0
+  for (let seen = 0; j < next.length && seen < letters; j++) if (!TONE_MARK_SET.has(next[j]!)) seen++
+  while (j < next.length && TONE_MARK_SET.has(next[j]!)) j++
+  return j
+}
+
+/**
+ * Put `mark` on the syllable at the caret, on its first vowel letter: máa,
+ * kɔ̀ɔp, gǔai. Any tone already on that syllable goes. The caret keeps its
+ * place in the text. With no vowel, insert à/â/á/ǎ there.
+ */
 export function toneAt(value: string, caret: number, mark: string): { value: string; caret: number } {
   const { nfd, pos } = nfdCaret(value, caret)
-  const cluster = clusterAt(nfd, pos)
-  if (!cluster) return spliceCluster(value, caret, withTone('a', mark))
-  let letter = nfd[cluster.start]!
-  if (nfd[cluster.start + 1] === DOT_BELOW) letter += DOT_BELOW
-  return spliceCluster(value, caret, withTone(letter, mark))
+  const nucleus = nucleusAt(nfd, pos)
+  if (!nucleus) return spliceCluster(value, caret, withTone('a', mark))
+  const old = nfd.slice(nucleus.start, nucleus.end)
+  const bare = old.replace(/[\u0300\u0301\u0302\u030C]/g, '')
+  const first = bare[1] === DOT_BELOW ? 2 : 1
+  const next = bare.slice(0, first) + mark + bare.slice(first)
+  const merged = nfd.slice(0, nucleus.start) + next + nfd.slice(nucleus.end)
+  const at =
+    pos <= nucleus.start
+      ? pos
+      : pos >= nucleus.end
+        ? pos + next.length - old.length
+        : nucleus.start + caretInside(old, pos - nucleus.start, next)
+  return { value: merged.normalize('NFC'), caret: caretAfter(merged, at) }
 }
 
 /** Replace the vowel at the caret with another letter, and leave the caret after it. */
@@ -153,7 +201,7 @@ export function RomanInput(props: {
   }
 
   const pickTone = (mark: string) => {
-    const caret = pop?.at ?? ref.current?.selectionStart ?? props.value.length
+    const caret = ref.current?.selectionStart ?? pop?.at ?? props.value.length
     const next = toneAt(read(), caret, mark)
     commit(next.value, next.caret)
     setPop(null)
@@ -196,7 +244,7 @@ export function RomanInput(props: {
     if (e.key.length === 1 && TYPED_VOWELS.has(e.key.toLowerCase()) && !e.metaKey && !e.ctrlKey && !e.altKey) {
       const caret = ref.current?.selectionStart ?? props.value.length
       setPop({ mode: 'vowel', base: e.key.toLowerCase(), at: caret + 1 })
-    } else if (e.key.length === 1 && !e.metaKey) {
+    } else if ((e.key.length === 1 && !e.metaKey) || /^(Arrow|Home|End|Backspace|Delete|Tab)/.test(e.key)) {
       setPop(null)
     }
   }
@@ -237,6 +285,7 @@ export function RomanInput(props: {
           spellCheck={false}
           onChange={(e) => props.onChange(e.target.value)}
           onKeyDown={onKeyDown}
+          onPointerDown={() => setPop(null)}
           onPaste={blockPaste}
           onDrop={(e) => e.preventDefault()}
         />

@@ -89,13 +89,13 @@ describe('the live card', () => {
     expect(host.querySelector('.try-pair .prompt-tools')?.textContent).toMatch(/Hear/)
     expect(host.querySelector('.try-panel .balloon')?.textContent).toBe(jasmine.thai)
     const next = [...host.querySelectorAll('button')].find((b) => b.textContent === 'Next card')
-    expect(next?.className).toBe('btn commit')
+    expect(next?.className).toBe('btn primary commit')
 
     clickNamed(host, 'Next card')
     expect(host.querySelector('.try')?.getAttribute('data-stem')).toBe('passenger')
     expect(host.querySelector('.try')?.getAttribute('data-phase')).toBe('look')
     expect(host.querySelector('.try-rom')?.textContent).toBe(passenger.rom)
-    expect(host.querySelector('.feedback')?.textContent).toBe('')
+    expect(host.querySelector('.feedback')).toBeNull()
   })
 
   it('loads a clicked panel on Look', () => {

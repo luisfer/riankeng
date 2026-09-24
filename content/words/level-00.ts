@@ -1,5 +1,5 @@
-import { words } from '../build'
-import type { Entry } from '../types'
+import { words } from '../build.js'
+import type { Entry } from '../types.js'
 
 /**
  * Level 0 — the sound system. Real words chosen as minimal pairs so the ear

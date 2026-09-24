@@ -1,4 +1,4 @@
-import type { Entry, Kind, PhraseRow, WordRow } from './types'
+import type { Entry, Kind, PhraseRow, WordRow } from './types.js'
 
 const PREFIX: Record<Kind, string> = { word: 'w', phrase: 'p', idiom: 'i' }
 

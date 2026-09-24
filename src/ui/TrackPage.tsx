@@ -41,8 +41,10 @@ export function TrackPage(props: {
                     <span className="contents-title">{lvl.title}</span>
                     <span className="contents-rom rom">{lvl.rom}</span>
                   </span>
-                  <span className="contents-meta">{meta}</span>
-                  {at && <span className="contents-go">{chrome.continue}</span>}
+                  <span className="contents-end">
+                    {at && <span className="contents-go">{chrome.continue}</span>}
+                    <span className="contents-meta">{meta}</span>
+                  </span>
                   {at && s && s.total > 0 && (
                     <Meter
                       className="row-meter"

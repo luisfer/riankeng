@@ -43,6 +43,7 @@ SIZES = (980, 490)
 NO_BALLOON = {
     "night", "pier", "temple", "canal", "train", "park", "shrine", "soi", "ferry",
     "alms", "krathong", "rain",
+    "cat", "dishes", "elder", "market", "sewing",
 }
 
 # The two shipped panels every candidate is laid beside on the sheet.
@@ -68,7 +69,9 @@ SEEDS: dict[str, tuple[float, float]] = {
     "bike": (44.7, 13.0),
     "bill": (41.9, 20.1),
     "cash": (62.9, 16.9),
+    "children": (66.3, 17.1),
     "coffee": (44.5, 15.9),
+    "dinner": (60.9, 17.5),
     "door": (44.2, 13.0),
     "eaten": (71.8, 24.2),
     "from": (57.3, 13.4),

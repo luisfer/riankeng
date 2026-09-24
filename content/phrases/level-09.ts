@@ -7,6 +7,7 @@ export default phrases(9, [
   ['pǒm mii pîi sǎam kon', 'ผมมีพี่สามคน', ['I have three older siblings']],
   ['kǎo bpen kon jai dii', 'เขาเป็นคนใจดี', ['he is kind', 'she is kind']],
   ['dèk kon níi nâa rák', 'เด็กคนนี้น่ารัก', ['this child is cute']],
+  ['gǔai-dtǐao duu nâa gin', 'ก๋วยเตี๋ยวดูน่ากิน', ['the noodles look tasty', 'the noodles look good']],
   ['kun mii lûuk mái', 'คุณมีลูกไหม', ['do you have children', 'do you have kids']],
   ['pûu-chaai kon nán sǔung', 'ผู้ชายคนนั้นสูง', ['that man is tall']],
   ['kǎo lɔ̀ɔ mâak', 'เขาหล่อมาก', ['he is very handsome']],

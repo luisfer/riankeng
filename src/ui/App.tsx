@@ -341,6 +341,7 @@ export function App() {
             script={scriptStatuses}
             onTrack={(track) => go({ name: 'track', track })}
             onReview={() => go({ name: 'review' })}
+            yoursCount={yours.length}
             onAlphabet={() => go({ name: 'alphabet' })}
           />
         )}

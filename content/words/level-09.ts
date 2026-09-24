@@ -30,6 +30,7 @@ export default words(9, [
   ['yài', 'ใหญ่', ['big', 'large'], 'adj', ['describe']],
   ['sà-nùk', 'สนุก', ['fun', 'enjoyable'], 'adj', ['describe']],
   ['nâa rák', 'น่ารัก', ['cute', 'lovely'], 'adj', ['describe']],
+  ['nâa gin', 'น่ากิน', ['looks tasty', 'appetizing'], 'adj', ['describe']],
   ['nâa glua', 'น่ากลัว', ['scary', 'frightening'], 'adj', ['describe']],
   ['kε̌ng', 'แข็ง', ['hard', 'strong', 'tough'], 'adj', ['describe']],
   ['ɔ̀ɔn', 'อ่อน', ['soft', 'weak', 'young (of age)'], 'adj', ['describe']],

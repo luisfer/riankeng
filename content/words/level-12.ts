@@ -8,6 +8,7 @@ export default words(12, [
   ['bʉ̀a', 'เบื่อ', ['bored'], 'adj', ['feel']],
   ['glua#2', 'กลัว', ['afraid', 'scared', 'to fear'], 'v', ['feel']],
   ['dii jai', 'ดีใจ', ['glad', 'happy'], 'adj', ['feel']],
+  ['dtà-lòk', 'ตลก', ['funny', 'a joke'], 'adj', ['feel']],
   ['sǐa jai', 'เสียใจ', ['sad', 'sorry', 'regret'], 'adj', ['feel']],
   ['gròot', 'โกรธ', ['angry'], 'adj', ['feel']],
   ['ngong', 'งง', ['confused'], 'adj', ['feel']],

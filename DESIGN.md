@@ -38,8 +38,10 @@ Never gray. Never gold-on-navy.
 - `.contents-row`: contents of a primer. Number (right-aligned, tabular), title + rom, count of done over total, or `soon`. Locked rows have a blank meta. The open level’s number is lacquer and it carries a 2px lacquer mark in the margin.
 - `.status`: label and value on a hairline row, for what is true about this device’s copy: where it lives, cards with progress, last saved, opens without network, network now, last backup file. A value that needs attention is lacquer, not red-and-loud.
 - `.btn.commit`: 36×, radius 2px, lacquer on paper. One per screen. Continue is that key. Sit again when the level is started. Begin again is a text button.
-- `.text-btn`: ink-2 word, underline on hover. Hear, Slower, Pause, export.
-- `.answer-form`: field and Check share row 1. Popover and key strip span below.
+- `.text-btn`: ink-2 word; the underline arrives in lacquer on hover or when current. Hear, Slower, Pause, export. Hear and Slower are also Alt+H and Alt+S.
+- **The sitting is a primer page.** The card pins under the trail in the upper third, never mid-screen. The instruction is Brygada italic in ink-2, an exercise heading. The card's number in the sitting hangs in the margin in lacquer Brygada on the word's baseline; under 760px it opens the instruction's line. The word, then Hear and Slower as type; on a listening card they take the word's place, larger.
+- `.answer-form`: one ruled line to write on. A 2px ink rule runs under the field and under Check, which stands on it; while the line holds the caret it turns lacquer, and that is its focus mark, so the field carries no outline. The answer starts flush with the word above. Once checked, what was written stays on the line in ink-2 and Next stands where Check stood. The tone popover and the key strip are type under the line: tones keyed 1 to 4, then ε ɔ ə ʉ and the four marks, underlined in lacquer on hover. No boxes.
+- A right answer lays one lacquer stroke under the word, drawn in once (under reduced motion it is simply there), and its meaning beneath in lacquer. A tone or length miss writes the target under the word with only the slipped syllable in lacquer, and the grader's sentence goes to ink beside it.
 - `.tone-word`: five words, underline on hover. Not chips.
 - `.heat-c`: 12×7 lacquer dots.
 - `.splash`: the journey opens on one quiet drawing, picked at random from the nine in `QUIET` each time the home mounts. No balloon, no lettering, painted to every edge. Photographs stay refused.

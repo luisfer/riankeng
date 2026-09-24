@@ -7,11 +7,13 @@ import {
   LAYOUTS,
   balloonNeedsWidth,
   fillClose,
+  fillScene,
   fillComic,
   mountComic,
   pickComic,
   pickLayout,
   placeComic,
+  swapComicStem,
 } from '../src/landing/comic'
 import { DEMO, QUIET, demoByStem } from '../src/landing/demo'
 
@@ -163,6 +165,21 @@ describe('bento packing', () => {
 })
 
 describe('fillClose', () => {
+  it('paints the preview and the close from two different quiet drawings', () => {
+    const window = new Window()
+    const document = window.document as unknown as Document
+    document.body.innerHTML = `<img class="sitting-art" width="980" height="980" alt="" /><img class="night-art" width="980" height="980" alt="" />`
+    const [sitting, closeScene] = pickComic(QUIET, 2, lcg(4))
+    fillScene(document, sitting!, '.sitting-art')
+    fillClose(document, closeScene!)
+    const a = document.querySelector<HTMLImageElement>('.sitting-art')!
+    const b = document.querySelector<HTMLImageElement>('.night-art')!
+    expect(a.dataset.scene).not.toBe(b.dataset.scene)
+    expect(demoByStem(a.dataset.scene ?? '')).toBeUndefined()
+    expect(demoByStem(b.dataset.scene ?? '')).toBeUndefined()
+    window.happyDOM.close()
+  })
+
   it('paints one quiet drawing, with no balloon', () => {
     const window = new Window()
     const document = window.document as unknown as Document
@@ -188,5 +205,20 @@ describe('balloonNeedsWidth', () => {
     expect(balloonNeedsWidth(demoByStem('umbrella')!)).toBe(true)
     expect(balloonNeedsWidth(demoByStem('door')!)).toBe(false)
     expect(balloonNeedsWidth(demoByStem('jasmine')!)).toBe(false)
+  })
+})
+
+describe('swapComicStem', () => {
+  it('replaces a drawing the try card has taken', () => {
+    const { document, close } = slotDoc()
+    const cards = placeComic(['door', 'tea', 'coffee', 'mango', 'bike', 'stall', 'laugh', 'umbrella'].map((s) => demoByStem(s)!))
+    mountComic(document, cards, 'left', 'top')
+    const next = demoByStem('water')!
+    expect(swapComicStem(document, 'tea', next)).toBe(true)
+    const stems = [...document.querySelectorAll<HTMLElement>('a.panel')].map((p) => p.dataset.scene)
+    expect(stems).not.toContain('tea')
+    expect(stems).toContain('water')
+    expect(new Set(stems).size).toBe(COMIC_SLOTS)
+    close()
   })
 })

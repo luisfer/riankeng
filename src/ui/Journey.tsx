@@ -49,8 +49,10 @@ function Row(props: {
           <span className="contents-title">{props.title}</span>
           <span className={props.rom ? 'contents-rom rom' : 'contents-rom'}>{props.sub}</span>
         </span>
-        <span className="contents-meta">{props.meta}</span>
-        {props.here && <span className="contents-go">{chrome.continue}</span>}
+        <span className="contents-end">
+          {props.here && <span className="contents-go">{chrome.continue}</span>}
+          <span className="contents-meta">{props.meta}</span>
+        </span>
         {props.meter}
       </button>
     </li>
@@ -72,8 +74,8 @@ function TrackRow(props: {
   return (
     <Row
       n={place.n}
-      title={place.title}
-      sub={place.done ? `${props.title}. ${chrome.trackDone}` : props.title}
+      title={props.title}
+      sub={place.done ? chrome.trackDone : props.track === 'voice' ? `Phonetic. ${place.title}` : place.title}
       here={!place.done}
       meta={place.done ? '' : `${levelDone} of ${levelTotal}`}
       meter={
@@ -96,8 +98,15 @@ export function Journey(props: {
   onTrack: (track: TrackId) => void
   onReview: () => void
   onAlphabet: () => void
+  /** Words already met. The hub offers them as a review. */
+  yoursCount?: number
 }) {
-  const [scene] = useState(() => QUIET[Math.floor(Math.random() * QUIET.length)]!)
+  const [scenes] = useState(() => {
+    const first = Math.floor(Math.random() * QUIET.length)
+    let second = Math.floor(Math.random() * (QUIET.length - 1))
+    if (second >= first) second += 1
+    return [QUIET[first]!, QUIET[second]!]
+  })
   return (
     <main className="page journey">
       <ol className="contents hub">
@@ -115,20 +124,30 @@ export function Journey(props: {
           levels={SCRIPT_LEVELS}
           onOpen={() => props.onTrack('script')}
         />
-        <Row title="Already yours" sub={chrome.yoursSub} rom meta="open" onOpen={props.onReview} />
+        <Row
+          title="Already yours"
+          sub={props.yoursCount ? `${props.yoursCount} words` : chrome.yoursSub}
+          rom
+          meta={props.yoursCount ? 'Review' : ''}
+          onOpen={props.onReview}
+        />
         <Row title="The whole script" sub={chrome.alphabetSub} rom meta="open" onOpen={props.onAlphabet} />
       </ol>
-      <figure className="splash">
-        <img
-          src={sceneSrc(scene.stem)}
-          srcSet={sceneSrcSet(scene.stem)}
-          sizes="(max-width: 860px) min(420px, calc(100vw - 48px)), 42vw"
-          width={980}
-          height={980}
-          alt={scene.alt}
-          decoding="async"
-        />
-      </figure>
+      <div className="splash-pair">
+        {scenes.map((scene) => (
+          <figure key={scene.stem} className="splash">
+            <img
+              src={sceneSrc(scene.stem)}
+              srcSet={sceneSrcSet(scene.stem)}
+              sizes="(max-width: 860px) 42vw, 28vw"
+              width={980}
+              height={980}
+              alt={scene.alt}
+              decoding="async"
+            />
+          </figure>
+        ))}
+      </div>
     </main>
   )
 }

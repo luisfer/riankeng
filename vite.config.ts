@@ -121,7 +121,18 @@ export default defineConfig(({ mode }) => {
         workbox: {
           globPatterns: ['**/*.{js,css,html,svg,png,woff2,webmanifest}'],
           // The landing page and its drawings are never part of the app's precache.
-          globIgnores: ['index.html', 'privacy.html', 'terms.html', 'preview/**', 'scenes/**', 'assets/landing-*'],
+          // Nor are the gallery and the candidate art it shows.
+          globIgnores: [
+            'index.html',
+            'privacy.html',
+            'terms.html',
+            'preview/**',
+            'gallery/**',
+            'scenes/**',
+            'assets/landing-*',
+            'assets/gallery-*',
+            'assets/candidates/**',
+          ],
           navigateFallback: '/learn/index.html',
           navigateFallbackAllowlist: [/^\/learn\//],
           runtimeCaching: [
@@ -183,10 +194,16 @@ export default defineConfig(({ mode }) => {
           privacy: fileURLToPath(new URL('./privacy.html', import.meta.url)),
           terms: fileURLToPath(new URL('./terms.html', import.meta.url)),
           preview: fileURLToPath(new URL('./preview/index.html', import.meta.url)),
+          gallery: fileURLToPath(new URL('./gallery/index.html', import.meta.url)),
           learn: fileURLToPath(new URL('./learn/index.html', import.meta.url)),
         },
         output: {
           entryFileNames: 'assets/[name]-[hash].js',
+          // Candidate art gets its own folder, so the precache can leave it out by path.
+          assetFileNames: (asset) =>
+            asset.originalFileNames.some((f) => f.includes('art/candidates/'))
+              ? 'assets/candidates/[name]-[hash][extname]'
+              : 'assets/[name]-[hash][extname]',
         },
       },
     },

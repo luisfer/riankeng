@@ -166,13 +166,13 @@ html[data-stuck] .nav a.ghost {
 }
 html[data-stuck] .nav a.ghost:hover {
   background: var(--on-lacquer);
-  color: var(--lacquer);
+  color: var(--ink);
   border-color: var(--on-lacquer);
 }
 html[data-stuck][data-session="in"] .nav a.ghost {
   background: var(--on-lacquer);
   border-color: var(--on-lacquer);
-  color: var(--lacquer);
+  color: var(--ink);
 }
 .nav .nav-wait { display: none; }
 html[data-stuck] .nav .nav-wait {
@@ -367,14 +367,16 @@ header.wrap { max-width: none; position: relative; z-index: 5; }
   padding: 0 32px;
   font-size: 26px;
 }
-.cell.title [data-waitlist-open]::before {
+.cell.title [data-waitlist-open]::before,
+.cell.title [data-waitlist-open]::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: #1c1710;
   transform: translateX(-101%);
   pointer-events: none;
 }
+.cell.title [data-waitlist-open]::before { background: #1c1710; }
+.cell.title [data-waitlist-open]::after { background: #1b2d4f; }
 .waitlist-label { display: grid; place-items: center; position: relative; z-index: 1; }
 .waitlist-label > span { grid-area: 1 / 1; }
 .waitlist-rom,
@@ -467,8 +469,30 @@ html[data-session="in"] .signin-row { grid-template-columns: auto; justify-conte
   max-width: 40em;
   margin-bottom: 36px;
 }
-#sitting .section-head { margin-bottom: 0; }
-#sitting .btn.commit { justify-self: start; text-decoration: none; }
+.sitting {
+  margin-top: 72px;
+  padding: 72px 0;
+  background: #1b2d4f;
+  color: #f2ead8;
+}
+.sitting + .close { margin-top: 0; }
+.sitting .lede { color: #c9bfae; }
+.sitting-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 360px);
+  gap: 32px 56px;
+  align-items: center;
+}
+.sitting .section-head { margin-bottom: 0; }
+.sitting .lede { margin-bottom: 0; }
+.sitting .btn.commit { justify-self: start; text-decoration: none; }
+.sitting-panel {
+  margin: 0;
+  aspect-ratio: 1;
+  border: 2px solid #f2ead8;
+  overflow: hidden;
+}
+.sitting-panel img { display: block; width: 100%; height: 100%; object-fit: cover; }
 /* The live card is one sheet, ruled like a comic cell. */
 .try-sheet {
   border: 2px solid var(--ink);
@@ -524,7 +548,8 @@ html[data-session="in"] .signin-row { grid-template-columns: auto; justify-conte
   align-items: center;
   gap: 8px 20px;
 }
-.prompt-tools { display: inline-flex; align-items: center; gap: 8px; }
+/* Hear and Slower are type now, as in the course, so they need a word space between them. */
+.prompt-tools { display: inline-flex; align-items: baseline; gap: 8px 22px; }
 .try-rom {
   font-size: clamp(28px, 3vw, 36px);
   line-height: 1.2;
@@ -556,7 +581,7 @@ html[data-session="in"] .signin-row { grid-template-columns: auto; justify-conte
 
 /* Close. The page ends in ink, with the night panel and the way in. */
 .close {
-  margin-top: 96px;
+  margin-top: 72px;
   padding: 80px 0 48px;
   background: #1c1710;
   color: #f2ead8;
@@ -644,12 +669,19 @@ html[data-session="in"] .signin-row { grid-template-columns: auto; justify-conte
     animation: letter-in 360ms var(--ease) both;
     animation-delay: calc(var(--i, 0) * 70ms + 380ms);
   }
-  .cell.title [data-waitlist-open]::before {
+  .cell.title [data-waitlist-open]::before,
+  .cell.title [data-waitlist-open]::after {
     transition: transform 900ms var(--ease);
   }
   .cell.title [data-waitlist-open]:hover::before,
-  .cell.title [data-waitlist-open]:focus-visible::before {
+  .cell.title [data-waitlist-open]:focus-visible::before,
+  .cell.title [data-waitlist-open]:hover::after,
+  .cell.title [data-waitlist-open]:focus-visible::after {
     transform: none;
+  }
+  .cell.title [data-waitlist-open]:hover::after,
+  .cell.title [data-waitlist-open]:focus-visible::after {
+    transition-delay: 900ms;
   }
   .waitlist-label > span {
     transition: opacity 420ms var(--ease), filter 420ms var(--ease);
@@ -716,6 +748,8 @@ html[data-session="in"] .signin-row { grid-template-columns: auto; justify-conte
   .nav-links a:not(.ghost) { display: none; }
   .ghost { height: 34px; padding: 0 12px; }
   .section { padding-top: 64px; }
+  .sitting-grid { grid-template-columns: minmax(0, 1fr); }
+  .sitting-panel { max-width: 280px; }
   .try-sheet { padding: 24px 20px 28px; }
   .try-panel, .night-art { max-width: none; }
   .close { margin-top: 64px; padding-top: 56px; }

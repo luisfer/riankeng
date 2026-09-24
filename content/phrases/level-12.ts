@@ -10,6 +10,7 @@ export default phrases(12, [
   ['pǒm bʉ̀a', 'ผมเบื่อ', ['I am bored']],
   ['kǎo gròot', 'เขาโกรธ', ['he is angry', 'she is angry']],
   ['pǒm dii jai', 'ผมดีใจ', ['I am glad', 'I am happy']],
+  ['dtà-lòk mâak', 'ตลกมาก', ['so funny[, 555]', 'very funny', 'really funny', 'hilarious']],
   ['pǒm sǐa jai', 'ผมเสียใจ', ['I am sad', 'I am sorry']],
   ['mii kâi', 'มีไข้', ['I have a fever', 'have a fever']],
   ['pέε à-rai', 'แพ้อะไร', ['what are you allergic to']],

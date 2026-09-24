@@ -242,19 +242,79 @@ body::before {
 .page.journey { max-width: none; }
 .journey .contents { max-width: 640px; }
 .journey .contents.hub { max-width: none; }
-/* Home is a spread: the list on the left, the drawing on the right. */
+/* The list, then two quiet panels whose widths add up to the list. */
 .journey:has(.splash) {
   display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
-  gap: 40px 56px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 28px;
   align-items: start;
 }
-.journey:has(.splash) .splash {
-  grid-column: 2;
-  grid-row: 1;
+.splash-pair {
+  grid-column: 1;
+  grid-row: 2;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  width: 100%;
+}
+.journey:has(.splash) .splash-pair .splash {
   margin: 0;
   max-width: none;
   width: 100%;
+}
+.contents.hub .contents-row:not(.here):hover .contents-title,
+.contents.hub .contents-row:not(.here):focus-visible .contents-title {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-decoration-color: var(--lacquer);
+  text-underline-offset: 0.18em;
+}
+.preview-stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: baseline;
+  width: min(520px, 100%);
+}
+.preview-stage > * { grid-column: 1; min-width: 0; }
+.preview-stage .session-no,
+.preview-stage .preview-word { grid-row: 1; }
+.preview-word .prompt-tools { margin-top: 18px; gap: 8px 36px; }
+.hear-key { position: relative; }
+.hear-mark {
+  position: absolute;
+  left: calc(100% + 6px);
+  top: 50%;
+  width: 16px;
+  height: 14px;
+  transform: translateY(-50%);
+  color: var(--lacquer);
+  opacity: 0;
+  pointer-events: none;
+}
+.hear-key:hover .hear-mark,
+.hear-key:focus-visible .hear-mark { opacity: 1; }
+.preview-desk {
+  grid-row: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  width: 100%;
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid var(--hair);
+}
+.preview-desk > .btn.commit { align-self: flex-start; }
+.preview-stage .session-feedback.miss { display: flex; align-items: baseline; gap: 16px; }
+.preview-hint { margin: 0; color: var(--ink-2); font-size: 16px; max-width: 28em; }
+.preview-stage .answer-form { width: 100%; margin-top: 0; }
+.preview-word { display: flex; flex-direction: column; gap: 2px; }
+.preview-stage .prompt-thai { font-size: 72px; margin: 0; line-height: 1.1; }
+.preview-stage .prompt-rom { font-size: 48px; margin: 0; line-height: 1.15; }
+.preview-stage .prompt-en { font-size: 48px; margin: 14px 0 0; color: var(--ink); }
+.preview-word.right {
+  padding-bottom: 14px;
+  border-bottom: 3px solid var(--lacquer);
 }
 .page.session {
   flex: 1;
@@ -344,6 +404,12 @@ h2 {
 }
 .journey > section:first-child h2 { margin-top: 0; }
 .journey .track-block .lede { margin-bottom: 20px; }
+.yours-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  margin: 0 0 8px;
+}
 .yours-list { margin: 0 0 16px; }
 .yours-row {
   display: grid;
@@ -352,7 +418,16 @@ h2 {
   justify-items: start;
   align-items: center;
 }
-.yours-actions { display: flex; gap: 16px; margin-bottom: 8px; }
+.yours-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin: 4px 0 8px;
+  padding-top: 14px;
+  border-top: 1px solid var(--hair);
+}
+.yours-go { display: flex; gap: 16px; align-items: center; }
 .compose { list-style: none; padding: 0; margin: 0 0 32px; }
 .compose li {
   display: flex;
@@ -411,18 +486,24 @@ h2 {
   background: var(--hair);
   align-self: center;
 }
+.contents-end { display: contents; }
 .contents-row.here .contents-meta {
   grid-column: 3;
   grid-row: 2;
+  justify-self: end;
   align-self: center;
 }
 .contents-go {
   grid-column: 3;
   grid-row: 1;
   justify-self: end;
-  align-self: baseline;
+  align-self: end;
   color: var(--lacquer);
   font-size: 16px;
+}
+.contents.hub .contents-row:hover,
+.contents.hub .contents-row:focus-visible {
+  background: color-mix(in srgb, var(--lacquer) 7%, transparent);
 }
 .contents-row.here .contents-title {
   text-decoration: underline;
@@ -898,8 +979,16 @@ li.quiet-row { cursor: default; }
 /* The whole script: one cell per letter, lacquer once met. */
 .alpha-block { margin: 0 0 36px; }
 .alpha-block h2.quiet { font-size: 16px; color: var(--ink-2); margin: 0 0 10px; }
-.alpha-note { margin: 0 0 16px; font-size: 15px; }
-/* Body copy that carries a dotted circle: let the Thai font draw it. */
+.alpha-note { margin: 12px 0 16px; font-size: 16px; max-width: 36em; color: var(--ink-2); font-family: var(--ui); }
+.alpha-block .contents-row { margin-bottom: 0; }
+.alpha-block .contents-row:not(.here):hover .contents-title,
+.alpha-block .contents-row:not(.here):focus-visible .contents-title {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-decoration-color: var(--lacquer);
+  text-underline-offset: 0.18em;
+}
+/* A Thai glyph inside a UI sentence. The sentence itself stays in the UI face. */
 .thai-inline { font-family: var(--thai), var(--ui); }
 .alpha-grid {
   list-style: none;
@@ -960,12 +1049,6 @@ li.quiet-row { cursor: default; }
 }
 @media (max-width: 860px) {
   .journey:has(.splash) { grid-template-columns: minmax(0, 1fr); }
-  .journey:has(.splash) .contents.hub { grid-column: 1; grid-row: 1; }
-  .journey:has(.splash) .splash {
-    grid-column: 1;
-    grid-row: 2;
-    max-width: 420px;
-  }
 }
 @media (max-width: 520px) {
   .app { padding: calc(28px + env(safe-area-inset-top, 0px)) 16px calc(64px + env(safe-area-inset-bottom, 0px)); }

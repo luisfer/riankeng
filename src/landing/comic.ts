@@ -107,6 +107,16 @@ function paintPanel(cell: HTMLElement, card: DemoCard, hero: boolean): void {
   else delete cell.dataset.wide
 }
 
+/** The try card took this drawing. Put another one in the comic so it is not on the page twice. */
+export function swapComicStem(root: ParentNode, stem: string, replacement: DemoCard | undefined): boolean {
+  if (!replacement || replacement.stem === stem) return false
+  const panel = [...root.querySelectorAll<HTMLElement>('a.panel[data-scene]')].find((el) => el.dataset.scene === stem)
+  const cell = panel?.closest<HTMLElement>('.cell')
+  if (!cell) return false
+  paintPanel(cell, replacement, cell.dataset.slot === '0')
+  return true
+}
+
 function makeSlot(card: DemoCard, i: number, hero: boolean): HTMLElement {
   const cell = document.createElement('div')
   cell.className = 'cell'
@@ -139,14 +149,19 @@ function makeSlot(card: DemoCard, i: number, hero: boolean): HTMLElement {
   return cell
 }
 
-/** One quiet drawing for the close. Night is in the pool, not a fixed close. */
-export function fillClose(root: ParentNode, scene: { stem: string; alt: string }): void {
-  const img = root.querySelector<HTMLImageElement>('.night-art')
+/** Paint one scene into an empty landing image. */
+export function fillScene(root: ParentNode, scene: { stem: string; alt: string }, selector: string): void {
+  const img = root.querySelector<HTMLImageElement>(selector)
   if (!img) return
   img.src = sceneSrc(scene.stem)
   img.srcset = sceneSrcSet(scene.stem)
   img.alt = scene.alt
   img.dataset.scene = scene.stem
+}
+
+/** One quiet drawing for the close. Night is in the pool, not a fixed close. */
+export function fillClose(root: ParentNode, scene: { stem: string; alt: string }): void {
+  fillScene(root, scene, '.night-art')
 }
 
 /** Replace any fallback slots, paint the picked day, then the page may reveal. */

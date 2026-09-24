@@ -1,7 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { signInAccount } from '../storage/auth'
-import { COMIC_SLOTS, fillClose, mountComic, pickComic, pickLayout, pickPhone, placeComic } from './comic'
+import { COMIC_SLOTS, fillClose, fillScene, mountComic, pickComic, pickLayout, pickPhone, placeComic, swapComicStem } from './comic'
 import { landing } from './copy'
 import { bindWaitlist } from './waitlist'
 import { DEMO, QUIET, TRY_ORDER } from './demo'
@@ -128,8 +128,32 @@ for (const form of document.querySelectorAll<HTMLFormElement>('form[data-waitlis
 }
 
 const layout = pickLayout()
-mountComic(document, placeComic(pickComic(DEMO, COMIC_SLOTS)), layout, pickPhone())
-fillClose(document, pickComic(QUIET, 1)[0]!)
+const shown = document.querySelector<HTMLElement>('.try')?.dataset.stem
+const comicPool = shown ? DEMO.filter((card) => card.stem !== shown) : DEMO
+const comicCards = placeComic(pickComic(comicPool, COMIC_SLOTS))
+mountComic(document, comicCards, layout, pickPhone())
+const [sittingScene, closeScene] = pickComic(QUIET, 2)
+if (sittingScene) fillScene(document, sittingScene, '.sitting-art')
+if (closeScene) fillClose(document, closeScene)
+
+const spare = DEMO.filter((card) => card.stem !== shown && !comicCards.some((drawn) => drawn.stem === card.stem))
+let current = shown ?? ''
+const tryHost = document.getElementById('try-card')
+if (tryHost) {
+  new MutationObserver(() => {
+    const stem = tryHost.querySelector<HTMLElement>('.try')?.dataset.stem ?? ''
+    if (!stem || stem === current) return
+    const previous = current
+    current = stem
+    const taken = [...tryHost.ownerDocument.querySelectorAll<HTMLElement>('a.panel')].some((panel) => panel.dataset.scene === stem)
+    if (!taken) return
+    const replacement = spare.shift()
+    if (swapComicStem(document, stem, replacement)) {
+      const freed = DEMO.find((card) => card.stem === previous)
+      if (freed) spare.push(freed)
+    } else if (replacement) spare.unshift(replacement)
+  }).observe(tryHost, { subtree: true, attributes: true, attributeFilter: ['data-stem'] })
+}
 document.documentElement.dataset.comic = 'in'
 
 // Every drawn panel is a card. Clicking one loads its phrase into the live card.

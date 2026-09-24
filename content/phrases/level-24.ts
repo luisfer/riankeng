@@ -2,6 +2,7 @@ import { phrases } from '../build'
 
 export default phrases(24, [
   ['kɔ̌ɔ jɔɔng dtó', 'ขอจองโต๊ะ', ['I would like to book a table', 'a table please']],
+  ['kɔ̌ɔ jɔɔng dtó sɔ̌ɔng tîi', 'ขอจองโต๊ะสองที่', ['I would like to book a table for two [people]', 'a table for two [please]', 'book a table for two [please]', 'can I book a table for two']],
   ['jɔɔng hɔ̂ng nʉ̀ng hɔ̂ng', 'จองห้องหนึ่งห้อง', ['book one room']],
   ['pǒm yàak châo rót', 'ผมอยากเช่ารถ', ['I want to rent a car']],
   ['kâa châo tâo-rài', 'ค่าเช่าเท่าไร', ['how much is the rent']],

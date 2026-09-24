@@ -74,15 +74,19 @@ describe('the landing page', () => {
     return host
   }
 
-  it('opens on one quiet drawing, with no lettering', () => {
+  it('opens on two quiet drawings, with no lettering', () => {
     const host = render()
     const imgs = [...host.querySelectorAll('.splash img')]
-    expect(imgs).toHaveLength(1)
-    const scene = QUIET.find((q) => imgs[0]!.getAttribute('src') === sceneSrc(q.stem))
-    expect(scene, imgs[0]!.getAttribute('src') ?? '').toBeDefined()
-    expect(imgs[0]!.getAttribute('alt')).toBe(scene!.alt)
+    expect(imgs).toHaveLength(2)
+    const stems = imgs.map((img) => img.getAttribute('src'))
+    expect(new Set(stems).size).toBe(2)
+    for (const img of imgs) {
+      const scene = QUIET.find((q) => img.getAttribute('src') === sceneSrc(q.stem))
+      expect(scene, img.getAttribute('src') ?? '').toBeDefined()
+      expect(img.getAttribute('alt')).toBe(scene!.alt)
+    }
     expect(host.querySelector('.splash .balloon')).toBeNull()
-    expect(host.querySelector('.splash')?.textContent?.trim()).toBe('')
+    expect(host.querySelector('.splash-pair')?.textContent?.trim()).toBe('')
   })
 
   it('is four rows, not a list of every level', () => {
@@ -90,8 +94,8 @@ describe('the landing page', () => {
     const rows = [...host.querySelectorAll('.contents-row')]
     expect(rows).toHaveLength(4)
     expect(rows.map((r) => r.querySelector('.contents-title')?.textContent)).toEqual([
-      LEVELS[0]!.title,
-      SCRIPT_LEVELS[0]!.title,
+      'Voice',
+      'Script',
       'Already yours',
       'The whole script',
     ])
@@ -102,13 +106,13 @@ describe('the landing page', () => {
     const rows = [...host.querySelectorAll('.contents-row')]
     const voice = allLevelStatus(emptyDoc(), Date.now(), 'voice')
     const script = allLevelStatus(emptyDoc(), Date.now(), 'script')
-    expect(rows[0]!.querySelector('.contents-title')?.textContent).toBe(LEVELS[0]!.title)
-    expect(rows[0]!.querySelector('.contents-rom')?.textContent).toBe('Voice')
+    expect(rows[0]!.querySelector('.contents-title')?.textContent).toBe('Voice')
+    expect(rows[0]!.querySelector('.contents-rom')?.textContent).toBe(`Phonetic. ${LEVELS[0]!.title}`)
     expect(rows[0]!.querySelector('.contents-n')?.textContent).toBe('0')
     expect(rows[0]!.querySelector('.contents-meta')?.textContent).toBe(`0 of ${voice[0]!.total}`)
     expect(rows[0]!.className).toContain('here')
-    expect(rows[1]!.querySelector('.contents-title')?.textContent).toBe(SCRIPT_LEVELS[0]!.title)
-    expect(rows[1]!.querySelector('.contents-rom')?.textContent).toBe('Script')
+    expect(rows[1]!.querySelector('.contents-title')?.textContent).toBe('Script')
+    expect(rows[1]!.querySelector('.contents-rom')?.textContent).toBe(SCRIPT_LEVELS[0]!.title)
     expect(rows[1]!.querySelector('.contents-meta')?.textContent).toBe(`0 of ${script[0]!.total}`)
     expect(rows[0]!.querySelector('.row-meter')?.getAttribute('aria-valuenow')).toBe('0')
   })

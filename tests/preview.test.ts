@@ -2,7 +2,6 @@ import { readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import voice1 from '../content/words/level-01'
-import voice0 from '../content/words/level-00'
 import { clipUrl } from '../src/audio/clip-url'
 import { decideGate } from '../src/gate-token'
 import { DEMO_IDS } from '../src/landing/demo'
@@ -34,8 +33,9 @@ describe('public sitting', () => {
     expect(sitting).toBeGreaterThan(html.indexOf('id="try"'))
     expect(sitting).toBeLessThan(html.indexOf('id="close"'))
     expect(html).toContain('href="/preview/"')
+    expect(html).toContain('Try a preview of the course.')
     expect(html).toContain('Try them')
-    expect(html).toContain('maa, máa, mǎa. Come, horse, dog.')
+    expect(html).toContain('A few very common words in Thai to get you started.')
     expect(slopHits([html.slice(sitting, html.indexOf('id="close"'))])).toEqual([])
   })
 
@@ -44,11 +44,12 @@ describe('public sitting', () => {
     expect(source('vite.config.ts')).toContain('preview/index.html')
   })
 
-  it('publishes eight voice cards, and nothing after', async () => {
-    expect(PREVIEW_VOICE.map((e) => e.id)).toEqual(voice0.slice(0, 8).map((e) => e.id))
+  it('publishes twenty-five common words, and nothing after', async () => {
     expect(PREVIEW_IDS).toEqual(PREVIEW_VOICE.map((e) => e.id))
-    expect(PREVIEW_VOICE).toHaveLength(8)
-    for (const e of PREVIEW_VOICE) expect(e.level).toBe(0)
+    expect(PREVIEW_VOICE).toHaveLength(25)
+    expect(PREVIEW_IDS).toContain('w:sà-wàt-dii')
+    expect(PREVIEW_IDS).toContain('w:kɔ̀ɔp kun')
+    expect(PREVIEW_IDS).not.toContain('w:glai')
 
     for (const id of PREVIEW_IDS) {
       expect(await decideGate(clipUrl(id), null, 'pristine', true)).toEqual({ kind: 'pass' })
@@ -56,7 +57,7 @@ describe('public sitting', () => {
     const held = voice1.find((e) => !DEMO_IDS.includes(e.id) && !PREVIEW_IDS.includes(e.id))
     expect(held).toBeTruthy()
     expect(await decideGate(clipUrl(held!.id), null, 'pristine', true)).toEqual({ kind: 'redirect', to: '/?signin' })
-    expect(await decideGate(clipUrl('w:bpai'), null, 'pristine', true)).toEqual({ kind: 'redirect', to: '/?signin' })
+    expect(await decideGate(clipUrl('w:glai'), null, 'pristine', true)).toEqual({ kind: 'redirect', to: '/?signin' })
     expect(await decideGate('/preview/', null, 'pristine', true)).toEqual({ kind: 'pass' })
     expect(slopHits(previewSources())).toEqual([])
   })

@@ -1,5 +1,6 @@
+import { useState, type ReactNode } from 'react'
 import { ENTRIES } from '@content/index'
-import { CONSONANTS, DIGITS, OTHER_SIGNS, VOWELS, type ConsonantClass } from '@content/script/alphabet'
+import { CONSONANTS, DIGITS, OTHER_SIGNS, VOWELS, type Consonant, type ConsonantClass } from '@content/script/alphabet'
 import type { Entry } from '@content/types'
 import { progressFor } from '@/engine/scheduler'
 import type { ProgressDoc } from '@/storage/progress-schema'
@@ -21,11 +22,20 @@ function cell(doc: ProgressDoc, char: string, sub: string, retired?: boolean): C
   return out
 }
 
-function Grid(props: { title: string; note?: string; cells: Cell[]; onOpen: (n: number) => void; unlocked?: (n: number) => boolean }) {
+/** The example word in a letter's name: gɔɔ gài → gài. */
+function exampleWord(name: string): string {
+  const parts = name.split(' ')
+  return parts[parts.length - 1] ?? name
+}
+
+/** The sound a letter makes at the start of a syllable, then the word that carries it. */
+function consonantLine(c: Consonant): string {
+  const word = exampleWord(c.name)
+  return c.initial ? `${c.initial}, ${word}` : word
+}
+
+function Grid(props: { cells: Cell[]; onOpen: (n: number) => void; unlocked?: (n: number) => boolean }) {
   return (
-    <section className="alpha-block">
-      <h2 className="quiet">{props.title}</h2>
-      {props.note && <p className="lede alpha-note thai-inline">{props.note}</p>}
       <ul className="alpha-grid">
         {props.cells.map((c) => (
           <li key={c.char}>
@@ -43,7 +53,6 @@ function Grid(props: { title: string; note?: string; cells: Cell[]; onOpen: (n: 
           </li>
         ))}
       </ul>
-    </section>
   )
 }
 
@@ -53,59 +62,119 @@ const CLASS_TITLE: Record<ConsonantClass, string> = {
   low: 'Low class',
 }
 
+function classNote(cls: ConsonantClass): ReactNode {
+  if (cls === 'mid') {
+    return 'A live syllable with no mark is mid. ก starts it as g, as in gài.'
+  }
+  if (cls === 'high') {
+    return (
+      <>
+        A live syllable with no mark is rising. <span className="thai">ห</span> in front lends this class to a low letter. ข starts it as k, as in kài.
+      </>
+    )
+  }
+  return 'Twenty-four letters. ค starts a syllable as k, as in kwaai.'
+}
+
 export function Alphabet(props: { doc: ProgressDoc; onOpen: (n: number) => void; unlocked?: (n: number) => boolean }) {
-  const taught = CONSONANTS.filter((c) => cardFor(c.char) && progressFor(props.doc, cardFor(c.char)!.id).reps > 0).length
-  return (
-    <main className="page alphabet">
-      <h2>The whole script</h2>
-      <p className="lede">
-        Forty-four consonants, the vowel signs, the marks and the digits. Every one has a card in Script. Lacquer means you
-        have met it. Tap a letter to open its level. {taught} of 44 consonants so far.
-      </p>
-      {(['mid', 'high', 'low'] as ConsonantClass[]).map((cls) => (
-        <Grid
-          key={cls}
-          title={CLASS_TITLE[cls]}
-          note={
-            cls === 'mid'
-              ? 'Nine letters. No mark on a live syllable is mid tone.'
-              : cls === 'high'
-                ? 'Eleven letters. No mark on a live syllable is rising. ห in front lends this class to a low letter.'
-                : 'Twenty-four letters. Many are second shapes for sounds you already read.'
-          }
-          cells={CONSONANTS.filter((c) => c.cls === cls).map((c) => cell(props.doc, c.char, c.name, c.retired))}
-          onOpen={props.onOpen}
-          unlocked={props.unlocked}
-        />
-      ))}
-      <Grid title="Vowels" cells={VOWELS.map((v) => cell(props.doc, v.char, v.reads))} onOpen={props.onOpen} unlocked={props.unlocked} />
-      <section className="alpha-block">
-        <h2 className="quiet">Tone marks</h2>
-        <p className="lede alpha-note thai-inline">
-          Learned on words, never as cards. On a mid-class letter: {showThai('่')} low, {showThai('้')} falling,{' '}
-          {showThai('๊')} high, {showThai('๋')} rising.
-        </p>
+  const [open, setOpen] = useState<string>('mid')
+  const toggle = (id: string) => setOpen((cur) => (cur === id ? '' : id))
+
+  const sections: Array<{ id: string; title: string; count: number; note: ReactNode; body: ReactNode }> = [
+    ...(['mid', 'high', 'low'] as ConsonantClass[]).map((cls) => {
+      const letters = CONSONANTS.filter((c) => c.cls === cls)
+      return {
+        id: cls,
+        title: CLASS_TITLE[cls],
+        count: letters.length,
+        note: classNote(cls),
+        body: (
+          <Grid
+            cells={letters.map((c) => cell(props.doc, c.char, consonantLine(c), c.retired))}
+            onOpen={props.onOpen}
+            unlocked={props.unlocked}
+          />
+        ),
+      }
+    }),
+    {
+      id: 'vowels',
+      title: 'Vowels',
+      count: VOWELS.length,
+      note: 'The sign, and the sound it writes on a consonant.',
+      body: <Grid cells={VOWELS.map((v) => cell(props.doc, v.char, v.reads))} onOpen={props.onOpen} unlocked={props.unlocked} />,
+    },
+    {
+      id: 'tones',
+      title: 'Tone marks',
+      count: 4,
+      note: (
+        <>
+          On a mid letter, <span className="thai">{showThai('่')}</span> is low, <span className="thai">{showThai('้')}</span> falling,{' '}
+          <span className="thai">{showThai('๊')}</span> high, <span className="thai">{showThai('๋')}</span> rising. ก่า is gàa.
+        </>
+      ),
+      body: (
         <ul className="tone-mark-row">
           <li>
             <span className="thai">{showThai('ก่า')}</span>
-            <span className="rom">low</span>
+            <span className="rom">gàa, low</span>
           </li>
           <li>
             <span className="thai">{showThai('ก้า')}</span>
-            <span className="rom">falling</span>
+            <span className="rom">gâa, falling</span>
           </li>
           <li>
             <span className="thai">{showThai('ก๊า')}</span>
-            <span className="rom">high</span>
+            <span className="rom">gáa, high</span>
           </li>
           <li>
             <span className="thai">{showThai('ก๋า')}</span>
-            <span className="rom">rising</span>
+            <span className="rom">gǎa, rising</span>
           </li>
         </ul>
-      </section>
-      <Grid title="Other marks" cells={OTHER_SIGNS.map((s) => cell(props.doc, s.char, s.reads))} onOpen={props.onOpen} unlocked={props.unlocked} />
-      <Grid title="Digits" cells={DIGITS.map((d, i) => cell(props.doc, d, String(i)))} onOpen={props.onOpen} unlocked={props.unlocked} />
+      ),
+    },
+    {
+      id: 'marks',
+      title: 'Other marks',
+      count: OTHER_SIGNS.length,
+      note: 'A mark on a word you can already say.',
+      body: <Grid cells={OTHER_SIGNS.map((s) => cell(props.doc, s.char, s.reads))} onOpen={props.onOpen} unlocked={props.unlocked} />,
+    },
+    {
+      id: 'digits',
+      title: 'Digits',
+      count: DIGITS.length,
+      note: '๐ is zero. The rest count up from there.',
+      body: <Grid cells={DIGITS.map((d, i) => cell(props.doc, d, String(i)))} onOpen={props.onOpen} unlocked={props.unlocked} />,
+    },
+  ]
+
+  return (
+    <main className="page alphabet">
+      <h2>The whole script</h2>
+      <p className="lede">44 consonants. Then vowels, marks, digits.</p>
+      {sections.map((s) => {
+        const here = open === s.id
+        return (
+          <section key={s.id} className="alpha-block">
+            <button type="button" className={here ? 'contents-row here' : 'contents-row'} onClick={() => toggle(s.id)} aria-expanded={here}>
+              <span className="contents-n">{s.count}</span>
+              <span>
+                <span className="contents-title">{s.title}</span>
+              </span>
+              {!here && <span className="contents-go">Open</span>}
+            </button>
+            {here && (
+              <>
+                <p className="lede alpha-note">{s.note}</p>
+                {s.body}
+              </>
+            )}
+          </section>
+        )
+      })}
     </main>
   )
 }

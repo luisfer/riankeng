@@ -47,7 +47,7 @@ describe('the landing page', () => {
       expect(existsSync(join(ROOT, 'public', 'scenes', `${card.stem}-980.webp`)), card.stem).toBe(true)
       expect(existsSync(join(ROOT, 'public', 'scenes', `${card.stem}-490.webp`)), card.stem).toBe(true)
     }
-    expect(DEMO.length).toBe(38)
+    expect(DEMO.length).toBe(40)
     expect(new Set(DEMO_IDS).size).toBe(DEMO.length)
   })
 
@@ -64,11 +64,13 @@ describe('the landing page', () => {
     expect(slopHits(QUIET.map((q) => q.alt))).toEqual([])
   })
 
-  it('leaves the close drawing empty so the script can pick a quiet one', () => {
-    const close = doc.querySelector<HTMLImageElement>('.night-art')
-    expect(close).not.toBeNull()
-    expect(close?.getAttribute('src')).toBeNull()
-    expect(close?.getAttribute('alt')).toBe('')
+  it('leaves the quiet drawings empty so the script can pick two different ones', () => {
+    for (const selector of ['.sitting-art', '.night-art']) {
+      const img = doc.querySelector<HTMLImageElement>(selector)
+      expect(img, selector).not.toBeNull()
+      expect(img?.getAttribute('src')).toBeNull()
+      expect(img?.getAttribute('alt')).toBe('')
+    }
   })
 
   it('ships every drawing it shows, square, with its size declared', () => {

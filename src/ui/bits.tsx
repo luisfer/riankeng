@@ -90,6 +90,7 @@ export function TextBtn({
   current,
   rank = 'tertiary',
   className,
+  ariaKeyshortcuts,
 }: {
   children: ReactNode
   onClick?: () => void
@@ -98,6 +99,7 @@ export function TextBtn({
   /** Secondary is the ink outline. Danger is the lacquer outline. Quiet is a small key. Tertiary is type. */
   rank?: 'secondary' | 'danger' | 'quiet' | 'tertiary'
   className?: string
+  ariaKeyshortcuts?: string
 }) {
   const cls = [
     rank === 'secondary' ? 'btn secondary' : rank === 'danger' ? 'btn danger' : rank === 'quiet' ? 'btn quiet' : 'text-btn',
@@ -107,7 +109,14 @@ export function TextBtn({
     .filter(Boolean)
     .join(' ')
   return (
-    <button type="button" className={cls} onClick={onClick} disabled={disabled} aria-current={current || undefined}>
+    <button
+      type="button"
+      className={cls}
+      onClick={onClick}
+      disabled={disabled}
+      aria-current={current || undefined}
+      aria-keyshortcuts={ariaKeyshortcuts}
+    >
       {children}
     </button>
   )
@@ -171,9 +180,7 @@ export function Trail(props: {
       </span>
       <div className="trail-end">
         {props.onPause && (
-          <TextBtn rank="quiet" onClick={props.onPause}>
-            Pause
-          </TextBtn>
+          <TextBtn onClick={props.onPause}>Pause</TextBtn>
         )}
         {props.onAccount && !props.onPause && <TextBtn onClick={props.onAccount}>{props.accountLabel || 'Account'}</TextBtn>}
       </div>

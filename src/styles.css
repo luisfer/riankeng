@@ -121,7 +121,9 @@ body::before {
 .app.in-session .page.session {
   width: 100%;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+  /* The card sits under the trail, in the upper third, not in the middle of nothing. */
+  padding-top: clamp(24px, 11vh, 112px);
   padding-inline: var(--session-gutter);
 }
 
@@ -180,7 +182,7 @@ body::before {
   align-items: baseline;
   margin-inline: 20px;
   min-width: 0;
-  color: var(--ink-3);
+  color: var(--ink-2);
   font-size: 15px;
   font-variant-numeric: tabular-nums;
 }
@@ -262,17 +264,41 @@ body::before {
   display: flex;
   flex-direction: column;
 }
+/*
+ * A sitting is a primer page: the instruction, the word with its number hung in the
+ * margin, its audio as type, then one ruled line to write on.
+ */
 .session-stage {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 20px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: baseline;
   width: min(640px, 100%);
 }
+.session-stage > * { grid-column: 1; min-width: 0; }
+.session-stage .session-prompt { grid-row: 1; }
+.session-stage .session-no,
+.session-stage .session-stimulus { grid-row: 2; }
+.session-stage .prompt-tools { grid-row: 3; margin-top: 14px; }
+.session-stage .session-desk { grid-row: 4; margin-top: 52px; }
+.session-stage .session-feedback { grid-row: 5; margin-top: 14px; }
 .session-stage .prompt-en { font-size: 56px; }
-.session-stage .prompt-rom { font-size: 56px; }
+.session-stage .prompt-rom,
+.session-stage .reveal { font-size: 60px; line-height: 1.12; }
 .session-stage .prompt-thai { font-size: 72px; }
-.session-stage .roman-field { font-size: 42px; }
+.session-stage .roman-field,
+.session-stage .answer-said { font-size: 32px; }
+.session-stage .roman-field.en,
+.session-stage .answer-said.en { font-size: 26px; }
+/* Hung in the margin: its right edge 20px left of the column, on the word's baseline. */
+.session-no {
+  justify-self: start;
+  transform: translateX(calc(-100% - 20px));
+  font-family: var(--display);
+  font-size: 28px;
+  line-height: 1;
+  color: var(--lacquer);
+  font-variant-numeric: tabular-nums lining-nums;
+}
 
 h1 {
   font-family: var(--display);
@@ -532,17 +558,22 @@ li.quiet-row { cursor: default; }
   font-weight: 400;
   margin: 0 0 8px;
 }
+/* The instruction, set the way a printed primer sets it: the display face, in italic. */
 .session-prompt {
-  margin: 0;
+  margin: 0 0 8px;
+  font-family: var(--display);
+  font-style: italic;
+  font-size: 20px;
+  line-height: 1.3;
   color: var(--ink-2);
-  font-size: 15px;
 }
 .prompt-tools {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
+  align-items: baseline;
+  gap: 8px 22px;
   margin: 0;
+  font-size: 15px;
 }
 .contents-row:disabled {
   opacity: 1;
@@ -560,16 +591,38 @@ li.quiet-row { cursor: default; }
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
-  gap: 6px;
+  gap: 8px;
 }
-/* A right answer: one lacquer stroke under the card, and its other half beneath. */
+/* A right answer: one lacquer stroke under the word, drawn once, and its other half beneath. */
 .session-stimulus.right > .prompt-en,
 .session-stimulus.right > .prompt-rom,
 .session-stimulus.right > .prompt-thai {
-  text-decoration: underline;
-  text-decoration-color: var(--lacquer);
-  text-decoration-thickness: 3px;
-  text-underline-offset: 0.28em;
+  background: linear-gradient(var(--lacquer), var(--lacquer)) 0 100% / 100% 3px no-repeat;
+  padding-bottom: 0.08em;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .session-stimulus.right > .prompt-en,
+  .session-stimulus.right > .prompt-rom,
+  .session-stimulus.right > .prompt-thai { animation: ink-under 620ms var(--ease) both; }
+}
+@keyframes ink-under { from { background-size: 0% 3px; } }
+/* A miss: the word as it is written, the syllable that slipped the only lacquer in it. */
+.slip-line {
+  margin: 4px 0 0;
+  font-size: 32px;
+  line-height: 1.2;
+  color: var(--ink);
+}
+.slip { color: var(--lacquer); }
+/* Beside a slipped syllable the sentence goes to ink: the syllable already carries the lacquer. */
+.session-stage:has(.slip-line) .session-feedback.miss { color: var(--ink); }
+/* A listening card has no word to show, so its Hear and Slower take the word's place, larger. */
+.session-stage .prompt-listen:empty { display: none; }
+.session-stage:has(.session-stimulus > .prompt-listen:only-child) .prompt-tools {
+  grid-row: 2;
+  margin-top: 0;
+  gap: 8px 32px;
+  font-size: 26px;
 }
 .session-desk {
   width: 100%;
@@ -577,6 +630,7 @@ li.quiet-row { cursor: default; }
 .session-feedback {
   margin: 0;
   min-height: 0;
+  font-size: 16px;
 }
 .sense-line {
   margin: 0;
@@ -899,6 +953,11 @@ li.quiet-row { cursor: default; }
   color: var(--ink-3);
 }
 
+/* Too narrow to hang the number in the margin: it opens the instruction's line instead. */
+@media (max-width: 760px) {
+  .session-stage .session-no { grid-row: 1; transform: none; font-size: 20px; }
+  .session-stage .session-prompt { padding-left: 2.1rem; }
+}
 @media (max-width: 860px) {
   .journey:has(.splash) { grid-template-columns: minmax(0, 1fr); }
   .journey:has(.splash) .contents.hub { grid-column: 1; grid-row: 1; }
@@ -915,11 +974,25 @@ li.quiet-row { cursor: default; }
     padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px));
   }
   .prompt-en { font-size: 34px; }
-  .session-stage .prompt-en { font-size: 44px; }
+  .session-stage .prompt-en { font-size: 42px; }
   .session-stage .prompt-rom,
-  .session-stage .prompt-thai { font-size: 40px; }
-  .session-stage .roman-field { font-size: 32px; }
+  .session-stage .reveal,
+  .session-stage .prompt-thai { font-size: 44px; }
+  .session-stage .roman-field,
+  .session-stage .answer-said { font-size: 28px; }
+  .session-stage .roman-field.en,
+  .session-stage .answer-said.en { font-size: 22px; }
   .prompt-rom, .prompt-thai, .prompt-listen, .reveal { font-size: 28px; }
+  .app.in-session .page.session { padding-top: 20px; }
+  .session-stage .session-prompt { font-size: 18px; }
+  .session-stage .session-desk { margin-top: 36px; }
+  .slip-line { font-size: 26px; }
+  /* The trail keeps one row: the count and its meter move beside the name. */
+  .app.in-session .trail { grid-template-columns: auto minmax(0, 1fr) auto; }
+  .app.in-session .trail-mid { grid-column: 2; grid-row: 1; justify-self: end; margin-inline: 12px; grid-template-columns: 40px auto; }
+  .app.in-session .trail-mid-copy { display: none; }
+  .app.in-session .trail-meter { width: 40px; }
+  .app.in-session .trail-end { grid-column: 3; }
   .tone-charts-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px 12px; }
   .tone-chart-name { font-size: 12px; }
   .tone-chart-rom { font-size: 15px; }

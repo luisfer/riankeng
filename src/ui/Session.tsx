@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { TONES, TONE_LABEL, type Tone } from '@content/system'
 import { cleanGloss, gradeEnglish } from '@/engine/grader-en'
 import { gradeThai } from '@/engine/grader-thai'
@@ -37,6 +37,25 @@ export function pickPrompt(entry: { en: string[] }): string {
   return cleanGloss(entry.en[0] ?? '')
 }
 
+/**
+ * The target as it is written, with the syllables the grader named set in lacquer:
+ * the way the tone marks are the only lacquer in the mark. Anything it cannot place stays plain.
+ */
+export function slipSpans(target: string, slips: number[]): ReactNode {
+  if (!slips.length) return target
+  const out: ReactNode[] = []
+  let at = 0
+  for (const [i, syllable] of analyseRom(target).syllables.entries()) {
+    const from = target.indexOf(syllable, at)
+    if (from < 0) return target
+    if (from > at) out.push(target.slice(at, from))
+    out.push(slips.includes(i) ? <span key={i} className="slip">{syllable}</span> : syllable)
+    at = from + syllable.length
+  }
+  if (at < target.length) out.push(target.slice(at))
+  return out
+}
+
 export function SessionView(props: {
   doc: ProgressDoc
   session: LiveSession
@@ -49,6 +68,7 @@ export function SessionView(props: {
   const [hint, setHint] = useState<string | null>(null)
   const [heard, setHeard] = useState(false)
   const [toneStep, setToneStep] = useState(0)
+  const [slipLine, setSlipLine] = useState<{ target: string; slips: number[] } | null>(null)
   const [, setVoiceTick] = useState(0)
   const goNextRef = useRef(() => {})
   const attemptedRef = useRef(false)
@@ -81,6 +101,23 @@ export function SessionView(props: {
     void speakThai(card.thai, card.id, props.doc.settings.audioRate, { gesture: false })
     setHeard(true)
   }, [item?.id, item?.modality, item?.meet, props.doc.settings.autoplay, props.doc.settings.silent, props.doc.settings.audioRate])
+
+  useEffect(() => {
+    if (!item || props.doc.settings.silent) return
+    const onKey = (e: KeyboardEvent) => {
+      if (!e.altKey || e.metaKey || e.ctrlKey || e.repeat) return
+      const key = e.key.toLowerCase()
+      if (key !== 'h' && key !== 's') return
+      e.preventDefault()
+      const card = entryOrThrow(item.id)
+      setHeard(true)
+      setHint(null)
+      if (key === 'h') void speakThai(card.thai, card.id, props.doc.settings.audioRate, { gesture: true })
+      else void speakSlower(card.thai, card.id, props.doc.settings.audioRate, { gesture: true })
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [item, props.doc.settings.silent, props.doc.settings.audioRate])
 
   useEffect(() => {
     if (!canAdvance) return
@@ -122,6 +159,7 @@ export function SessionView(props: {
     const verdict = ack ?? props.session.pending
     setAck(null)
     setAnswer('')
+    setSlipLine(null)
     if (hold) props.onSession(afterHold(props.session))
     else if (verdict?.ok) props.onSession(markCorrect(props.session))
     else props.onSession(requeueCurrent(props.session))
@@ -168,7 +206,9 @@ export function SessionView(props: {
     if (g.correct) {
       noteAttempt(true, g.verdict, chrome.right)
     } else if (g.verdict === 'tone' || g.verdict === 'length') {
-      noteAttempt(false, g.verdict, g.message, 'move')
+      if (noteAttempt(false, g.verdict, g.message, 'move')) {
+        setSlipLine({ target: g.matchedTarget ?? entry.rom, slips: g.toneSlips.map((s) => s.syllable) })
+      }
     } else {
       if (noteAttempt(false, 'wrong', g.message, 'stay', { kind: 'retype-th', id: entry.id, target: g.matchedTarget })) {
         setAnswer('')
@@ -332,17 +372,18 @@ export function SessionView(props: {
   }
 
   const desk = meeting ? (
-    <div className="answer-form">
+    <div className="answer-form bare">
       <div />
       <Commit onClick={goNext}>Continue</Commit>
     </div>
   ) : waitingNext ? (
-    <div className="answer-form">
-      <div />
+    /* What was written stays on its line, and Next stands where Check stood. */
+    <div className={answer ? 'answer-form said' : 'answer-form bare'}>
+      <p className={`answer-said${voiceEn ? ' en' : ' rom'}`}>{answer}</p>
       <Commit onClick={goNext}>Next</Commit>
     </div>
   ) : pairing && hearable && !heard ? (
-    <div className="answer-form">
+    <div className="answer-form bare">
       <div />
     </div>
   ) : pairing && hearable && heard && !hold ? (
@@ -421,6 +462,10 @@ export function SessionView(props: {
     <main className="page session">
       <div className="session-stage">
         <p className="prompt session-prompt">{prompt}</p>
+        {/* The card's place in this sitting, hung in the margin the way a primer numbers its exercises. */}
+        <span className="session-no" aria-hidden="true">
+          {props.session.cursor + 1}
+        </span>
         <div className={`session-stimulus${right ? ' right' : ''}`}>
           {stimulus}
           {pairLine && (
@@ -428,6 +473,7 @@ export function SessionView(props: {
               {pairLine}
             </p>
           )}
+          {slipLine && ack && !ack.ok && <p className="slip-line rom">{slipSpans(slipLine.target, slipLine.slips)}</p>}
           {sense && !right && <p className="sense-line">{sense}</p>}
         </div>
         {(!props.doc.settings.silent || fromVoice) && (
@@ -435,8 +481,8 @@ export function SessionView(props: {
             {!props.doc.settings.silent && (
               <>
                 <TextBtn
-                  rank="quiet"
                   current={listenLocked}
+                  ariaKeyshortcuts="Alt+H"
                   onClick={() => {
                     setHeard(true)
                     if (hint === chrome.hearFirst) setHint(null)
@@ -446,7 +492,7 @@ export function SessionView(props: {
                   Hear
                 </TextBtn>
                 <TextBtn
-                  rank="quiet"
+                  ariaKeyshortcuts="Alt+S"
                   onClick={() => {
                     setHeard(true)
                     setHint(null)

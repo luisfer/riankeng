@@ -20,38 +20,127 @@ button:disabled { cursor: default; opacity: 0.4; }
 }
 .thai { font-family: var(--thai); }
 
+/* Four ranks. Primary is the lacquer fill. Secondary is the ink outline.
+   Danger is the lacquer outline, for a step that throws work away. Tertiary is type. */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  height: 36px;
+  padding: 0 14px;
+  border: 2px solid transparent;
+  border-radius: 2px;
+  font-family: var(--ui);
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 1;
+  text-decoration: none;
+}
+.btn.primary,
+.btn.commit {
+  background: var(--lacquer);
+  color: var(--on-lacquer);
+  border-color: var(--lacquer);
+}
+.btn.primary:hover:not(:disabled),
+.btn.commit:hover:not(:disabled),
+.btn.primary:focus-visible,
+.btn.commit:focus-visible {
+  background: color-mix(in srgb, var(--lacquer) 86%, #1c1710);
+  border-color: color-mix(in srgb, var(--lacquer) 86%, #1c1710);
+}
+.btn.secondary {
+  background: transparent;
+  color: var(--ink);
+  border: 2px solid var(--ink);
+}
+.btn.secondary:hover:not(:disabled),
+.btn.secondary:focus-visible {
+  background: var(--ink);
+  color: var(--paper);
+}
+.btn.danger {
+  background: transparent;
+  color: var(--lacquer);
+  border: 2px solid var(--lacquer);
+}
+.btn.danger:hover:not(:disabled),
+.btn.danger:focus-visible {
+  background: var(--lacquer);
+  color: var(--on-lacquer);
+}
+/* A small key. The rule is enough at rest. Ink arrives on hover. */
+.btn.quiet {
+  height: 32px;
+  padding: 0 12px;
+  background: transparent;
+  color: var(--ink);
+  border-color: color-mix(in srgb, var(--ink) 28%, transparent);
+}
+.btn.quiet:hover:not(:disabled),
+.btn.quiet:focus-visible {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--paper);
+}
+.btn.quiet.current {
+  color: var(--lacquer);
+  border-color: var(--lacquer);
+}
+.btn.quiet.current:hover:not(:disabled),
+.btn.quiet.current:focus-visible {
+  background: var(--lacquer);
+  border-color: var(--lacquer);
+  color: var(--on-lacquer);
+}
+input[type='checkbox'] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  border: 2px solid var(--ink);
+  border-radius: 2px;
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 12px 12px;
+  cursor: pointer;
+  flex: none;
+}
+input[type='checkbox']:hover:not(:disabled) { border-color: var(--lacquer); }
+input[type='checkbox']:checked {
+  border-color: var(--lacquer);
+  background-color: var(--lacquer);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M3.2 8.1 6.4 11.3 12.8 4.6' fill='none' stroke='%23f2ead8' stroke-width='2' stroke-linecap='square' stroke-linejoin='miter'/></svg>");
+}
+input[type='checkbox']:focus-visible {
+  outline: 2px solid var(--lacquer);
+  outline-offset: 3px;
+}
+input[type='checkbox']:disabled { cursor: default; opacity: 0.4; }
 .text-btn {
   color: var(--ink-2);
   text-underline-offset: 3px;
 }
 .text-btn:hover, .text-btn.current { color: var(--ink); text-decoration: underline; }
 
-.btn.commit {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: 36px;
-  padding: 0 14px;
-  background: var(--lacquer);
-  color: var(--paper);
-  border-radius: 2px;
-  font-size: 16px;
-  font-weight: 500;
-}
-
 .answer-form {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   column-gap: 16px;
-  align-items: center;
+  align-items: end;
   position: relative;
 }
+.answer-form > .btn.commit { margin-bottom: 10px; }
 .roman { display: contents; }
 .roman-line { grid-column: 1; grid-row: 1; min-width: 0; }
 .answer-form > .btn.commit {
   grid-column: 2;
   grid-row: 1;
-  align-self: center;
+  align-self: end;
 }
 .roman-field {
   appearance: none;
@@ -67,7 +156,7 @@ button:disabled { cursor: default; opacity: 0.4; }
 }
 .roman-field:focus-visible,
 .text-btn:focus-visible,
-.btn.commit:focus-visible,
+.btn:focus-visible,
 .pop-opt:focus-visible,
 .strip-k:focus-visible {
   outline: 2px solid var(--lacquer);
@@ -80,9 +169,10 @@ button:disabled { cursor: default; opacity: 0.4; }
 
 .popover {
   display: flex;
-  gap: 16px;
+  gap: 8px;
   flex-wrap: wrap;
-  padding: 8px 0 4px;
+  align-items: center;
+  padding: 12px 0 4px;
   grid-column: 1 / -1;
   position: absolute;
   left: 0;
@@ -93,12 +183,27 @@ button:disabled { cursor: default; opacity: 0.4; }
 }
 .pop-opt {
   display: inline-flex;
-  gap: 6px;
-  align-items: baseline;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 12px 0 10px;
+  border: 2px solid var(--ink);
+  border-radius: 2px;
+  color: var(--ink);
+  background: transparent;
+}
+.pop-opt:hover {
+  background: var(--ink);
+  color: var(--paper);
+}
+.pop-opt .rom { font-size: 24px; line-height: 1; color: var(--ink); }
+.pop-opt:hover .pop-k,
+.pop-opt:hover .rom { color: var(--paper); }
+.pop-k {
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
   color: var(--ink-2);
 }
-.pop-opt:hover { color: var(--ink); }
-.pop-k { font-size: 14px; font-variant-numeric: tabular-nums; }
 
 .strip {
   display: flex;
@@ -173,4 +278,43 @@ button:disabled { cursor: default; opacity: 0.4; }
 @media (max-width: 520px) {
   .roman-field { font-size: 28px; }
   .roman-field.en { font-size: 24px; }
+}
+
+/* The phonetic line is lacquer. Hover tips the seal, and the two lines trade that ink. */
+.wordmark .wordmark-rom { color: var(--word-rom); }
+.wordmark:hover .wordmark-th,
+.wordmark:focus-visible .wordmark-th { color: var(--word-rom); }
+.wordmark:hover .wordmark-rom,
+.wordmark:focus-visible .wordmark-rom { color: var(--ink); }
+.wordmark:focus-visible { outline: 2px solid var(--word-rom); outline-offset: 4px; }
+
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .wordmark .wordmark-th,
+  .wordmark .wordmark-rom {
+    background-image: linear-gradient(90deg, var(--word-rom) 0 50%, var(--ink) 50% 100%);
+    background-size: 200% 100%;
+    background-repeat: no-repeat;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .wordmark .wordmark-th { background-position: 100% 0; }
+  /* The clip box is the line box. A g's tail falls outside it and vanishes. */
+  .wordmark .wordmark-rom {
+    background-position: 0 0;
+    padding-bottom: 0.45em;
+    margin-bottom: -0.45em;
+  }
+  .wordmark:hover .wordmark-th,
+  .wordmark:focus-visible .wordmark-th { background-position: 0 0; }
+  .wordmark:hover .wordmark-rom,
+  .wordmark:focus-visible .wordmark-rom { background-position: 100% 0; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .wordmark .logo-mark { transition: transform 680ms var(--ease); }
+  .wordmark .wordmark-th,
+  .wordmark .wordmark-rom { transition: background-position 680ms var(--ease), color 680ms var(--ease); }
+  .wordmark:hover .logo-mark,
+  .wordmark:focus-visible .logo-mark { transform: rotate(-8deg); }
 }

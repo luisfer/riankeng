@@ -32,14 +32,14 @@ describe('decideGate', () => {
     for (const id of DEMO_IDS) {
       expect(await decideGate(clipUrl(id), null, SECRET, true)).toEqual({ kind: 'pass' })
     }
-    expect(await decideGate(clipUrl('w:maa'), null, SECRET, true)).toEqual({ kind: 'redirect', to: '/?signin' })
-    expect(await decideGate(clipUrl('w:maa'), await cookieFor(SECRET), SECRET, true)).toEqual({ kind: 'shell' })
+    expect(await decideGate(clipUrl('w:bpai'), null, SECRET, true)).toEqual({ kind: 'redirect', to: '/?signin' })
+    expect(await decideGate(clipUrl('w:bpai'), await cookieFor(SECRET), SECRET, true)).toEqual({ kind: 'shell' })
   })
 
   it('names an unset password on Vercel, and stays open locally', async () => {
     expect(await decideGate('/learn/', null, undefined, true)).toEqual({ kind: 'redirect', to: '/?signin=unset' })
     expect(await decideGate('/learn/', null, '', true)).toEqual({ kind: 'redirect', to: '/?signin=unset' })
     expect(await decideGate('/learn/', null, undefined, false)).toEqual({ kind: 'shell' })
-    expect(await decideGate('/audio/w:maa.mp3', null, undefined, false)).toEqual({ kind: 'shell' })
+    expect(await decideGate('/audio/w:bpai.mp3', null, undefined, false)).toEqual({ kind: 'shell' })
   })
 })

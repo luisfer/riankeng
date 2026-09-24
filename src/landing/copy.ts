@@ -8,6 +8,7 @@ export const landing = {
   waitlistNeed: 'Type an email.',
   waitlistFail: 'Could not save this.',
   open: 'Open the course',
+  typeEmail: 'Type an email.',
   typePassword: 'Type the password.',
   wrong: 'Wrong password.',
   couldNot: 'Could not sign in.',

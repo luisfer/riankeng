@@ -3,7 +3,7 @@ import { phrases } from '../build'
 export default phrases(21, [
   ['pǒm pûut tai dâi lέεo', 'ผมพูดไทยได้แล้ว', ['I can speak Thai now']],
   ['bprà-yòok níi kâo jai ngâai', 'ประโยคนี้เข้าใจง่าย', ['this sentence is easy to understand']],
-  ['kwaam mǎai kụụ à-rai', 'ความหมายคืออะไร', ['what does it mean']],
+  ['kwaam mǎai kʉʉ à-rai', 'ความหมายคืออะไร', ['what does it mean']],
   ['sǎm-nuan níi sǔai', 'สำนวนนี้สวย', ['this saying is beautiful']],
   ['pûut cháa ìik nɔ̀i', 'พูดช้าอีกหน่อย', ['speak a bit more slowly']],
   ['sùan yài kâo jai', 'ส่วนใหญ่เข้าใจ', ['mostly I understand']],
@@ -21,5 +21,5 @@ export default phrases(21, [
   ['kâo jai táng bprà-yòok', 'เข้าใจทั้งประโยค', ['I understand the whole sentence']],
   ['sùan nɔ́ɔi tîi pìt', 'ส่วนน้อยที่ผิด', ['only a little is wrong']],
   ['wan níi pûut dâi mâak gwàa', 'วันนี้พูดได้มากกว่า', ['today I can say more']],
-  ['gèng kụ̂n lέεo', 'เก่งขึ้นแล้ว', ['better already', 'improved']],
+  ['gèng kʉ̂n lέεo', 'เก่งขึ้นแล้ว', ['better already', 'improved']],
 ])

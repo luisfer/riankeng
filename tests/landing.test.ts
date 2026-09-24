@@ -28,7 +28,7 @@ describe('the landing page', () => {
     }
     const waitlist = doc.querySelector('.cell.title form.waitlist')
     expect(text(waitlist?.querySelector('.waitlist-en') ?? null)).toBe('Join the waitlist')
-    expect(text(waitlist?.querySelector('.waitlist-rom') ?? null)).toBe('long chụ̂ụ rɔɔ')
+    expect(text(waitlist?.querySelector('.waitlist-rom') ?? null)).toBe('long chʉ̂ʉ rɔɔ')
     expect(text(waitlist?.querySelector('.waitlist-th') ?? null)).toBe('ลงชื่อรอ')
     expect(waitlist?.querySelector('input[name="email"]')).not.toBeNull()
     expect(text(waitlist?.querySelector('button[type="submit"]') ?? null)).toBe('Join')
@@ -72,7 +72,7 @@ describe('the landing page', () => {
   })
 
   it('ships every drawing it shows, square, with its size declared', () => {
-    const imgs = [...doc.querySelectorAll('img')].filter((img) => img.getAttribute('src'))
+    const imgs = [...doc.querySelectorAll('img')].filter((img) => img.getAttribute('src')?.startsWith('/scenes/'))
     expect(imgs.length).toBeGreaterThanOrEqual(1)
     for (const img of imgs) {
       const sources = [img.getAttribute('src')!, ...(img.getAttribute('srcset') ?? '').split(',').map((s) => s.trim().split(' ')[0]!)].filter(Boolean)
@@ -95,37 +95,53 @@ describe('the landing page', () => {
 
   it('names the extra vowels on the try card, without coaching the sitting', () => {
     expect(text(doc.querySelector('#try .lede'))).toBe(
-      'Thai has more vowels than English, and five tones. The keys write ε, ɔ, ə, ụ and the marks.',
+      'Thai has more vowels than English, and five tones. The keys write ε, ɔ, ə, ʉ and the marks.',
     )
   })
 
-  it('has one password form in the title panel, and a waitlist at the close', () => {
-    expect(doc.querySelector('.cell.title form[data-signin]')?.id).toBe('gate')
-    expect(doc.querySelector('.cell.title form[data-signin] input[name="password"]')?.id).toBe('password')
-    expect(doc.querySelector('.cell.title form[data-signin] input[name="email"]')?.id).toBe('gate-email')
-    expect(text(doc.querySelector('.cell.title form[data-signin] button[type="submit"]') ?? null)).toBe('Log in')
+  it('keeps Log in in the nav, and the waitlist alone in the title cell', () => {
+    expect(doc.querySelector('.cell.title form[data-signin]')).toBeNull()
+    expect(doc.querySelector('.nav form[data-signin]')?.id).toBe('gate')
+    expect(doc.querySelector('.nav form[data-signin] input[name="password"]')?.id).toBe('password')
+    expect(doc.querySelector('.nav form[data-signin] input[name="email"]')?.id).toBe('gate-email')
+    expect(text(doc.querySelector('.nav form[data-signin] button[type="submit"]') ?? null)).toBe('Log in')
     expect(doc.querySelector('[data-nav-sign]')?.getAttribute('href')).toBe('#gate')
     expect(text(doc.querySelector('[data-nav-sign]'))).toBe('Log in')
     expect(doc.querySelectorAll('form[data-signin]')).toHaveLength(1)
     expect(doc.querySelector('.close form[data-signin]')).toBeNull()
+    expect(text(doc.querySelector('.cell.title .waitlist .waitlist-en') ?? null)).toBe('Join the waitlist')
     expect(doc.querySelector('#device')).toBeNull()
     expect(doc.querySelector('#tracks, a[href="#tracks"]')).toBeNull()
     expect(text(doc.querySelector('#close-h'))).toBe('Speak with Thainess.')
     const waitlist = doc.querySelector('.close-copy form.waitlist')
     expect(text(waitlist?.querySelector('.waitlist-en') ?? null)).toBe('Join the waitlist')
-    expect(text(waitlist?.querySelector('.waitlist-rom') ?? null)).toBe('long chụ̂ụ rɔɔ')
+    expect(text(waitlist?.querySelector('.waitlist-rom') ?? null)).toBe('long chʉ̂ʉ rɔɔ')
     expect(text(waitlist?.querySelector('.waitlist-th') ?? null)).toBe('ลงชื่อรอ')
     expect(waitlist?.querySelector('input[name="email"]')).not.toBeNull()
   })
 
-  it('keeps the English of the name under the wordmark', () => {
-    expect(text(doc.querySelector('.nav .wordmark-en'))).toBe('learn well')
+  it('sets the name the same way the course header does', () => {
+    expect(text(doc.querySelector('.nav .wordmark-th'))).toBe('เรียนเก่ง')
+    expect(text(doc.querySelector('.nav .wordmark-rom'))).toBe('rian gèng')
+    expect(doc.querySelector('.nav .wordmark-en')).toBeNull()
+    expect(doc.querySelector('.nav .logo-mark')?.getAttribute('src')).toBe('/brand/mark.svg')
+    expect(doc.querySelector('.nav .lockup')).toBeNull()
     expect(doc.querySelector('.nav .wordmark')?.getAttribute('aria-label')).toBe('rian gèng, เรียนเก่ง')
+  })
+
+  it('puts the same name in the footer', () => {
+    expect(text(doc.querySelector('.footer .wordmark-th'))).toBe('เรียนเก่ง')
+    expect(text(doc.querySelector('.footer .wordmark-rom'))).toBe('rian gèng')
+    expect(doc.querySelector('.footer .logo-mark')?.getAttribute('src')).toBe('/brand/mark.svg')
+    expect(doc.querySelector('.footer .lockup')).toBeNull()
   })
 
   it('credits the romanization in the footer', () => {
     expect(text(doc.querySelector('.footer .footer-note'))).toBe(
-      'Romanization adapted from the Paiboon system of Benjawan Poomsan Becker.',
+      'Romanization is the Paiboon system of Benjawan Poomsan Becker.',
+    )
+    expect(doc.querySelector('.footer .footer-note a')?.getAttribute('href')).toBe(
+      'https://paiboonlanguageacademy.com/product/thai-for-beginners/',
     )
   })
 })

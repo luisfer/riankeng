@@ -3,17 +3,22 @@ import {
   DOT_BELOW,
   SEPARATORS,
   TONE_BY_MARK,
+  U_BAR,
   VOWEL_BASES,
   type Tone,
 } from '@content/system'
 
-/** Lowercase, NFD, apply character aliases, collapse whitespace. */
+/**
+ * Lowercase, NFD, fold the older dotted u and the umlaut onto ʉ, apply
+ * character aliases, collapse whitespace.
+ * NFD orders the dot (class 220) before a tone mark (class 230), so a dotted ụ́
+ * arrives as u + dot + tone and becomes ʉ + tone.
+ */
 export function canonicalRom(input: string): string {
   let s = input.normalize('NFD').toLowerCase()
-  s = s.replace(/u\u0308/g, 'u' + DOT_BELOW).replace(/u\u0324/g, 'u' + DOT_BELOW)
+  s = s.replace(/u[\u0308\u0323\u0324\u0331\u0332]/g, U_BAR)
   let out = ''
   for (const ch of s) out += CHAR_ALIASES[ch] ?? ch
-  // A learner might type the dot-below after a tone mark; canonical order is dot first.
   out = out.normalize('NFD')
   return out.replace(/\s+/g, ' ').trim()
 }
@@ -127,7 +132,7 @@ export function analyseRom(input: string): RomAnalysis {
   }
 }
 
-/** aa → a, ɔɔ → ɔ, ụụ → ụ. Keeps diphthongs (ia, ua, ao...) intact. */
+/** aa → a, ɔɔ → ɔ, ʉʉ → ʉ. Keeps diphthongs (ia, ua, ao...) intact. */
 export function collapseLength(skeleton: string): string {
   const units = toUnits(skeleton)
   const out: string[] = []
@@ -138,7 +143,7 @@ export function collapseLength(skeleton: string): string {
   return out.join('')
 }
 
-/** Split into letter units where ụ (u + dot) is one unit. */
+/** Split into letter units. A legacy dotted u (u + dot) is still one unit. */
 export function toUnits(skeleton: string): string[] {
   const units: string[] = []
   for (const ch of skeleton) {

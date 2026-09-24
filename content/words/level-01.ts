@@ -32,7 +32,7 @@ export default words(1, [
   ['paa-sǎa ang-grìt', 'ภาษาอังกฤษ', ['English', 'English language', '(the) English language'], 'n', []],
   ['kon tai', 'คนไทย', ['Thai person', 'Thai people', 'Thai (person)', 'a Thai'], 'n', []],
   ['fà-ràng', 'ฝรั่ง', ['Westerner', 'foreigner', 'Western foreigner', 'white foreigner'], 'n', [], 'Also "guava". Not rude, just descriptive.'],
-  ['chụ̂ụ', 'ชื่อ', ['name', 'to be named', 'be called'], 'n', [], 'Your name goes after it. pǒm chụ̂ụ …: my name is ….'],
+  ['chʉ̂ʉ', 'ชื่อ', ['name', 'to be named', 'be called'], 'n', [], 'Your name goes after it. pǒm chʉ̂ʉ …: my name is ….'],
   ['rúu', 'รู้', ['know', 'to know', 'know (a fact)'], 'v', []],
   ['mâi rúu', 'ไม่รู้', ['do not know', 'I do not know', 'dunno'], 'expr', []],
   ['mâak', 'มาก', ['very', 'a lot', 'much', 'very much', 'many'], 'adv', []],
@@ -48,7 +48,7 @@ export default words(1, [
   ['laa gɔ̀ɔn', 'ลาก่อน', ['goodbye', 'farewell'], 'expr', ['greeting'], 'Formal. Thais usually say bpai gɔ̀ɔn ná or chôok dii.'],
   ['yin-dii', 'ยินดี', ['glad', 'pleased', 'happy to', 'delighted'], 'adj', ['polite']],
   ['yin-dii tîi dâi rúu-jàk', 'ยินดีที่ได้รู้จัก', ['nice to meet you', 'pleased to meet you', 'glad to meet you'], 'expr', ['greeting']],
-  // numbers 0–10 (nụ̀ng is in level 0)
+  // numbers 0–10 (nʉ̀ng is in level 0)
   ['sǔun', 'ศูนย์', ['zero', '0'], 'num', ['number']],
   ['sɔ̌ɔng', 'สอง', ['two', '2'], 'num', ['number']],
   ['sǎam', 'สาม', ['three', '3'], 'num', ['number']],

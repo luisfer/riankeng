@@ -51,57 +51,92 @@ h3 {
 }
 :focus-visible { outline: 2px solid var(--lacquer); outline-offset: 3px; }
 
+/* The thin lacquer line is body::before. Once the page moves, the nav sticks
+   and that line grows into the bar. */
+.site-bar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  padding-top: 8px;
+  background: transparent;
+  transition: background-color 420ms var(--ease);
+}
+html[data-stuck] .site-bar { background: var(--lacquer); }
 /* Nav */
 .nav {
   height: 64px;
-  margin-top: 8px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 24px;
 }
+.logo-marks {
+  position: relative;
+  width: var(--mark);
+  height: var(--mark);
+  flex: none;
+}
+.logo-marks .logo-mark {
+  position: absolute;
+  inset: 0;
+  opacity: 1;
+  transition: opacity 420ms var(--ease);
+}
+.logo-marks .logo-mark-bar { opacity: 0; }
+html[data-stuck] .nav .logo-marks .logo-mark { opacity: 0; }
+html[data-stuck] .nav .logo-marks .logo-mark-bar { opacity: 1; }
+html[data-stuck] .nav .wordmark {
+  --ink: var(--on-lacquer);
+  --word-rom: var(--on-lacquer);
+  color: var(--on-lacquer);
+}
 .wordmark {
+  --th: 26px;
+  --rom: 16px;
+  /* Thai is line-height 1. The roman line is 1.05. The square matches both. */
+  --mark: calc(var(--th) + var(--rom) * 1.05);
   display: flex;
-  align-items: baseline;
-  gap: 12px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  line-height: 1.05;
   text-decoration: none;
   color: var(--ink);
   white-space: nowrap;
   flex-shrink: 0;
 }
+.logo-mark {
+  display: block;
+  width: var(--mark);
+  height: var(--mark);
+  flex: none;
+}
+.wordmark-name {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
 .wordmark-th {
   font-family: "Fahkwang", var(--thai);
-  font-size: 26px;
+  font-size: var(--th);
+  font-weight: 400;
   line-height: 1;
+  color: var(--ink);
 }
 .wordmark-rom {
   font-family: var(--phonetic);
   font-synthesis: none;
-  font-size: 17px;
+  font-size: var(--rom);
+  line-height: 1.05;
 }
-.wordmark-rom b { font-weight: 400; color: var(--lacquer); }
-.wordmark-swap {
-  display: grid;
-  align-items: baseline;
-}
-.wordmark-swap > * { grid-area: 1 / 1; }
-.wordmark-en {
-  font-family: var(--ui);
-  font-size: 17px;
-  color: var(--ink-2);
-  opacity: 0;
-  pointer-events: none;
-}
-a.wordmark:hover .wordmark-rom,
-a.wordmark:focus-visible .wordmark-rom { opacity: 0; }
-a.wordmark:hover .wordmark-en,
-a.wordmark:focus-visible .wordmark-en { opacity: 1; }
 .nav-links {
   display: flex;
   align-items: center;
   gap: 28px;
   font-size: 16px;
 }
+.nav-login { position: relative; }
 .nav-links a {
   color: var(--ink-2);
   text-decoration: none;
@@ -121,6 +156,57 @@ a.wordmark:focus-visible .wordmark-en { opacity: 1; }
 .nav-links a.ghost:hover { background: var(--ink); color: var(--paper); text-decoration: none; }
 html[data-session="in"] .nav-links a.ghost { background: var(--lacquer); border-color: var(--lacquer); color: var(--paper); }
 html[data-session="in"] .nav-links a.ghost:hover { background: var(--ink); border-color: var(--ink); }
+html[data-stuck] .nav-links a:not(.ghost) { color: color-mix(in srgb, var(--on-lacquer) 82%, var(--lacquer)); }
+html[data-stuck] .nav-links a:not(.ghost):hover { color: var(--on-lacquer); }
+html[data-stuck] .nav a.ghost {
+  border-width: 2px;
+  border-color: var(--on-lacquer);
+  color: var(--on-lacquer);
+  background: transparent;
+}
+html[data-stuck] .nav a.ghost:hover {
+  background: var(--on-lacquer);
+  color: var(--lacquer);
+  border-color: var(--on-lacquer);
+}
+html[data-stuck][data-session="in"] .nav a.ghost {
+  background: var(--on-lacquer);
+  border-color: var(--on-lacquer);
+  color: var(--lacquer);
+}
+.nav .nav-wait { display: none; }
+html[data-stuck] .nav .nav-wait {
+  display: grid;
+  position: relative;
+  width: auto;
+  justify-items: end;
+}
+html[data-stuck] .nav-join {
+  height: 36px;
+  padding: 0 14px;
+  background: var(--on-lacquer);
+  color: var(--lacquer);
+  border: 2px solid var(--on-lacquer);
+  font-size: 16px;
+}
+html[data-stuck] .nav-join:hover:not(:disabled) {
+  background: #fffaf3;
+  border-color: #fffaf3;
+}
+html[data-stuck] .nav .nav-wait[data-open] { width: auto; }
+html[data-stuck] .nav .nav-wait[data-open] [data-waitlist-open] { display: inline-flex; }
+html[data-stuck] .nav .nav-wait .waitlist-row [data-waitlist-note] { grid-column: 1 / -1; }
+html[data-stuck] .nav .nav-wait[data-open] .waitlist-row {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 6;
+  width: min(340px, calc(100vw - 40px));
+  padding: 20px;
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  color: var(--ink);
+}
 
 /* The comic page. A square bento: column count follows the comic's width,
    title and the largest drawing take a 2×2 when that row still fills.
@@ -132,7 +218,7 @@ html:not([data-comic]) .comic { visibility: hidden; }
   /* The day of panels uses the viewport. The card and the close stay in the column. */
   max-width: none;
 }
-header.wrap { max-width: none; }
+header.wrap { max-width: none; position: relative; z-index: 5; }
 .comic {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -251,22 +337,45 @@ header.wrap { max-width: none; }
   font-family: var(--display);
   font-weight: 400;
   font-size: clamp(28px, 12cqw, 4rem);
-  line-height: 1.02;
+  line-height: 1.08;
   letter-spacing: -0.01em;
   text-wrap: balance;
+}
+/* The spoken half. Italic, then lacquer, with the rule arriving under it. */
+.cell.title h1 em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--lacquer);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-decoration-color: var(--lacquer);
+  text-decoration-skip-ink: auto;
+  text-underline-offset: 0.22em;
 }
 .cell.title .waitlist {
   margin-top: auto;
   width: 100%;
 }
 .cell.title .waitlist .btn.commit:hover:not([data-waitlist-open]) { filter: brightness(0.92); }
+/* Ink wipes across the lacquer. The words stay above it. */
 .cell.title [data-waitlist-open] {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
   width: 100%;
   height: 80px;
   padding: 0 32px;
   font-size: 26px;
 }
-.waitlist-label { display: grid; place-items: center; }
+.cell.title [data-waitlist-open]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #1c1710;
+  transform: translateX(-101%);
+  pointer-events: none;
+}
+.waitlist-label { display: grid; place-items: center; position: relative; z-index: 1; }
 .waitlist-label > span { grid-area: 1 / 1; }
 .waitlist-rom,
 .waitlist-th { opacity: 0; }
@@ -306,17 +415,21 @@ header.wrap { max-width: none; }
   order: -1;
   color: var(--ink-2);
 }
-/* The password form waits on Sign in. :target covers a click with no script. */
-.cell.title .signin { display: none; }
-.cell.title:has(.signin:target),
-html[data-gate="open"] .cell.title { justify-content: flex-start; }
-.cell.title:has(.signin:target) .waitlist,
-html[data-gate="open"] .cell.title .waitlist { margin-top: 0; }
-.cell.title .signin:target,
-html[data-gate="open"] .cell.title .signin { display: grid; }
-
-/* Sign in. The one action. */
-.signin { display: grid; gap: 8px; }
+/* Log in is a paper panel under the nav button. :target covers a click with no script. */
+.signin {
+  display: none;
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 6;
+  width: min(340px, calc(100vw - 40px));
+  padding: 20px;
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  gap: 8px;
+}
+html[data-gate="open"] .signin,
+.signin:target { display: grid; }
 .signin-label { font-size: 14px; color: var(--ink-2); }
 .signin-row {
   display: grid;
@@ -354,13 +467,20 @@ html[data-session="in"] .signin-row { grid-template-columns: auto; justify-conte
   max-width: 40em;
   margin-bottom: 36px;
 }
+#sitting .section-head { margin-bottom: 0; }
+#sitting .btn.commit { justify-self: start; text-decoration: none; }
+/* The live card is one sheet, ruled like a comic cell. */
+.try-sheet {
+  border: 2px solid var(--ink);
+  padding: 36px 32px 40px;
+}
 
 /* One card */
 .try {
   display: grid;
   grid-template-columns: minmax(0, 420px) minmax(0, 620px);
   gap: 48px;
-  align-items: start;
+  align-items: stretch;
 }
 .try-panel {
   position: relative;
@@ -371,16 +491,40 @@ html[data-session="in"] .signin-row { grid-template-columns: auto; justify-conte
 }
 .try-art { height: 100%; }
 .try-panel .balloon { animation: letter-in 360ms var(--ease) both; }
-.try-desk { display: grid; gap: 16px; padding-top: 8px; max-width: 560px; }
+.try-desk {
+  display: flex;
+  min-width: 0;
+  max-width: 560px;
+  min-height: 100%;
+}
+/* The words and the action share one column, as tall as the picture. */
+.try-stage {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  width: 100%;
+  min-height: 100%;
+  padding: 8px 0 4px 28px;
+  border-left: 2px solid var(--ink);
+}
+.try-copy {
+  flex: 1;
+  display: grid;
+  align-content: center;
+  gap: 12px;
+}
+.try-act { display: grid; gap: 16px; }
+.try-go, .try-next { display: flex; justify-content: flex-end; }
 .try .prompt {
   font-size: 18px;
   color: var(--ink-2);
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
+  align-items: center;
   gap: 8px 20px;
 }
-.prompt-tools { display: inline-flex; gap: 16px; }
+.prompt-tools { display: inline-flex; align-items: center; gap: 8px; }
 .try-rom {
   font-size: clamp(28px, 3vw, 36px);
   line-height: 1.2;
@@ -391,7 +535,7 @@ html[data-session="in"] .signin-row { grid-template-columns: auto; justify-conte
   line-height: 1.15;
   text-wrap: balance;
 }
-.try .answer-form { margin-top: 8px; }
+.try .answer-form { margin-top: 0; }
 .try .roman-field { font-size: 34px; }
 .try .feedback { margin-top: 4px; }
 .try-pair { display: grid; gap: 4px; padding: 8px 0 4px; }
@@ -399,8 +543,8 @@ html[data-session="in"] .signin-row { grid-template-columns: auto; justify-conte
 .try-pair .pair-line.rom {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
-  gap: 8px 20px;
+  align-items: center;
+  gap: 12px 20px;
 }
 .try-pair .prompt-tools {
   font-family: var(--ui);
@@ -421,6 +565,7 @@ html[data-session="in"] .signin-row { grid-template-columns: auto; justify-conte
   --ink-2: #c9bfae;
   --ink-3: #8a8074;
   --hair: rgba(242, 234, 216, 0.16);
+  --word-rom: #c68b7b;
 }
 .close-grid {
   display: grid;
@@ -440,11 +585,7 @@ html[data-session="in"] .signin-row { grid-template-columns: auto; justify-conte
   line-height: 1.12;
   text-wrap: balance;
 }
-.close-copy .btn.commit {
-  justify-self: start;
-  text-decoration: none;
-  color: #f2ead8;
-}
+.close-copy .btn.commit { justify-self: start; text-decoration: none; }
 .footer {
   margin-top: 72px;
   padding-top: 20px;
@@ -458,10 +599,35 @@ html[data-session="in"] .signin-row { grid-template-columns: auto; justify-conte
 }
 .footer a { color: inherit; text-underline-offset: 3px; }
 .footer a:hover { text-decoration-thickness: 2px; }
-/* Lacquer on the ink ground fails. This is the same red, lifted to stay readable. */
-.footer .wordmark-rom b { color: #c68b7b; }
-.footer .wordmark-th { font-size: 22px; }
+.footer .wordmark { --th: 22px; }
 .footer-note { flex-basis: 100%; color: var(--ink-2); font-size: 14px; }
+.footer-legal {
+  flex-basis: 100%;
+  display: flex;
+  gap: 16px;
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 14px;
+}
+.legal {
+  max-width: 720px;
+  padding: 48px 32px 72px;
+}
+.legal h1 {
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(40px, 5vw, 56px);
+  line-height: 1.05;
+  margin: 0 0 16px;
+}
+.legal h2 { margin: 36px 0 10px; font-size: 28px; }
+.legal p, .legal li { max-width: 38em; }
+.legal p + p { margin-top: 12px; }
+.legal ul { margin: 8px 0 0; padding-left: 1.15em; }
+.legal li { margin: 8px 0; }
+.legal a { text-underline-offset: 3px; }
+.legal .meta { margin-top: 40px; color: var(--ink-3); font-size: 15px; }
+.legal-foot { margin-bottom: 48px; }
 
 /* The one authored moment: the page inks in once, panel by panel, in reading order. */
 @media (prefers-reduced-motion: no-preference) {
@@ -470,26 +636,19 @@ html[data-session="in"] .signin-row { grid-template-columns: auto; justify-conte
     animation: ink-in 480ms var(--ease) both;
     animation-delay: calc(var(--i, 0) * 70ms);
   }
+  html[data-stuck] .nav-wait { animation: bar-join 420ms var(--ease) both; }
+  .cell.title h1 em {
+    animation: motto-speak 1100ms var(--ease) 420ms both;
+  }
   .balloon {
     animation: letter-in 360ms var(--ease) both;
     animation-delay: calc(var(--i, 0) * 70ms + 380ms);
   }
-  .wordmark-rom,
-  .wordmark-en {
-    transition: opacity 480ms var(--ease), filter 480ms var(--ease), transform 480ms var(--ease);
+  .cell.title [data-waitlist-open]::before {
+    transition: transform 900ms var(--ease);
   }
-  .wordmark-en {
-    filter: blur(7px);
-    transform: translateY(3px);
-  }
-  a.wordmark:hover .wordmark-rom,
-  a.wordmark:focus-visible .wordmark-rom {
-    filter: blur(7px);
-    transform: translateY(-3px);
-  }
-  a.wordmark:hover .wordmark-en,
-  a.wordmark:focus-visible .wordmark-en {
-    filter: blur(0);
+  .cell.title [data-waitlist-open]:hover::before,
+  .cell.title [data-waitlist-open]:focus-visible::before {
     transform: none;
   }
   .waitlist-label > span {
@@ -525,19 +684,29 @@ html[data-session="in"] .signin-row { grid-template-columns: auto; justify-conte
   from { opacity: 0; transform: scale(0.985); }
   to { opacity: 1; transform: none; }
 }
+@keyframes bar-join {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes motto-speak {
+  from { color: var(--ink); text-decoration-color: transparent; }
+  to { color: var(--lacquer); text-decoration-color: var(--lacquer); }
+}
 @keyframes letter-in {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .site-bar,
+  .logo-marks .logo-mark,
+  .nav-wait { transition: none; animation: none; }
   [data-waitlist-open]:hover .waitlist-en,
   [data-waitlist-open]:focus-visible .waitlist-en { opacity: 0; }
   [data-waitlist-open]:hover .waitlist-th,
   [data-waitlist-open]:focus-visible .waitlist-th { opacity: 1; }
 }
 @media (max-width: 1199px) {
-  .cell.title .signin { max-width: 520px; }
   .try, .close-grid { grid-template-columns: minmax(0, 1fr); }
   .try-panel, .night-art { max-width: 420px; }
 }
@@ -546,10 +715,8 @@ html[data-session="in"] .signin-row { grid-template-columns: auto; justify-conte
   .nav-links { gap: 18px; font-size: 15px; }
   .nav-links a:not(.ghost) { display: none; }
   .ghost { height: 34px; padding: 0 12px; }
-  .wordmark { gap: 10px; }
-  .wordmark-th { font-size: 22px; }
-  .wordmark-rom { font-size: 15px; }
   .section { padding-top: 64px; }
+  .try-sheet { padding: 24px 20px 28px; }
   .try-panel, .night-art { max-width: none; }
   .close { margin-top: 64px; padding-top: 56px; }
 }

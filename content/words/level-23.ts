@@ -24,15 +24,15 @@ export default words(23, [
   // the words that count things
   ['lûuk#2', 'ลูก', ['classifier for fruit', 'classifier for round things'], 'clf', ['classifier'], 'glûai hâa lûuk: five bananas.'],
   ['lêm', 'เล่ม', ['classifier for books'], 'clf', ['classifier']],
-  ['krụ̂ang', 'เครื่อง', ['machine', 'classifier for machines'], 'n', ['classifier']],
+  ['krʉ̂ang', 'เครื่อง', ['machine', 'classifier for machines'], 'n', ['classifier']],
   ['pὲn', 'แผ่น', ['sheet', 'classifier for flat things'], 'clf', ['classifier']],
-  ['lǎng#2', 'หลัง', ['classifier for houses'], 'clf', ['classifier'], 'bâan nụ̀ng lǎng: one house.'],
+  ['lǎng#2', 'หลัง', ['classifier for houses'], 'clf', ['classifier'], 'bâan nʉ̀ng lǎng: one house.'],
   ['dtôn-mái', 'ต้นไม้', ['tree', 'a tree'], 'n', ['classifier'], 'Counted with dtôn: dtôn-mái sɔ̌ɔng dtôn.'],
   ['dtôn', 'ต้น', ['classifier for trees', 'plant', 'trunk'], 'clf', ['classifier'], 'A tree on its own is dtôn-mái.'],
   ['gɔ̂ɔn', 'ก้อน', ['lump', 'classifier for lumps'], 'clf', ['classifier']],
   ['duang', 'ดวง', ['classifier for lights', 'classifier for stars'], 'clf', ['classifier']],
   ['táng mòt', 'ทั้งหมด', ['altogether', 'all of it', 'in total'], 'adv', ['classifier']],
   ['dtὲε lá', 'แต่ละ', ['each', 'every one'], 'adj', ['classifier']],
-  ['tîi nụ̀ng', 'ที่หนึ่ง', ['first', 'the first'], 'adj', ['classifier'], 'tîi plus a number is the order.'],
+  ['tîi nʉ̀ng', 'ที่หนึ่ง', ['first', 'the first'], 'adj', ['classifier'], 'tîi plus a number is the order.'],
   ['tîi sɔ̌ɔng', 'ที่สอง', ['second', 'the second'], 'adj', ['classifier']],
 ])

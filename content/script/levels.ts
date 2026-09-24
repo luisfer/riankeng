@@ -112,7 +112,7 @@ export const SCRIPT_LEVELS: LevelMeta[] = [
   {
     n: 12,
     title: 'ฟ พ ภ',
-    rom: 'fang pụ̂an paa-sǎa',
+    rom: 'fang pʉ̂an paa-sǎa',
     thai: 'ฟังเพื่อนภาษา',
     blurb: 'ฟ พ ภ. Three letters, two sounds you already use. ั sits above in ฟัง. ษ is the s inside ภาษา.',
     focus: ['ฟ. ฟัง, fang. ั above.', 'พ. พ่อ, pɔ̂ɔ.', 'ภ. ภาษา, paa-sǎa.', 'ษ. The s in ภาษา.'],
@@ -130,10 +130,10 @@ export const SCRIPT_LEVELS: LevelMeta[] = [
   {
     n: 14,
     title: 'Marks above and below',
-    rom: 'gin dii sụ́ụ',
+    rom: 'gin dii sʉ́ʉ',
     thai: 'กินดีซื้อ',
-    blurb: 'Three vowel marks that sit above the consonant: the i in กิน, the ii in ดี, the ụụ in ซื้อ. ซ is another s.',
-    focus: ['ิ. กิน, gin.', 'ี. ดี, dii.', 'ซ. Another s.', 'ื. ซื้อ, sụ́ụ.'],
+    blurb: 'Three vowel marks that sit above the consonant: the i in กิน, the ii in ดี, the ʉʉ in ซื้อ. ซ is another s.',
+    focus: ['ิ. กิน, gin.', 'ี. ดี, dii.', 'ซ. Another s.', 'ื. ซื้อ, sʉ́ʉ.'],
     min: 8,
   },
   {
@@ -177,8 +177,8 @@ export const SCRIPT_LEVELS: LevelMeta[] = [
     title: 'The leftover seats',
     rom: 'tǔng tam',
     thai: 'ถึงทำ',
-    blurb: 'ถ ท ศ ธ ฮ. Same sounds you already say, more shapes. And ึ, the short ụ in ถึง.',
-    focus: ['ถ. ถึง, tǔng.', 'ึ. Short ụ, sits above.', 'ท. ทำ, กรุงเทพ.', 'ศ. ประเทศ.', 'ธ. ธนาคาร.', 'ฮ. Rare. The letter hɔɔ.'],
+    blurb: 'ถ ท ศ ธ ฮ. Same sounds you already say, more shapes. And ึ, the short ʉ in ถึง.',
+    focus: ['ถ. ถึง, tǔng.', 'ึ. Short ʉ, sits above.', 'ท. ทำ, กรุงเทพ.', 'ศ. ประเทศ.', 'ธ. ธนาคาร.', 'ฮ. Rare. The letter hɔɔ.'],
     min: 8,
   },
   {

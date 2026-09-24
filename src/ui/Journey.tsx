@@ -50,6 +50,7 @@ function Row(props: {
           <span className={props.rom ? 'contents-rom rom' : 'contents-rom'}>{props.sub}</span>
         </span>
         <span className="contents-meta">{props.meta}</span>
+        {props.here && <span className="contents-go">{chrome.continue}</span>}
         {props.meter}
       </button>
     </li>
@@ -76,15 +77,13 @@ function TrackRow(props: {
       here={!place.done}
       meta={place.done ? '' : `${levelDone} of ${levelTotal}`}
       meter={
-        <Meter
-          className="row-meter"
-          value={frac}
-          label={
-            place.done
-              ? `${props.title}, every level cleared`
-              : `${levelDone} of ${levelTotal} in ${place.title}`
-          }
-        />
+        place.done ? undefined : (
+          <Meter
+            className="row-meter"
+            value={frac}
+            label={`${levelDone} of ${levelTotal} in ${place.title}`}
+          />
+        )
       }
       onOpen={props.onOpen}
     />
@@ -101,17 +100,6 @@ export function Journey(props: {
   const [scene] = useState(() => QUIET[Math.floor(Math.random() * QUIET.length)]!)
   return (
     <main className="page journey">
-      <figure className="splash">
-        <img
-          src={sceneSrc(scene.stem)}
-          srcSet={sceneSrcSet(scene.stem)}
-          sizes="(max-width: 520px) calc(100vw - 48px), 420px"
-          width={980}
-          height={980}
-          alt={scene.alt}
-          decoding="async"
-        />
-      </figure>
       <ol className="contents hub">
         <TrackRow
           title="Voice"
@@ -130,6 +118,17 @@ export function Journey(props: {
         <Row title="Already yours" sub={chrome.yoursSub} rom meta="open" onOpen={props.onReview} />
         <Row title="The whole script" sub={chrome.alphabetSub} rom meta="open" onOpen={props.onAlphabet} />
       </ol>
+      <figure className="splash">
+        <img
+          src={sceneSrc(scene.stem)}
+          srcSet={sceneSrcSet(scene.stem)}
+          sizes="(max-width: 860px) min(420px, calc(100vw - 48px)), 42vw"
+          width={980}
+          height={980}
+          alt={scene.alt}
+          decoding="async"
+        />
+      </figure>
     </main>
   )
 }

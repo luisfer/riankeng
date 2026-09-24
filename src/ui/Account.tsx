@@ -1,9 +1,8 @@
-import { useEffect, useRef, useState } from 'react'
-import { LEVELS, SCRIPT_LEVELS } from '@content/index'
+import { useRef, useState } from 'react'
+import { LEVELS, SCRIPT_LEVELS, getEntry } from '@content/index'
+import { isoDay } from '@/engine/srs'
 import { activeDays, streak, todayStats, type LevelStatus } from '@/engine/scheduler'
 import type { ProgressDoc } from '@/storage/progress-schema'
-import { download, exportCsv, exportJson } from '@/storage/export'
-import { applyImport, parseExport, previewImport } from '@/storage/import'
 import { detectVoice } from '@/audio/tts'
 import {
   accountConfig,
@@ -14,10 +13,85 @@ import {
   updatePassword,
   type AccountSession,
 } from '@/storage/auth'
-import type { MirrorState } from '@/storage/mirror-file'
-import { Commit, TextBtn } from './bits'
+import { Commit, Meter, TextBtn } from './bits'
 
 const MONTH_WORD = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] as const
+
+/** Polite title in front of a given name. A name that already starts with it is left as written. */
+export function khunName(name: string): string {
+  const n = name.trim()
+  if (!n) return ''
+  if (/^khun\b/i.test(n)) return n
+  return `Khun ${n}`
+}
+const WEEKDAY = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'] as const
+
+export function dayLabel(key: string): string {
+  const [y, m, d] = key.split('-').map(Number)
+  if (!y || !m || !d) return key
+  const date = new Date(y, m - 1, d)
+  return `${WEEKDAY[date.getDay()]} ${d} ${MONTH_WORD[m - 1] ?? ''}`
+}
+
+export type DayLine = { text: string; miss: boolean }
+
+/** What the log still knows about one calendar day. */
+export function dayWork(doc: ProgressDoc, key: string): { label: string; summary: string; lines: DayLine[] } {
+  const named: { text: string; miss: boolean; t: number }[] = []
+  let unnamed = 0
+  let answered = 0
+  let correct = 0
+  for (const p of Object.values(doc.items)) {
+    const attempts = p.history.filter((h) => isoDay(h.t) === key)
+    if (attempts.length) {
+      answered += attempts.length
+      correct += attempts.filter((h) => h.ok).length
+      const entry = getEntry(p.id)
+      const gloss = entry?.en[0] ?? entry?.rom ?? p.id
+      const miss = attempts.some((h) => !h.ok)
+      const t = attempts.reduce((n, h) => Math.max(n, h.t), 0)
+      named.push({ text: miss ? `${gloss}, missed` : gloss, miss, t })
+    } else if (p.days.includes(key)) {
+      unnamed += 1
+      answered += 1
+      correct += 1
+    }
+  }
+  named.sort((a, b) => a.t - b.t)
+  const shown = named.slice(0, 5).map(({ text, miss }) => ({ text, miss }))
+  const extra = named.length - shown.length
+  if (extra > 0) shown.push({ text: extra === 1 ? '1 more card' : `${extra} more cards`, miss: false })
+  if (unnamed > 0) {
+    shown.push({
+      text: unnamed === 1 ? '1 more, no longer in the log' : `${unnamed} more, no longer in the log`,
+      miss: false,
+    })
+  }
+  const summary =
+    answered === 0
+      ? 'Nothing answered.'
+      : `${answered === 1 ? '1 answered' : `${answered} answered`}, ${correct === 0 ? 'none right' : correct === 1 ? '1 right' : `${correct} right`}.`
+  return { label: dayLabel(key), summary, lines: shown }
+}
+
+function HeatDay(props: { doc: ProgressDoc; day: string }) {
+  const work = dayWork(props.doc, props.day)
+  return (
+    <>
+      <p className="heat-when">{work.label}</p>
+      <p className="heat-sum">{work.summary}</p>
+      {work.lines.length > 0 && (
+        <ul className="heat-done">
+          {work.lines.map((line, i) => (
+            <li key={`${i}-${line.text}`} className={line.miss ? 'miss' : undefined}>
+              {line.text}
+            </li>
+          ))}
+        </ul>
+      )}
+    </>
+  )
+}
 
 export const ERASE_CONFIRM = 'Erase cards on this browser and sign out? The account keeps its copy.'
 
@@ -25,6 +99,27 @@ export function localDayKey(now = Date.now()): string {
   const day = new Date(now)
   day.setHours(0, 0, 0, 0)
   return `${day.getFullYear()}-${String(day.getMonth() + 1).padStart(2, '0')}-${String(day.getDate()).padStart(2, '0')}`
+}
+
+/** 0.85 is the clip as recorded. The words follow that, not the decimal. */
+export function hearPace(rate: number): string {
+  if (rate < 0.68) return 'Much slower'
+  if (rate < 0.82) return 'Slower'
+  if (rate <= 0.92) return 'As recorded'
+  if (rate < 1.08) return 'Faster'
+  return 'Much faster'
+}
+
+function LevelCount(props: { seen: number; total: number; title: string }) {
+  if (props.total <= 0) return <span className="mini-soon">soon</span>
+  return (
+    <span className="mini-count">
+      <span>
+        {props.seen} of {props.total}
+      </span>
+      <Meter value={props.seen / props.total} label={`${props.seen} of ${props.total} in ${props.title}`} />
+    </span>
+  )
 }
 
 /** How long ago, in the plainest words that still say it. */
@@ -82,26 +177,12 @@ export function Account(props: {
   voice: LevelStatus[]
   script: LevelStatus[]
   onDoc: (doc: ProgressDoc) => void
-  /** The file this device keeps up to date, if the learner has chosen one. */
-  mirror: {
-    state: MirrorState
-    writtenAt: number
-    onStart: () => void | Promise<void>
-    onStop: () => void | Promise<void>
-    onAuthorise: () => void | Promise<void>
-  }
-  onGlyphs: () => void
   onReset: () => void
   account: AccountSession | null
   onAccount: (session: AccountSession | null) => void
   recovery: boolean
   onRecoveryDone: () => void
 }) {
-  const fileRef = useRef<HTMLInputElement>(null)
-  const [preview, setPreview] = useState<string | null>(null)
-  const [pending, setPending] = useState<ReturnType<typeof parseExport>>(null)
-  const [offlineReady, setOfflineReady] = useState(false)
-  const [online, setOnline] = useState(() => (typeof navigator === 'undefined' ? true : navigator.onLine))
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [currentPassword, setCurrentPassword] = useState('')
@@ -109,6 +190,8 @@ export function Account(props: {
   const [signingIn, setSigningIn] = useState(false)
   const [signInNote, setSignInNote] = useState('')
   const [passwordNote, setPasswordNote] = useState('')
+  const [hotDay, setHotDay] = useState<string | null>(null)
+  const eraseRef = useRef<HTMLDialogElement>(null)
   const days = activeDays(props.doc)
   const cells = lastWeeks(12)
   const months = heatMonthMarks(cells)
@@ -117,54 +200,11 @@ export function Account(props: {
   const s = streak(props.doc)
   const voice = detectVoice()
 
-  useEffect(() => {
-    if (!('serviceWorker' in navigator)) {
-      setOfflineReady(import.meta.env.DEV)
-      return
-    }
-    let cancelled = false
-    const mark = () => {
-      if (!cancelled) setOfflineReady(true)
-    }
-    void navigator.serviceWorker.ready.then(mark)
-    navigator.serviceWorker.addEventListener('controllerchange', mark)
-    if (import.meta.env.DEV) {
-      void navigator.serviceWorker.getRegistration().then((reg) => {
-        if (!reg) mark()
-      })
-    }
-    return () => {
-      cancelled = true
-      navigator.serviceWorker.removeEventListener('controllerchange', mark)
-    }
-  }, [])
-
-  useEffect(() => {
-    const up = () => setOnline(true)
-    const down = () => setOnline(false)
-    window.addEventListener('online', up)
-    window.addEventListener('offline', down)
-    return () => {
-      window.removeEventListener('online', up)
-      window.removeEventListener('offline', down)
-    }
-  }, [])
-
   const set = <K extends keyof ProgressDoc['settings']>(key: K, value: ProgressDoc['settings'][K]) => {
     props.onDoc({ ...props.doc, settings: { ...props.doc.settings, [key]: value } })
   }
 
-  const cards = Object.keys(props.doc.items).length
-  const mirroring = props.mirror.state === 'granted'
   const signedIn = Boolean(props.account)
-  const stale = !mirroring && backupStale(props.doc.settings.lastBackupAt)
-  const where = signedIn
-    ? mirroring
-      ? 'this device, your file, and your account'
-      : 'this device, and your account'
-    : mirroring
-      ? 'this device, and your file'
-      : 'this device'
   const submitSignIn = () => {
     if (!accountConfig()) {
       setSignInNote('Sign in is not set up on this copy.')
@@ -219,18 +259,28 @@ export function Account(props: {
       setSignInNote(ok ? 'Check your email.' : 'Could not send this.')
     })
   }
-  const backUp = () => {
-    download('riankeng-progress-v1.json', exportJson(props.doc), 'application/json')
-    set('lastBackupAt', Date.now())
-  }
-
   return (
     <main className="page account">
       <h1>Account</h1>
-      <p className="lede">
-        {s > 0 ? `${s} day streak. ` : ''}
-        Today {today.correct} of {today.answered || 0}.
-      </p>
+      {(s > 0 || today.answered > 0) && (
+        <div className="account-now">
+          {s > 0 && (
+            <p>
+              <span className="account-n">{s}</span>
+              <span className="account-k">{s === 1 ? 'day' : 'days'}</span>
+            </p>
+          )}
+          {today.answered > 0 ? (
+            <p>
+              <span className={s > 0 ? 'account-n ink' : 'account-n'}>{today.correct} of {today.answered}</span>
+              <span className="account-k">today</span>
+            </p>
+          ) : (
+            <p className="account-quiet">Nothing answered today.</p>
+          )}
+        </div>
+      )}
+      <section className="account-block">
       <h2>{signedIn ? 'Signed in' : 'Sign in'}</h2>
       {signedIn ? (
         <>
@@ -313,84 +363,31 @@ export function Account(props: {
             <Commit type="submit" disabled={signingIn}>
               Sign in
             </Commit>
-            <TextBtn disabled={signingIn} onClick={submitReset}>
+            <TextBtn rank="secondary" disabled={signingIn} onClick={submitReset}>
               Send a reset link
             </TextBtn>
           </div>
           {signInNote && <p className="lede">{signInNote}</p>}
         </form>
       )}
+      </section>
 
+      <section className="account-block">
       <h2>Your progress</h2>
-      <ul className="status">
-        <li>
-          <span>Where it lives</span>
-          <span className="status-value">{where}</span>
-        </li>
-        <li>
-          <span>Cards with progress</span>
-          <span className="status-value">{cards}</span>
-        </li>
-        <li>
-          <span>Last saved</span>
-          <span className="status-value">{agoWords(props.doc.updatedAt)}</span>
-        </li>
-        <li>
-          <span>Opens without network</span>
-          <span className={offlineReady ? 'status-value' : 'status-value warn'}>
-            {offlineReady ? 'yes' : 'not yet'}
-          </span>
-        </li>
-        <li>
-          <span>Network now</span>
-          <span className="status-value">{online ? 'online' : 'offline'}</span>
-        </li>
-        <li>
-          <span>Backup file</span>
-          {props.mirror.state === 'granted' ? (
-            <span className="status-value">kept up to date, {agoWords(props.mirror.writtenAt)}</span>
-          ) : props.mirror.state === 'needs-permission' ? (
-            <span className="status-value warn">needs permission again</span>
-          ) : (
-            <span className={stale ? 'status-value warn' : 'status-value'}>
-              {agoWords(props.doc.settings.lastBackupAt)}
-            </span>
-          )}
-        </li>
-      </ul>
-      <p className="lede status-note">
-        {signedIn
-          ? 'Saved on this browser and on the account.'
-          : mirroring
-            ? 'Saved on this browser and in the file.'
-            : 'Saved on this browser.'}
-      </p>
-      <div className="account-actions">
-        <Commit onClick={backUp}>Back up now</Commit>
-        {props.mirror.state === 'off' && (
-          <TextBtn onClick={() => void props.mirror.onStart()}>Keep a file up to date</TextBtn>
-        )}
-        {props.mirror.state === 'needs-permission' && (
-          <TextBtn onClick={() => void props.mirror.onAuthorise()}>Authorise the file again</TextBtn>
-        )}
-        {mirroring && <TextBtn onClick={() => void props.mirror.onStop()}>Stop writing to the file</TextBtn>}
-        <TextBtn onClick={() => fileRef.current?.click()}>Restore from a file</TextBtn>
-        <TextBtn onClick={() => download('riankeng-progress.csv', exportCsv(props.doc), 'text/csv')}>
-          Export CSV
-        </TextBtn>
-      </div>
-
-      <div className="heat-wrap">
+      <div className="heat-wrap" onMouseLeave={() => setHotDay(null)}>
         <div className="heat" aria-label="twelve week heatmap, Sunday first">
           {cells.map((key) => {
             const n = days.get(key) ?? 0
             const band = n === 0 ? 0 : n < 4 ? 1 : n < 10 ? 2 : 3
             const todayCell = key === todayKey
             return (
-              <span
+              <button
                 key={key}
-                className={`heat-c c${band}${todayCell ? ' today' : ''}`}
-                title={`${key}, ${n}`}
+                type="button"
+                tabIndex={-1}
+                className={`heat-c c${band}${todayCell ? ' today' : ''}${hotDay === key ? ' on' : ''}`}
+                onMouseEnter={() => setHotDay(key)}
+                onClick={() => setHotDay(key)}
               />
             )
           })}
@@ -400,9 +397,13 @@ export function Account(props: {
             <span key={`m-${i}`}>{m ?? ''}</span>
           ))}
         </div>
+        <div className="heat-day" aria-live="polite">
+          {hotDay && <HeatDay doc={props.doc} day={hotDay} />}
+        </div>
       </div>
-      <p className="heat-legend">Each column is a week. Sunday at the top.</p>
+      </section>
 
+      <section className="account-block">
       <h2>Voice</h2>
       <ol className="mini-index" start={0}>
         {LEVELS.map((lvl) => {
@@ -411,11 +412,14 @@ export function Account(props: {
             <li key={`v-${lvl.n}`}>
               <span>{lvl.n}</span>
               <span>{lvl.title}</span>
-              <span className="rom">{st && st.total > 0 ? `${st.seen}/${st.total}` : 'soon'}</span>
+              <LevelCount seen={st?.seen ?? 0} total={st?.total ?? 0} title={lvl.title} />
             </li>
           )
         })}
       </ol>
+      </section>
+
+      <section className="account-block">
       <h2>Script</h2>
       <ol className="mini-index" start={0}>
         {SCRIPT_LEVELS.map((lvl) => {
@@ -424,16 +428,25 @@ export function Account(props: {
             <li key={`s-${lvl.n}`}>
               <span>{lvl.n}</span>
               <span>{lvl.title}</span>
-              <span className="rom">{st && st.total > 0 ? `${st.seen}/${st.total}` : 'soon'}</span>
+              <LevelCount seen={st?.seen ?? 0} total={st?.total ?? 0} title={lvl.title} />
             </li>
           )
         })}
       </ol>
+      </section>
 
+      <section className="account-block">
       <h2>Settings</h2>
       <label className="field">
         <span>Your name</span>
-        <input className="roman-field en" value={props.doc.settings.name} onChange={(e) => set('name', e.target.value)} placeholder="optional" />
+        <span className="name-line">
+          <span className="name-khun">Khun</span>
+          <input
+            className="roman-field en"
+            value={props.doc.settings.name}
+            onChange={(e) => set('name', e.target.value.replace(/^khun\s+/i, ''))}
+          />
+        </span>
       </label>
       <label className="check">
         <input type="checkbox" checked={props.doc.settings.thaiScript} onChange={(e) => set('thaiScript', e.target.checked)} />
@@ -452,54 +465,34 @@ export function Account(props: {
         <input type="checkbox" checked={props.doc.settings.silent} onChange={(e) => set('silent', e.target.checked)} />
         Silent. No listening exercises, no sound, no Hear
       </label>
-      <label className="field">
-        <span>Hear rate {props.doc.settings.audioRate.toFixed(2)}</span>
-        <input type="range" min={0.5} max={1.2} step={0.05} value={props.doc.settings.audioRate} onChange={(e) => set('audioRate', Number(e.target.value))} />
+      <label className="field rate">
+        <span className="rate-name">
+          <span>Speaking</span>
+          <span>{hearPace(props.doc.settings.audioRate)}</span>
+        </span>
+        <input
+          type="range"
+          min={0.5}
+          max={1.2}
+          step={0.05}
+          disabled={props.doc.settings.silent}
+          value={props.doc.settings.audioRate}
+          style={{ ['--at' as string]: String((props.doc.settings.audioRate - 0.5) / 0.7) }}
+          onChange={(e) => set('audioRate', Number(e.target.value))}
+        />
       </label>
       <p className={voice.ready ? 'lede' : 'warn'}>{voice.ready ? `Thai voice: ${voice.name}` : voice.warning}</p>
-      <p className="lede">Clips when they exist. The Mac voice misses tones.</p>
+      </section>
 
-      <input
-        ref={fileRef}
-        type="file"
-        accept="application/json,.json"
-        hidden
-        onChange={async (e) => {
-          const file = e.target.files?.[0]
-          if (!file) return
-          const raw = await file.text()
-          const parsed = parseExport(raw)
-          setPending(parsed)
-          setPreview(parsed ? previewImport(props.doc, parsed).message : 'Not a riankeng progress file.')
-          e.target.value = ''
-        }}
-      />
-      {preview && (
-        <div className="import-box">
-          <p>{preview}</p>
-          {pending && (
-            <Commit
-              onClick={() => {
-                props.onDoc(applyImport(props.doc, pending))
-                setPreview(previewImport(props.doc, pending).message.replace('would merge', 'merged'))
-                setPending(null)
-              }}
-            >
-              Apply import
-            </Commit>
-          )}
-        </div>
-      )}
-
-      <h2>Type</h2>
-      <div className="account-actions">
-        <TextBtn onClick={props.onGlyphs}>Glyph coverage</TextBtn>
-      </div>
-
-      <h2>Course password</h2>
-      <p className="lede">Ends the password on this browser. Cards stay on this device.</p>
+      <section className="account-block">
+      <h2>Sign out</h2>
+      <p className="lede">The password is the account password. Cards stay on this device.</p>
       <TextBtn
+        rank="secondary"
         onClick={() => {
+          signOutAccount()
+          props.onAccount(null)
+          props.onRecoveryDone()
           void fetch('/api/logout', { method: 'POST' }).then((res) => {
             if (res.ok) window.location.assign('/')
           })
@@ -507,15 +500,42 @@ export function Account(props: {
       >
         Log out
       </TextBtn>
+      </section>
 
+      <section className="account-block">
       <h2>Reset</h2>
-      <TextBtn
-        onClick={() => {
-          if (confirm(ERASE_CONFIRM)) props.onReset()
-        }}
-      >
+      <TextBtn rank="danger" onClick={() => eraseRef.current?.showModal()}>
         Erase this device
       </TextBtn>
+      <dialog
+        ref={eraseRef}
+        className="confirm"
+        aria-labelledby="erase-title"
+        onClick={(event) => {
+          if (event.target === event.currentTarget) event.currentTarget.close()
+        }}
+      >
+        <div className="confirm-sheet">
+          <h2 id="erase-title">Erase this device</h2>
+          <p>{ERASE_CONFIRM}</p>
+          <div className="confirm-acts">
+            <button type="button" className="btn secondary" autoFocus onClick={() => eraseRef.current?.close()}>
+              Keep the cards
+            </button>
+            <button
+              type="button"
+              className="btn danger"
+              onClick={() => {
+                eraseRef.current?.close()
+                props.onReset()
+              }}
+            >
+              Erase
+            </button>
+          </div>
+        </div>
+      </dialog>
+      </section>
     </main>
   )
 }

@@ -7,7 +7,7 @@ import { ToneCharts } from './ToneCharts'
 import { showParts, showThai } from './thai'
 
 const THAI = /[\u0E00-\u0E7F]/
-const PHONETIC = /[àâáǎèêéěìîíǐòôóǒùûúǔÀÂÁǍεɔəụ]/
+const PHONETIC = /[àâáǎèêéěìîíǐòôóǒùûúǔÀÂÁǍεɔəʉ]/
 
 function tidyFocus(line: string): string {
   return line.replaceAll(' · ', ', ').replaceAll('·', ', ')
@@ -141,6 +141,7 @@ export function LevelIntro(props: {
             )}
             {props.canContinue ? (
               <TextBtn
+                rank="secondary"
                 onClick={() => {
                   unlockSpeech()
                   props.onStart()

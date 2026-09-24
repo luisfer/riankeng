@@ -2,11 +2,11 @@ import { words } from '../build'
 
 export default words(19, [
   ['kít wâa', 'คิดว่า', ['I think', 'to think that'], 'v', ['mind']],
-  ['rúu-sụ̀k wâa', 'รู้สึกว่า', ['I feel that'], 'v', ['mind']],
+  ['rúu-sʉ̀k wâa', 'รู้สึกว่า', ['I feel that'], 'v', ['mind']],
   ['hěn dûai', 'เห็นด้วย', ['agree', 'I agree'], 'v', ['mind']],
   ['mâi hěn dûai', 'ไม่เห็นด้วย', ['disagree'], 'v', ['mind']],
-  ['chụ̂a', 'เชื่อ', ['believe', 'to believe'], 'v', ['mind']],
-  ['mâi chụ̂a', 'ไม่เชื่อ', ['do not believe'], 'v', ['mind']],
+  ['chʉ̂a', 'เชื่อ', ['believe', 'to believe'], 'v', ['mind']],
+  ['mâi chʉ̂a', 'ไม่เชื่อ', ['do not believe'], 'v', ['mind']],
   ['sǒng-sǎi', 'สงสัย', ['suspect', 'wonder'], 'v', ['mind']],
   ['nε̂ε jai', 'แน่ใจ', ['sure', 'be sure'], 'adj', ['mind']],
   ['mâi nε̂ε jai', 'ไม่แน่ใจ', ['not sure'], 'adj', ['mind']],
@@ -14,7 +14,7 @@ export default words(19, [
   ['bpà-dtì-sèet', 'ปฏิเสธ', ['refuse', 'deny'], 'v', ['mind']],
   ['pìt', 'ผิด', ['wrong', 'incorrect'], 'adj', ['mind']],
   ['lâo', 'เล่า', ['tell a story', 'narrate'], 'v', ['mind']],
-  ['rụ̂ang', 'เรื่อง', ['story', 'matter', 'about'], 'n', ['mind']],
+  ['rʉ̂ang', 'เรื่อง', ['story', 'matter', 'about'], 'n', ['mind']],
   ['kít tǔng', 'คิดถึง', ['miss', 'think of'], 'v', ['mind']],
   ['tét', 'เท็จ', ['false', 'untrue'], 'adj', ['mind']],
   ['kwaam kít', 'ความคิด', ['idea', 'thought'], 'n', ['mind']],

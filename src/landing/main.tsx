@@ -6,6 +6,7 @@ import { landing } from './copy'
 import { bindWaitlist } from './waitlist'
 import { DEMO, QUIET, TRY_ORDER } from './demo'
 import { TRY_EVENT, TryCard } from './TryCard'
+import './bar'
 
 // Old app URLs carried the route in the hash at /. The course lives at /learn/ now.
 if (location.hash.startsWith('#/')) {
@@ -44,13 +45,16 @@ function markSignedIn() {
   }
 }
 
+function closeGate() {
+  delete html.dataset.gate
+  navSign?.setAttribute('aria-expanded', 'false')
+  if (location.hash === '#gate') history.replaceState(null, '', `${location.pathname}${location.search}`)
+}
+
 function openGate() {
   if (html.dataset.session === 'in') return
   html.dataset.gate = 'open'
   navSign?.setAttribute('aria-expanded', 'true')
-  for (const form of document.querySelectorAll<HTMLFormElement>('form[data-waitlist]')) {
-    if (!form.dataset.sent) delete form.dataset.open
-  }
   heroField?.focus()
 }
 
@@ -70,34 +74,29 @@ for (const form of forms) {
     const email = emailField?.value.trim() ?? ''
     const password = field?.value ?? ''
     missLine(form, '')
+    if (!email) {
+      missLine(form, landing.typeEmail)
+      emailField?.focus()
+      return
+    }
     if (!password) {
       missLine(form, landing.typePassword)
       field?.focus()
       return
     }
     try {
-      if (email) {
-        const session = await signInAccount(email, password)
-        if (!session) {
-          missLine(form, landing.couldNot)
-          field?.select()
-          return
-        }
-        const res = await fetch('/api/gate', {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${session.accessToken}` },
-        })
-        if (res.ok) return openCourse()
-        missLine(form, res.status === 503 ? landing.unset : landing.couldNot)
+      const session = await signInAccount(email, password)
+      if (!session) {
+        missLine(form, landing.couldNot)
+        field?.select()
         return
       }
       const res = await fetch('/api/gate', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password }),
+        headers: { Authorization: `Bearer ${session.accessToken}` },
       })
       if (res.ok) return openCourse()
-      missLine(form, res.status === 503 ? landing.unset : landing.wrong)
+      missLine(form, res.status === 503 ? landing.unset : landing.couldNot)
     } catch {
       missLine(form, landing.offline)
     }
@@ -113,11 +112,12 @@ if (params.has('signin')) {
   history.replaceState(null, '', '/')
 }
 
-// The nav's Log in opens the title-panel form.
+// Log in lives in the nav. The same control closes the panel.
 navSign?.addEventListener('click', (e) => {
   if (html.dataset.session === 'in') return
   e.preventDefault()
-  openGate()
+  if (html.dataset.gate === 'open') closeGate()
+  else openGate()
 })
 
 for (const form of document.querySelectorAll<HTMLFormElement>('form[data-waitlist]')) {

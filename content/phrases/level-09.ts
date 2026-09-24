@@ -11,7 +11,7 @@ export default phrases(9, [
   ['pûu-chaai kon nán sǔung', 'ผู้ชายคนนั้นสูง', ['that man is tall']],
   ['kǎo lɔ̀ɔ mâak', 'เขาหล่อมาก', ['he is very handsome']],
   ['təə sǔai', 'เธอสวย', ['she is beautiful']],
-  ['rao bpen pụ̂an gan', 'เราเป็นเพื่อนกัน', ['we are friends']],
+  ['rao bpen pʉ̂an gan', 'เราเป็นเพื่อนกัน', ['we are friends']],
   ['kon gὲε kon níi', 'คนแก่คนนี้', ['this old person', 'this elderly person']],
   ['chɔ̂ɔp kon ngîap', 'ชอบคนเงียบ', ['I like quiet people']],
   ['an níi sǔai', 'อันนี้สวย', ['this one is beautiful']],

@@ -1,12 +1,11 @@
 /**
  * The romanization system from "Getting to Know Thai, Level 1", as used in
  * Luis's notes: tones by diacritic, doubled letters for long vowels,
- * g/bp/dt for unaspirated stops, ε ɔ ə for the open/mid vowels and ụ for อึ/อือ.
- * That is the Paiboon system of Benjawan Poomsan Becker with ụ for its ʉ. Voice 0
- * (chrome.systemSource) and the landing footer credit it, so a further departure
- * from Paiboon has to change those lines too.
+ * g/bp/dt for unaspirated stops, ε ɔ ə ʉ for the vowels English has no letter for.
+ * That is the Paiboon system of Benjawan Poomsan Becker. Voice 0
+ * (chrome.systemSource) and the landing footer credit it.
  *
- * Everything here works on NFD (decomposed) strings so that ǔ, έ, ụ̀ etc.
+ * Everything here works on NFD (decomposed) strings so that ǔ, έ, ʉ̀ etc.
  * are always "base letter + combining marks".
  */
 
@@ -36,11 +35,14 @@ export const TONE_LABEL: Record<Tone, string> = {
   rising: 'rising',
 }
 
-/** Combining dot below: u + this = ụ (อึ / อือ). */
+/** Paiboon's barred u, ʉ (อึ / อือ). One letter, not u plus a dot. */
+export const U_BAR = '\u0289'
+
+/** Legacy dotted u. Accepted when typed, stored as U_BAR. */
 export const DOT_BELOW = '\u0323'
 
-/** Base vowel letters (NFD). ụ is represented as 'u' + DOT_BELOW. */
-export const VOWEL_BASES = new Set(['a', 'e', 'i', 'o', 'u', 'ε', 'ɔ', 'ə'])
+/** Base vowel letters (NFD). */
+export const VOWEL_BASES = new Set(['a', 'e', 'i', 'o', 'u', 'ε', 'ɔ', 'ə', U_BAR])
 
 /** Consonant letters that may appear in the skeleton. */
 export const CONSONANT_LETTERS = new Set([
@@ -55,7 +57,7 @@ export const ALLOWED_CODEPOINTS = new Set<string>([
   ...VOWEL_BASES,
   ...CONSONANT_LETTERS,
   ...SEPARATORS,
-  DOT_BELOW,
+  U_BAR,
   ...Object.values(TONE_MARKS),
   '…', // ellipsis for "ao … nɔ̀i" style frames
   '/', // alternatives such as kráp/kâ
@@ -71,13 +73,8 @@ export const ALLOWED_CODEPOINTS = new Set<string>([
 export const CHAR_ALIASES: Record<string, string> = {
   'ɛ': 'ε', // IPA epsilon → Greek epsilon (the textbook's glyph)
   'ɒ': 'ɔ',
-  'ʉ': 'u' + DOT_BELOW,
-  'ɨ': 'u' + DOT_BELOW,
-  'ɯ': 'u' + DOT_BELOW,
-  'ü': 'u' + DOT_BELOW, // ü → ụ (typed with a Mac umlaut by habit)
-  'ṳ': 'u' + DOT_BELOW,
-  '\u0331': DOT_BELOW, // macron below → dot below (the textbook prints an underline)
-  '\u0332': DOT_BELOW,
+  'ɨ': U_BAR,
+  'ɯ': U_BAR,
   '\u2019': "'", // curly apostrophe
   '\u2018': "'",
   '\u02BC': "'",
@@ -100,7 +97,7 @@ export const FINALS = ['ng', 'k', 'p', 't', 'm', 'n', 'w', 'y']
 export const VOWEL_VARIANTS: Record<string, string[]> = {
   e: ['ε', 'ə'],
   o: ['ɔ'],
-  u: ['u' + DOT_BELOW],
+  u: [U_BAR],
 }
 
 /** Order the popover uses for tones: 1 low, 2 falling, 3 high, 4 rising. */
@@ -128,7 +125,7 @@ export const SYSTEM_SUMMARY = {
     { rom: 'ε / εε', hint: 'cat (open e)' },
     { rom: 'ɔ / ɔɔ', hint: 'or (open o)' },
     { rom: 'ə / əə', hint: 'ago / fur' },
-    { rom: 'ụ / ụụ', hint: 'between i and u, lips flat' },
+    { rom: 'ʉ / ʉʉ', hint: 'between i and u, lips flat' },
   ],
   consonants: [
     { rom: 'g', hint: 'unaspirated k, as in skin' },

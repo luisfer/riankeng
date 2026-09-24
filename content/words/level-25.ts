@@ -22,7 +22,7 @@ export default words(25, [
   ['gε̂ε', 'แก้', ['fix', 'solve', 'cure', 'undo'], 'v', ['trouble']],
   ['yaa gε̂ε bpùat', 'ยาแก้ปวด', ['painkiller'], 'n', ['trouble']],
   // papers
-  ['nǎng-sụ̌ụ dəən taang', 'หนังสือเดินทาง', ['passport'], 'n', ['trouble'], 'Literally the book for walking a way.'],
+  ['nǎng-sʉ̌ʉ dəən taang', 'หนังสือเดินทาง', ['passport'], 'n', ['trouble'], 'Literally the book for walking a way.'],
   ['wii-sâa', 'วีซ่า', ['visa'], 'n', ['trouble']],
   ['sà-tǎan tûut', 'สถานทูต', ['embassy'], 'n', ['trouble']],
   // and how to be decent about all of it

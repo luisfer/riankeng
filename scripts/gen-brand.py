@@ -10,8 +10,8 @@ Writes:
   public/favicon.svg, public/favicon.ico       the mark at tab size
   public/icons/*.png                           apple-touch, 192, 512 and maskable 512
   public/brand/mark.svg, lockup.svg, wordmark.svg
-  src/brand/paths.ts                           the lockup the course draws
-  index.html                                   the lockup between <!-- brand:lockup --> markers
+  src/brand/paths.ts                           the lockup, for drawing inline
+  index.html                                   any inline lockup between <!-- brand:lockup --> markers
 
 Usage: python3 scripts/gen-brand.py
 """
@@ -345,11 +345,13 @@ def save_png(img: Image.Image, rel: str, optical: str) -> None:
 
 
 def letter_landing(inline: str) -> None:
+    """Refresh any inline copy of the lockup the landing page carries between markers."""
     html_path = ROOT / "index.html"
     html = html_path.read_text(encoding="utf-8")
     marker = re.compile(r"(<!-- brand:lockup -->).*?(<!-- /brand:lockup -->)", re.S)
     if not marker.search(html):
-        raise SystemExit("index.html has no <!-- brand:lockup --> markers")
+        print("index.html carries no <!-- brand:lockup --> markers, left alone")
+        return
     html_path.write_text(marker.sub(lambda m: m.group(1) + inline + m.group(2), html), encoding="utf-8")
     print("lettered index.html")
 

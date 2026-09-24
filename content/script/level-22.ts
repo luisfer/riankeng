@@ -1,7 +1,7 @@
 import { scriptWords } from '../build'
 
 export default scriptWords(22, [
-  ['pɔ̌ɔ', 'ผ', ['high-class p', 'the letter p (pɔ̌ɔ pụ̂ng)'], 'n', ['letter'], 'High class p. The letter in ผม, the I you already say.'],
+  ['pɔ̌ɔ', 'ผ', ['high-class p', 'the letter p (pɔ̌ɔ pʉ̂ng)'], 'n', ['letter'], 'High class p. The letter in ผม, the I you already say.'],
   ['pǒm', 'ผม', ['I (male)', 'hair'], 'pron', ['bridge', 'voice:w:pǒm', 'parts:ผ+ม']],
   ['pâa', 'ผ้า', ['cloth', 'fabric'], 'n', ['bridge', 'voice:w:pâa', 'parts:ผ+้+า']],
   ['pèt', 'เผ็ด', ['spicy'], 'adj', ['bridge', 'voice:w:pèt', 'parts:เ+ผ+็+ด'], '็ from two levels back, on the ผ you just met.'],

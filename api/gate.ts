@@ -9,18 +9,7 @@ export async function POST(request: Request): Promise<Response> {
     url: process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || '',
     anon: process.env.VITE_SUPABASE_ANON_KEY || '',
   })
-  let password = ''
-  if (!openedByAccount) {
-    const ctype = request.headers.get('content-type') ?? ''
-    if (ctype.includes('application/json')) {
-      const body = (await request.json()) as { password?: string }
-      password = body.password ?? ''
-    } else if (ctype.includes('form')) {
-      const form = await request.formData()
-      password = String(form.get('password') ?? '')
-    }
-  }
-  if (!openedByAccount && password !== secret) return Response.json({ ok: false }, { status: 401 })
+  if (!openedByAccount) return Response.json({ ok: false }, { status: 401 })
 
   const token = await gateToken(secret)
   const secure = process.env.VERCEL ? '; Secure' : ''

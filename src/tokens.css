@@ -4,12 +4,16 @@
  *
  * Type roles. Brygada 1918 sets headlines and big numbers. Onest sets the
  * interface and English body. Didact Gothic sets every romanization: it has
- * ε ɔ ə ụ with anchors for all four tone marks. Onest has no Greek ε, so its
+ * ε ɔ ə ʉ with anchors for all four tone marks. Onest has no Greek ε, so its
  * stack falls to Didact, and romanization is never set in Onest.
  */
 :root {
   --paper: #f2ead8;
   --lacquer: #9a2b1f;
+  /* Label on a lacquer fill. The close swaps --paper, so this one stays put. */
+  --on-lacquer: #f2ead8;
+  /* The wordmark's phonetic line. Close sections lift it; lacquer on ink fails. */
+  --word-rom: var(--lacquer);
   --ink: #1c1710;
   --ink-2: #5a5146;
   --ink-3: #8a8074;

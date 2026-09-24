@@ -8,7 +8,7 @@ export default phrases(14, [
   ['bpai tá-lee gan', 'ไปทะเลกัน', ['let us go to the sea']],
   ['puu-kǎo sǔung', 'ภูเขาสูง', ['the mountain is high']],
   ['jang-wàt nǎi', 'จังหวัดไหน', ['which province']],
-  ['pǒm chɔ̂ɔp mụang tai', 'ผมชอบเมืองไทย', ['I like Thailand', 'I like Thai towns']],
+  ['pǒm chɔ̂ɔp mʉang tai', 'ผมชอบเมืองไทย', ['I like Thailand', 'I like Thai towns']],
   ['nák tɔ̂ng tîao mâak', 'นักท่องเที่ยวมาก', ['many tourists']],
   ['fáa rɔ́ɔng sǐang dang', 'ฟ้าร้องเสียงดัง', ['the thunder is loud']],
   ['náam tûam lέεo', 'น้ำท่วมแล้ว', ['it has already flooded']],

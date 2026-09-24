@@ -6,7 +6,6 @@ export type Route =
   | { name: 'intro'; n: number; track: TrackId }
   | { name: 'session' }
   | { name: 'account' }
-  | { name: 'glyphs' }
   | { name: 'review' }
   | { name: 'alphabet' }
 
@@ -20,7 +19,6 @@ export function parseHash(raw = window.location.hash): Route {
   if (h === '/script') return { name: 'track', track: 'script' }
   if (h === '/session') return { name: 'session' }
   if (h === '/account') return { name: 'account' }
-  if (h === '/glyphs') return { name: 'glyphs' }
   if (h === '/review') return { name: 'review' }
   if (h === '/alphabet') return { name: 'alphabet' }
   return { name: 'journey' }
@@ -38,8 +36,6 @@ export function hashFor(route: Route): string {
       return '#/session'
     case 'account':
       return '#/account'
-    case 'glyphs':
-      return '#/glyphs'
     case 'review':
       return '#/review'
     case 'alphabet':

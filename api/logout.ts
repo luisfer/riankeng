@@ -1,6 +1,6 @@
 import { GATE_COOKIE } from '../src/gate-token.js'
 
-/** Clears the site password on this browser. Cards stay on the device. */
+/** Clears the course sign-in cookie. The account password stays in Supabase. */
 export async function POST(): Promise<Response> {
   const secure = process.env.VERCEL ? '; Secure' : ''
   return Response.json(

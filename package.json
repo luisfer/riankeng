@@ -20,6 +20,7 @@
     "ground": "python3 scripts/gen-ground.py",
     "audio": "python3 scripts/gen-audio.py",
     "scenes": "python3 scripts/gen-scenes.py",
+    "brand": "python3 scripts/gen-brand.py",
     "fonts": "python3 scripts/fetch-fonts.py"
   },
   "dependencies": {

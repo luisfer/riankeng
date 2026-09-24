@@ -3,7 +3,7 @@ import { activeDays, sittingSense, streak, todayStats } from '../src/engine/sche
 import { getEntry } from '../content/index'
 import { emptyDoc } from '../src/storage/progress-schema'
 import { newItemProgress } from '../src/engine/srs'
-import { heatMonthMarks, lastWeeks, localDayKey } from '../src/ui/Account'
+import { dayWork, heatMonthMarks, khunName, lastWeeks, localDayKey } from '../src/ui/Account'
 
 describe('journal from days', () => {
   it('keeps a mastered day after history has forgotten it', () => {
@@ -36,6 +36,15 @@ describe('journal from days', () => {
   })
 })
 
+describe('khun', () => {
+  it('puts the title in front of a given name once', () => {
+    expect(khunName('')).toBe('')
+    expect(khunName('  Luis ')).toBe('Khun Luis')
+    expect(khunName('Khun Luis')).toBe('Khun Luis')
+    expect(khunName('khun Ana')).toBe('khun Ana')
+  })
+})
+
 describe('heatmap weeks', () => {
   it('lays out twelve Sunday-first weeks', () => {
     const now = new Date(2026, 8, 18, 12).getTime()
@@ -52,6 +61,22 @@ describe('heatmap weeks', () => {
     expect(marks).toHaveLength(12)
     expect(marks.filter(Boolean).length).toBeGreaterThanOrEqual(2)
     expect(marks.some((m) => m === 'Sep')).toBe(true)
+  })
+
+  it('names the day and the cards still in the log', () => {
+    const doc = emptyDoc()
+    const t = new Date(2026, 8, 23, 15).getTime()
+    const key = localDayKey(t)
+    doc.items['w:maa'] = {
+      ...newItemProgress('w:maa'),
+      days: [key],
+      history: [{ t, ok: false, v: 'miss', m: 'th-en' }],
+    }
+    const work = dayWork(doc, key)
+    expect(work.label).toBe('Wednesday 23 Sep')
+    expect(work.summary).toBe('1 answered, none right.')
+    expect(work.lines[0]?.miss).toBe(true)
+    expect(work.lines[0]?.text.startsWith(getEntry('w:maa')?.en[0] ?? 'w:maa')).toBe(true)
   })
 })
 

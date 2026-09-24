@@ -16,7 +16,7 @@ rian gèng (เรียนเก่ง, "learn well") is a local-first Thai pri
 
 ## Positioning
 
-- The romanization comes from "Getting to Know Thai, Level 1": à â á ǎ for tones, g/bp/dt for unaspirated stops, and ε ɔ ə ụ for the vowels English has no letter for. That is the Paiboon system of Benjawan Poomsan Becker with ụ where Paiboon writes ʉ, and the course credits it on Voice 0 and in the landing footer. Grading is tone-aware, and names the syllable whose tone slipped.
+- The romanization comes from "Getting to Know Thai, Level 1": à â á ǎ for tones, g/bp/dt for unaspirated stops, and ε ɔ ə ʉ for the vowels English has no letter for. That is the Paiboon system of Benjawan Poomsan Becker, and the course credits it on Voice 0 and in the landing footer. Grading is tone-aware, and names the syllable whose tone slipped.
 - Every Voice card has a recorded Thai clip (1,512 of 1,512), so tones are never a synthetic voice's guess.
 - Voice comes first. Script then teaches each letter on words from Voice.
 - Local-first: there is no account. Progress lives on the device, with a backup file the learner keeps.
@@ -31,12 +31,12 @@ rian gèng (เรียนเก่ง, "learn well") is a local-first Thai pri
 
 - Voice has 27 levels (0 to 26) and Script has 28 (0 to 27). Script covers all 44 consonants, every vowel sign, the marks and the Thai digits. Always read counts from `content/levels.ts` and `content/script/levels.ts`.
 - The romanization system in `content/system.ts` is fixed, and the data obeys it. The open e is stored as Greek ε (U+03B5).
-- Any font that sets romanization must carry ɔ ε ə ụ with working tone-mark anchors. Fonts are self-hosted and OFL.
+- Any font that sets romanization must carry ɔ ε ə ʉ with working tone-mark anchors. Fonts are self-hosted and OFL.
 - Copy uses commas and periods: no middots, no em dashes, no uppercase kickers. Name the words, do not coach. Tests and `slopless` lint it.
 
 ## Brand Commitments
 
-- Name: rian gèng / เรียนเก่ง. The wordmark's Thai is set in Fahkwang.
+- Name: rian gèng / เรียนเก่ง. The mark is ก carrying the mai ek, paper on a lacquer square. The lockup sets เรียนเก่ง in Fahkwang over rian gèng in Didact Gothic, with only the two tone marks in lacquer, on one vertical line. `npm run brand` draws both (DESIGN.md, Mark).
 - Paper, ink and one lacquer red. See DESIGN.md.
 - Type roles chosen by Luis (September 2026): Brygada 1918 for headlines, Onest for the interface, Didact Gothic for romanization.
 - Comic scenes of one woman's day speaking Thai, in a single drawn style.

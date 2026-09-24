@@ -77,7 +77,7 @@ export function Commit({
   type?: 'button' | 'submit'
 }) {
   return (
-    <button type={type} className="btn commit" onClick={onClick} disabled={disabled}>
+    <button type={type} className="btn primary commit" onClick={onClick} disabled={disabled}>
       {children}
     </button>
   )
@@ -88,14 +88,26 @@ export function TextBtn({
   onClick,
   disabled,
   current,
+  rank = 'tertiary',
+  className,
 }: {
   children: ReactNode
   onClick?: () => void
   disabled?: boolean
   current?: boolean
+  /** Secondary is the ink outline. Danger is the lacquer outline. Quiet is a small key. Tertiary is type. */
+  rank?: 'secondary' | 'danger' | 'quiet' | 'tertiary'
+  className?: string
 }) {
+  const cls = [
+    rank === 'secondary' ? 'btn secondary' : rank === 'danger' ? 'btn danger' : rank === 'quiet' ? 'btn quiet' : 'text-btn',
+    current ? 'current' : '',
+    className,
+  ]
+    .filter(Boolean)
+    .join(' ')
   return (
-    <button type="button" className={current ? 'text-btn current' : 'text-btn'} onClick={onClick} disabled={disabled} aria-current={current || undefined}>
+    <button type="button" className={cls} onClick={onClick} disabled={disabled} aria-current={current || undefined}>
       {children}
     </button>
   )
@@ -134,9 +146,12 @@ export function Trail(props: {
 
   return (
     <nav className="trail">
-      <button type="button" className="wordmark" onClick={props.onHome}>
-        <span className="wordmark-th">เรียนเก่ง</span>
-        <span className="wordmark-rom">rian gèng</span>
+      <button type="button" className="wordmark" onClick={props.onHome} aria-label="rian gèng, เรียนเก่ง">
+        <img className="logo-mark" src="/brand/mark.svg" alt="" width={43} height={43} />
+        <span className="wordmark-name">
+          <span className="wordmark-th">เรียนเก่ง</span>
+          <span className="wordmark-rom">rian gèng</span>
+        </span>
       </button>
       <span className="trail-mid">
         {switcher ? (
@@ -155,7 +170,11 @@ export function Trail(props: {
         {inSitting && <span className="trail-left">{props.remaining} left</span>}
       </span>
       <div className="trail-end">
-        {props.onPause && <TextBtn onClick={props.onPause}>Pause</TextBtn>}
+        {props.onPause && (
+          <TextBtn rank="quiet" onClick={props.onPause}>
+            Pause
+          </TextBtn>
+        )}
         {props.onAccount && !props.onPause && <TextBtn onClick={props.onAccount}>{props.accountLabel || 'Account'}</TextBtn>}
       </div>
     </nav>

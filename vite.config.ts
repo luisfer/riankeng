@@ -20,8 +20,8 @@ function readBody(req: Connect.IncomingMessage): Promise<string> {
 /**
  * The gate and the waitlist, served locally. On Vercel these are api/gate.ts,
  * api/session.ts, api/logout.ts and api/waitlist.ts. Here the same routes run
- * inside Vite, dev and preview. With SITE_PASSWORD empty any password passes
- * and the session is always in.
+ * inside Vite, dev and preview. With SITE_PASSWORD empty, /learn/ is open
+ * and the session is always in. /api/gate opens only for a signed-in account.
  */
 function gateDev(secret: string, waitlist: WaitlistEnv, account: { url: string; anon: string }): Plugin {
   const handle: Connect.NextHandleFunction = (req, res, next) => {
@@ -49,15 +49,8 @@ function gateDev(secret: string, waitlist: WaitlistEnv, account: { url: string; 
         return json(200, { ok: true }, `${GATE_COOKIE}=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0`)
       }
       if (url.pathname === '/api/gate' && req.method === 'POST') {
-        const raw = await readBody(req)
-        let password = ''
-        try {
-          password = String((JSON.parse(raw) as { password?: string }).password ?? '')
-        } catch {
-          password = new URLSearchParams(raw).get('password') ?? ''
-        }
         const openedByAccount = await accountMayPass(req.headers.authorization ?? null, account)
-        if (!openedByAccount && secret && password !== secret) return json(401, { ok: false })
+        if (!openedByAccount) return json(401, { ok: false })
         const token = await gateToken(secret || 'open')
         return json(200, { ok: true }, `${GATE_COOKIE}=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=2592000`)
       }
@@ -100,7 +93,14 @@ export default defineConfig(({ mode }) => {
       VitePWA({
         disable: process.env.VITEST === 'true',
         registerType: 'autoUpdate',
-        includeAssets: ['favicon.svg', 'icons/icon-192.png', 'icons/icon-512.png'],
+        includeAssets: [
+          'favicon.svg',
+          'favicon.ico',
+          'icons/apple-touch-icon.png',
+          'icons/icon-192.png',
+          'icons/icon-512.png',
+          'icons/icon-maskable-512.png',
+        ],
         manifest: {
           id: '/',
           name: 'rian gèng',
@@ -114,12 +114,14 @@ export default defineConfig(({ mode }) => {
           icons: [
             { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
             { src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+            // ก่ drawn smaller, inside the circle a launcher's mask always keeps. scripts/gen-brand.py.
+            { src: '/icons/icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
           ],
         },
         workbox: {
           globPatterns: ['**/*.{js,css,html,svg,png,woff2,webmanifest}'],
           // The landing page and its drawings are never part of the app's precache.
-          globIgnores: ['index.html', 'scenes/**', 'assets/landing-*'],
+          globIgnores: ['index.html', 'privacy.html', 'terms.html', 'preview/**', 'scenes/**', 'assets/landing-*'],
           navigateFallback: '/learn/index.html',
           navigateFallbackAllowlist: [/^\/learn\//],
           runtimeCaching: [
@@ -178,6 +180,9 @@ export default defineConfig(({ mode }) => {
       rollupOptions: {
         input: {
           landing: fileURLToPath(new URL('./index.html', import.meta.url)),
+          privacy: fileURLToPath(new URL('./privacy.html', import.meta.url)),
+          terms: fileURLToPath(new URL('./terms.html', import.meta.url)),
+          preview: fileURLToPath(new URL('./preview/index.html', import.meta.url)),
           learn: fileURLToPath(new URL('./learn/index.html', import.meta.url)),
         },
         output: {

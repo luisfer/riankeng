@@ -17,12 +17,12 @@ export default words(24, [
   ['líp', 'ลิฟต์', ['lift', 'elevator'], 'n', ['city'], 'Written with ฟ, said with a p at the end.'],
   ['ban-dai', 'บันได', ['stairs', 'ladder'], 'n', ['city']],
   ['kɔɔn-doo', 'คอนโด', ['condo', 'apartment'], 'n', ['city']],
-  ['dtụ̀k', 'ตึก', ['building'], 'n', ['city']],
+  ['dtʉ̀k', 'ตึก', ['building'], 'n', ['city']],
   ['bpâai', 'ป้าย', ['sign', 'stop', 'bus stop'], 'n', ['city']],
   ['tîi jɔ̀ɔt rót', 'ที่จอดรถ', ['car park', 'parking'], 'n', ['city']],
   // getting there
-  ['rụa', 'เรือ', ['boat'], 'n', ['travel']],
-  ['krụ̂ang bin', 'เครื่องบิน', ['plane', 'aeroplane', 'airplane'], 'n', ['travel']],
+  ['rʉa', 'เรือ', ['boat'], 'n', ['travel']],
+  ['krʉ̂ang bin', 'เครื่องบิน', ['plane', 'aeroplane', 'airplane'], 'n', ['travel']],
   ['win', 'วิน', ['motorbike rank', 'motorbike taxi stand'], 'n', ['travel'], 'The orange vests at the mouth of a soi.'],
   // the phone words
   ['lai', 'ไลน์', ['LINE', 'the LINE app'], 'n', ['phone'], 'How Thailand actually messages.'],

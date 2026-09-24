@@ -16,6 +16,7 @@ function ReviewRows(props: { entries: Entry[]; audioRate: number }) {
           <span>{e.en[0]}</span>
           <span className="thai preview-thai">{e.thai}</span>
           <TextBtn
+            rank="quiet"
             onClick={() => {
               void speakThai(e.thai, e.id, props.audioRate, { gesture: true })
             }}

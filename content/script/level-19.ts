@@ -2,7 +2,7 @@ import { scriptWords } from '../build'
 
 export default scriptWords(19, [
   ['tɔ̌ɔ', 'ถ', ['high-class t', 'the letter t (tɔ̌ɔ tǔng)'], 'n', ['letter'], 'The letter in ถึง.'],
-  ['ụ#1', 'ึ', ['short ụ', 'ụ above'], 'n', ['letter', 'vowel'], 'Sits above. ถึง, หนึ่ง.'],
+  ['ʉ#1', 'ึ', ['short ʉ', 'ʉ above'], 'n', ['letter', 'vowel'], 'Sits above. ถึง, หนึ่ง.'],
   ['tǔng', 'ถึง', ['arrive', 'reach'], 'v', ['bridge', 'voice:w:tǔng', 'parts:ถ+ึ+ง']],
   ['tɔɔ', 'ท', ['low-class t', 'the letter t (tɔɔ tá-hǎan)'], 'n', ['letter'], 'The letter in ทำ.'],
   ['tam', 'ทำ', ['do', 'make'], 'v', ['bridge', 'voice:w:tam', 'parts:ท+ำ']],

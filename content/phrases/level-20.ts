@@ -10,7 +10,7 @@ export default phrases(20, [
   ['dtòk jai ləəi', 'ตกใจเลย', ['I was so startled']],
   ['dtàt sǐn jai lέεo', 'ตัดสินใจแล้ว', ['I have decided']],
   ['yàak bplìan jai', 'อยากเปลี่ยนใจ', ['I want to change my mind']],
-  ['rụ̂ang sǎm-kan', 'เรื่องสำคัญ', ['an important matter']],
+  ['rʉ̂ang sǎm-kan', 'เรื่องสำคัญ', ['an important matter']],
   ['jai kwâang ná', 'ใจกว้างนะ', ['be generous, yeah']],
   ['yàa jai dam', 'อย่าใจดำ', ['do not be cruel']],
   ['pǒm sǐa nám jai', 'ผมเสียน้ำใจ', ['I feel let down', 'my feelings are hurt', 'I am hurt']],

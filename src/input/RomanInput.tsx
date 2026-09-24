@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type KeyboardEvent, type ClipboardEvent, type MouseEvent } from 'react'
-import { DOT_BELOW, POPOVER_TONES, TONE_MARKS, VOWEL_BASES, VOWEL_VARIANTS } from '@content/system'
+import { DOT_BELOW, POPOVER_TONES, TONE_MARKS, U_BAR, VOWEL_BASES, VOWEL_VARIANTS } from '@content/system'
 
 const TYPED_VOWELS = new Set(['a', 'e', 'i', 'o', 'u'])
 
@@ -7,7 +7,7 @@ const STRIP: Array<{ ch: string; label: string }> = [
   { ch: 'ε', label: 'ε' },
   { ch: 'ɔ', label: 'ɔ' },
   { ch: 'ə', label: 'ə' },
-  { ch: 'ụ', label: 'ụ' },
+  { ch: U_BAR, label: U_BAR },
   { ch: TONE_MARKS.low, label: 'à' },
   { ch: TONE_MARKS.falling, label: 'â' },
   { ch: TONE_MARKS.high, label: 'á' },
@@ -17,43 +17,99 @@ const STRIP: Array<{ ch: string; label: string }> = [
 const TONE_MARK_SET = new Set<string>(Object.values(TONE_MARKS))
 
 type Pop =
-  | { mode: 'vowel'; base: string }
-  | { mode: 'tone'; letter: string }
+  | { mode: 'vowel'; base: string; at: number }
+  | { mode: 'tone'; letter: string; at: number }
 
 function withTone(letter: string, mark: string): string {
   return (letter.normalize('NFD').replace(/[\u0300\u0301\u0302\u030C]/g, '') + mark).normalize('NFC')
 }
 
-function lastVowelIndex(value: string): number {
-  const nfd = value.normalize('NFD')
-  for (let i = nfd.length - 1; i >= 0; i--) {
-    if (VOWEL_BASES.has(nfd[i]!)) return i
-  }
-  return -1
+type Cluster = { start: number; end: number }
+
+function clampCaret(value: string, caret: number): number {
+  if (!Number.isFinite(caret)) return value.length
+  return Math.max(0, Math.min(value.length, caret))
 }
 
-function replaceLastVowel(value: string, next: string): string {
+/** Caret in the NFD string, so a mark and its vowel stay one cluster. */
+function nfdCaret(value: string, caret: number): { nfd: string; pos: number } {
   const nfd = value.normalize('NFD')
-  const i = lastVowelIndex(value)
-  if (i < 0) return value + next
-  let end = i + 1
-  while (end < nfd.length && (nfd[end] === DOT_BELOW || TONE_MARK_SET.has(nfd[end]!))) {
-    end++
-  }
-  return (nfd.slice(0, i) + next.normalize('NFD') + nfd.slice(end)).normalize('NFC')
+  const pos = value.slice(0, clampCaret(value, caret)).normalize('NFD').length
+  return { nfd, pos }
 }
 
-/** Strip key: special vowels append; tone marks attach to the last vowel, or insert à/â/á/ǎ when there is none. */
-export function applyStripKey(value: string, ch: string): string {
-  if (TONE_MARK_SET.has(ch)) {
-    const i = lastVowelIndex(value)
-    if (i < 0) return value + withTone('a', ch)
-    const nfd = value.normalize('NFD')
-    let letter = nfd[i]!
-    if (nfd[i + 1] === DOT_BELOW) letter += DOT_BELOW
-    return replaceLastVowel(value, withTone(letter, ch))
+function clusterEnd(nfd: string, start: number): number {
+  let end = start + 1
+  if (nfd[end] === DOT_BELOW) end++
+  while (end < nfd.length && TONE_MARK_SET.has(nfd[end]!)) end++
+  return end
+}
+
+function clusters(nfd: string): Cluster[] {
+  const out: Cluster[] = []
+  for (let i = 0; i < nfd.length; i++) {
+    if (!VOWEL_BASES.has(nfd[i]!)) continue
+    const end = clusterEnd(nfd, i)
+    out.push({ start: i, end })
+    i = end - 1
   }
-  return value + ch
+  return out
+}
+
+/** The vowel the caret is in, else the nearest one before it, else the next one. */
+function clusterAt(nfd: string, pos: number): Cluster | null {
+  const all = clusters(nfd)
+  const inside = all.find((c) => c.start < pos && pos <= c.end)
+  if (inside) return inside
+  const before = [...all].reverse().find((c) => c.end <= pos)
+  if (before) return before
+  return all.find((c) => c.start >= pos) ?? null
+}
+
+function caretAfter(nfd: string, nfdIndex: number): number {
+  return nfd.slice(0, nfdIndex).normalize('NFC').length
+}
+
+function spliceCluster(value: string, caret: number, next: string): { value: string; caret: number } {
+  const { nfd, pos } = nfdCaret(value, caret)
+  const cluster = clusterAt(nfd, pos)
+  const piece = next.normalize('NFD')
+  if (!cluster) {
+    const c = clampCaret(value, caret)
+    const glyph = next.normalize('NFC')
+    return { value: value.slice(0, c) + glyph + value.slice(c), caret: c + glyph.length }
+  }
+  const merged = nfd.slice(0, cluster.start) + piece + nfd.slice(cluster.end)
+  return { value: merged.normalize('NFC'), caret: caretAfter(merged, cluster.start + piece.length) }
+}
+
+/** Put `mark` on the vowel at the caret. With no vowel, insert à/â/á/ǎ there. */
+export function toneAt(value: string, caret: number, mark: string): { value: string; caret: number } {
+  const { nfd, pos } = nfdCaret(value, caret)
+  const cluster = clusterAt(nfd, pos)
+  if (!cluster) return spliceCluster(value, caret, withTone('a', mark))
+  let letter = nfd[cluster.start]!
+  if (nfd[cluster.start + 1] === DOT_BELOW) letter += DOT_BELOW
+  return spliceCluster(value, caret, withTone(letter, mark))
+}
+
+/** Replace the vowel at the caret with another letter, and leave the caret after it. */
+export function replaceVowelAt(value: string, caret: number, letter: string): { value: string; caret: number } {
+  return spliceCluster(value, caret, letter)
+}
+
+/**
+ * Strip key at a caret. Special vowels insert there. Tone marks attach to the
+ * vowel at the caret. Omitted caret means the end of the field.
+ */
+export function applyStripKey(value: string, ch: string, caret = value.length): string {
+  return editRoman(value, caret, ch).value
+}
+
+export function editRoman(value: string, caret: number, ch: string): { value: string; caret: number } {
+  if (TONE_MARK_SET.has(ch)) return toneAt(value, caret, ch)
+  const c = clampCaret(value, caret)
+  return { value: value.slice(0, c) + ch + value.slice(c), caret: c + ch.length }
 }
 
 export function RomanInput(props: {
@@ -66,24 +122,49 @@ export function RomanInput(props: {
   autoFocus?: boolean
 }) {
   const ref = useRef<HTMLInputElement>(null)
+  const place = useRef<number | null>(null)
   const [pop, setPop] = useState<Pop | null>(null)
 
   useEffect(() => {
     if (props.autoFocus) ref.current?.focus()
   }, [props.autoFocus, props.disabled])
 
+  useEffect(() => {
+    const el = ref.current
+    const caret = place.current
+    if (!el || caret == null) return
+    el.setSelectionRange(caret, caret)
+    place.current = null
+  }, [props.value])
+
   const variants = pop?.mode === 'vowel' ? (VOWEL_VARIANTS[pop.base] ?? []) : []
 
+  const read = () => ref.current?.value ?? props.value
+
+  const commit = (value: string, caret: number) => {
+    place.current = caret
+    props.onChange(value)
+    queueMicrotask(() => {
+      const el = ref.current
+      if (!el || place.current == null || el.value !== value) return
+      el.setSelectionRange(caret, caret)
+      place.current = null
+    })
+  }
+
   const pickTone = (mark: string) => {
-    const letter = pop?.mode === 'tone' ? pop.letter : pop?.mode === 'vowel' ? pop.base : 'a'
-    props.onChange(replaceLastVowel(props.value, withTone(letter, mark)))
+    const caret = pop?.at ?? ref.current?.selectionStart ?? props.value.length
+    const next = toneAt(read(), caret, mark)
+    commit(next.value, next.caret)
     setPop(null)
     ref.current?.focus()
   }
 
   const pickVariant = (letter: string) => {
-    props.onChange(replaceLastVowel(props.value, letter.normalize('NFC')))
-    setPop({ mode: 'tone', letter })
+    const caret = pop?.mode === 'vowel' ? pop.at : (ref.current?.selectionStart ?? props.value.length)
+    const next = replaceVowelAt(read(), caret, letter)
+    commit(next.value, next.caret)
+    setPop({ mode: 'tone', letter, at: next.caret })
     ref.current?.focus()
   }
 
@@ -113,16 +194,19 @@ export function RomanInput(props: {
       }
     }
     if (e.key.length === 1 && TYPED_VOWELS.has(e.key.toLowerCase()) && !e.metaKey && !e.ctrlKey && !e.altKey) {
-      setPop({ mode: 'vowel', base: e.key.toLowerCase() })
+      const caret = ref.current?.selectionStart ?? props.value.length
+      setPop({ mode: 'vowel', base: e.key.toLowerCase(), at: caret + 1 })
     } else if (e.key.length === 1 && !e.metaKey) {
       setPop(null)
     }
   }
 
   const insert = (ch: string) => {
-    props.onChange(applyStripKey(props.value, ch))
-    if (ch === 'ε' || ch === 'ɔ' || ch === 'ə' || ch === 'ụ') {
-      setPop({ mode: 'tone', letter: ch === 'ụ' ? 'u' + DOT_BELOW : ch })
+    const caret = ref.current?.selectionStart ?? props.value.length
+    const next = editRoman(read(), caret, ch)
+    commit(next.value, next.caret)
+    if (ch === 'ε' || ch === 'ɔ' || ch === 'ə' || ch === U_BAR) {
+      setPop({ mode: 'tone', letter: ch, at: next.caret })
     }
     ref.current?.focus()
   }
@@ -160,14 +244,26 @@ export function RomanInput(props: {
       {pop && !props.disabled && (
         <div className="popover" role="listbox">
           {POPOVER_TONES.map((t) => (
-            <button key={t.key} type="button" className="pop-opt" onClick={() => pickTone(t.mark)}>
+            <button
+              key={t.key}
+              type="button"
+              className="pop-opt"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => pickTone(t.mark)}
+            >
               <span className="pop-k">{t.key}</span>
               <span className="rom">{withTone(pop.mode === 'tone' ? pop.letter : pop.base, t.mark)}</span>
             </button>
           ))}
           {pop.mode === 'vowel' &&
             variants.map((v, i) => (
-              <button key={v} type="button" className="pop-opt" onClick={() => pickVariant(v)}>
+              <button
+                key={v}
+                type="button"
+                className="pop-opt"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => pickVariant(v)}
+              >
                 <span className="pop-k">{i + 5}</span>
                 <span className="rom">{v.normalize('NFC')}</span>
               </button>

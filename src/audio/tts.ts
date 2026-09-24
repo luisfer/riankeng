@@ -1,4 +1,5 @@
 import { clipCached, clipUrl, hasShippedClip, prefetchClip, setClipCached, shouldTryClip } from './clips'
+import { stickPlaybackRate } from './rate'
 
 export interface VoiceInfo {
   ready: boolean
@@ -108,7 +109,7 @@ function speakNow(thai: string, rate: number, gesture: boolean): VoiceInfo {
 function playClip(thai: string, id: string, rate: number, gesture: boolean): VoiceInfo {
   lastAudio?.pause()
   const audio = new Audio(clipUrl(id))
-  audio.playbackRate = Math.min(1.2, Math.max(0.6, rate / 0.85))
+  stickPlaybackRate(audio, Math.min(1.2, Math.max(0.6, rate / 0.85)))
   lastAudio = audio
   void audio.play().then(
     () => {

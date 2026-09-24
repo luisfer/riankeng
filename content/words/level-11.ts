@@ -5,7 +5,7 @@ export default words(11, [
   ['sǐi dεεng', 'สีแดง', ['red'], 'adj', ['colour']],
   ['sǐi nám ngən', 'สีน้ำเงิน', ['blue'], 'adj', ['colour']],
   ['sǐi kǐao', 'สีเขียว', ['green'], 'adj', ['colour']],
-  ['sǐi lụ̌ang', 'สีเหลือง', ['yellow'], 'adj', ['colour']],
+  ['sǐi lʉ̌ang', 'สีเหลือง', ['yellow'], 'adj', ['colour']],
   ['sǐi sôm', 'สีส้ม', ['orange'], 'adj', ['colour']],
   ['sǐi mûang', 'สีม่วง', ['purple'], 'adj', ['colour']],
   ['sǐi nám dtaan', 'สีน้ำตาล', ['brown'], 'adj', ['colour']],
@@ -33,6 +33,6 @@ export default words(11, [
   ['lɔɔng sài', 'ลองใส่', ['try on'], 'v', ['shop']],
   ['pεεng bpai', 'แพงไป', ['too expensive'], 'expr', ['shop']],
   ['tùuk', 'ถูก', ['cheap', 'correct'], 'adj', ['shop']],
-  ['ụ̀ụn', 'อื่น', ['other', 'another'], 'adj', ['shop']],
+  ['ʉ̀ʉn', 'อื่น', ['other', 'another'], 'adj', ['shop']],
   ['sǐi fáa', 'สีฟ้า', ['sky blue', 'light blue'], 'adj', ['colour']],
 ])

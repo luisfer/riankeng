@@ -12,10 +12,10 @@ export default phrases(23, [
   ['kǎo dtὲng-ngaan lέεo', 'เขาแต่งงานแล้ว', ['they are married already']],
   ['pǒm yang sòot', 'ผมยังโสด', ['I am still single']],
   ['glûai hâa lûuk', 'กล้วยห้าลูก', ['five bananas']],
-  ['nǎng-sụ̌ụ sǎam lêm', 'หนังสือสามเล่ม', ['three books']],
+  ['nǎng-sʉ̌ʉ sǎam lêm', 'หนังสือสามเล่ม', ['three books']],
   ['rót sɔ̌ɔng kan', 'รถสองคัน', ['two cars']],
-  ['bâan nụ̀ng lǎng', 'บ้านหนึ่งหลัง', ['one house']],
+  ['bâan nʉ̀ng lǎng', 'บ้านหนึ่งหลัง', ['one house']],
   ['dtôn-mái sɔ̌ɔng dtôn', 'ต้นไม้สองต้น', ['two trees']],
   ['táng mòt tâo-rài', 'ทั้งหมดเท่าไร', ['how much altogether', 'how much in total']],
-  ['an tîi nụ̀ng dii gwàa', 'อันที่หนึ่งดีกว่า', ['the first one is better']],
+  ['an tîi nʉ̀ng dii gwàa', 'อันที่หนึ่งดีกว่า', ['the first one is better']],
 ])

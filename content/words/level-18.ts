@@ -18,7 +18,7 @@ export default words(18, [
   ['dtà-làat nát', 'ตลาดนัด', ['weekly market', 'weekend market', 'market fair'], 'n', ['city'], 'nát is the appointment: a market that meets on set days.'],
   ['kui lên', 'คุยเล่น', ['chat for fun'], 'v', ['city']],
   ['dtà-làat náam', 'ตลาดน้ำ', ['floating market'], 'n', ['city']],
-  ['tîao glaang kụụn', 'เที่ยวกลางคืน', ['go out at night'], 'v', ['city']],
+  ['tîao glaang kʉʉn', 'เที่ยวกลางคืน', ['go out at night'], 'v', ['city']],
   ['nát wee-laa', 'นัดเวลา', ['set a time'], 'v', ['city']],
   ['yîam', 'เยี่ยม', ['visit', 'great'], 'v', ['city']],
   ['chom', 'ชม', ['appreciate', 'watch', 'praise'], 'v', ['city']],

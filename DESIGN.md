@@ -19,6 +19,13 @@ Visual world: **river primer**. A language book on paper, iron-gall ink, one lac
 
 Never gray. Never gold-on-navy.
 
+## Mark
+- **The mark.** ก carrying the mai ek of เก่ง, paper on a lacquer square: a consonant is a seat, and the tone sits on it. Fahkwang Bold, kept in `art/fonts`. Square corners; a launcher rounds its own.
+- **Three optical sizes**, all drawn by `npm run brand` (`scripts/gen-brand.py`). Tab: `favicon.svg` and `favicon.ico`, ก่ at 80% of the square. Icon: `apple-touch-icon`, 192, 512 and `brand/mark.svg`, at 62%. Safe: the maskable 512, at 50%, inside the circle a launcher's mask always keeps.
+- **The lockup.** เรียนเก่ง in Fahkwang over rian gèng in Didact Gothic, flush left. The romanization is spaced 60/1000 and scaled until the grave over è stands under the mai ek over ก, one vertical line through both tone marks. Those two marks are the only lacquer. The rest is ink, or paper on the ink ground, where the lacquer lifts to `#c68b7b`. Masters: `public/brand/lockup.svg`, and `wordmark.svg` on one line. Inline paths: `src/brand/paths.ts`.
+- Clear space is the height of the mai ek on every side. Smallest: the mark at 16px, the lockup at 18px Thai.
+- Never outlined, shadowed, graded or recoloured. No second colour in the square.
+
 ## Type
 - English UI: **Fraunces** 300–600. Optical size on headings and the big prompt. Body 18px, optical off, a hair of tracking. Headings, wordmark (italic), prompts, buttons.
 - Phonetic: **Charis SIL**. Answers, romanization, tone samples, glyph table.

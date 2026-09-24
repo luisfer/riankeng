@@ -1,7 +1,7 @@
 import { phrases } from '../build'
 
 export default phrases(7, [
-  ['gin lέεo rụ̌ụ yang', 'กินแล้วหรือยัง', ['have you eaten yet', 'eaten yet']],
+  ['gin lέεo rʉ̌ʉ yang', 'กินแล้วหรือยัง', ['have you eaten yet', 'eaten yet']],
   ['yang mâi sèt', 'ยังไม่เสร็จ', ['not finished yet', 'I am not done yet']],
   ['pǒm gam-lang rian', 'ผมกำลังเรียน', ['I am studying', 'I am in the middle of studying']],
   ['jà bpai prûng-níi', 'จะไปพรุ่งนี้', ['I will go tomorrow', 'going tomorrow']],

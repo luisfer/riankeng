@@ -1,11 +1,11 @@
 import { words } from '../build'
 
 export default words(12, [
-  ['rúu-sụ̀k', 'รู้สึก', ['feel', 'to feel'], 'v', ['feel']],
+  ['rúu-sʉ̀k', 'รู้สึก', ['feel', 'to feel'], 'v', ['feel']],
   ['bpùai', 'ป่วย', ['ill', 'sick'], 'adj', ['feel']],
   ['jèp', 'เจ็บ', ['hurt', 'in pain', 'painful'], 'v', ['feel']],
-  ['nụ̀ai', 'เหนื่อย', ['tired'], 'adj', ['feel']],
-  ['bụ̀a', 'เบื่อ', ['bored'], 'adj', ['feel']],
+  ['nʉ̀ai', 'เหนื่อย', ['tired'], 'adj', ['feel']],
+  ['bʉ̀a', 'เบื่อ', ['bored'], 'adj', ['feel']],
   ['glua#2', 'กลัว', ['afraid', 'scared', 'to fear'], 'v', ['feel']],
   ['dii jai', 'ดีใจ', ['glad', 'happy'], 'adj', ['feel']],
   ['sǐa jai', 'เสียใจ', ['sad', 'sorry', 'regret'], 'adj', ['feel']],
@@ -25,7 +25,7 @@ export default words(12, [
   ['hǔa', 'หัว', ['head'], 'n', ['feel']],
   ['kε̌εn', 'แขน', ['arm'], 'n', ['feel']],
   ['kǎa', 'ขา', ['leg'], 'n', ['feel']],
-  ['mụụ', 'มือ', ['hand'], 'n', ['feel']],
+  ['mʉʉ', 'มือ', ['hand'], 'n', ['feel']],
   ['hǔu', 'หู', ['ear'], 'n', ['feel']],
   ['jà-mùuk', 'จมูก', ['nose'], 'n', ['feel']],
   ['bpàak', 'ปาก', ['mouth'], 'n', ['feel']],

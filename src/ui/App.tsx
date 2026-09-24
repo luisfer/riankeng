@@ -30,14 +30,13 @@ import { exportJson } from '@/storage/export'
 import { mergeWork } from '@/storage/sync'
 import { readAccount, signOutAccount, takeRecoverySession, type AccountSession } from '@/storage/auth'
 import { syncAccount } from '@/storage/account-sync'
-import { mirrorWrittenAt, setMirrorWrittenAt } from '@/storage/device'
+import { setMirrorWrittenAt } from '@/storage/device'
 import * as mirrorFile from '@/storage/mirror-file'
 import type { MirrorState } from '@/storage/mirror-file'
 import { onVoices } from '@/audio/tts'
 import { go, parseHash, replace, type Route } from './hash'
-import { Account } from './Account'
+import { Account, khunName } from './Account'
 import { Alphabet } from './Alphabet'
-import { Glyphs } from './Glyphs'
 import { Journey } from './Journey'
 import { TrackPage } from './TrackPage'
 import { ReviewPage } from './AlreadyYours'
@@ -54,7 +53,6 @@ export function App() {
   const [mirrorState, setMirrorState] = useState<MirrorState>(() =>
     mirrorFile.supported() ? 'off' : 'unsupported',
   )
-  const [mirrorAt, setMirrorAt] = useState(() => mirrorWrittenAt())
   const [boot] = useState(() => {
     const recovered = takeRecoverySession()
     return { session: recovered ?? readAccount(), recovery: Boolean(recovered) }
@@ -134,7 +132,6 @@ export function App() {
         if (await mirrorFile.write(mirror, exportJson(payload))) {
           const t = Date.now()
           setMirrorWrittenAt(t)
-          setMirrorAt(t)
         } else {
           setMirrorState('needs-permission')
         }
@@ -218,7 +215,7 @@ export function App() {
   const voiceStatuses = allLevelStatus(doc, Date.now(), 'voice')
   const scriptStatuses = allLevelStatus(doc, Date.now(), 'script')
   const yours = reviewEntries(doc)
-  const accountLabel = doc.settings.name.trim() || 'Account'
+  const accountLabel = khunName(doc.settings.name) || 'Account'
 
   const beginLevel = (n: number, track: TrackId) => {
     const list = track === 'script' ? scriptStatuses : voiceStatuses
@@ -260,32 +257,6 @@ export function App() {
       return
     }
     setSession(s)
-  }
-
-  const mirrorActions = {
-    state: mirrorState,
-    writtenAt: mirrorAt,
-    onStart: async () => {
-      const handle = await mirrorFile.choose()
-      if (!handle) return
-      setMirror(handle)
-      setMirrorState('granted')
-      const file = await mirrorFile.read(handle)
-      if (file) setDoc((d) => stampDoc(mergeWork(d, file)))
-    },
-    onStop: async () => {
-      await mirrorFile.forget()
-      setMirror(null)
-      setMirrorState('off')
-    },
-    onAuthorise: async () => {
-      if (!mirror) return
-      const state = await mirrorFile.permission(mirror, true)
-      setMirrorState(state)
-      if (state !== 'granted') return
-      const file = await mirrorFile.read(mirror)
-      if (file) setDoc((d) => stampDoc(mergeWork(d, file)))
-    },
   }
 
   const eraseDevice = () => {
@@ -432,8 +403,6 @@ export function App() {
             voice={voiceStatuses}
             script={scriptStatuses}
             onDoc={commitDoc}
-            mirror={mirrorActions}
-            onGlyphs={() => go({ name: 'glyphs' })}
             onReset={eraseDevice}
             account={account}
             onAccount={setAccount}
@@ -441,7 +410,6 @@ export function App() {
             onRecoveryDone={() => setRecovery(false)}
           />
         )}
-        {loadState === 'ready' && route.name === 'glyphs' && <Glyphs />}
       </div>
     </div>
   )

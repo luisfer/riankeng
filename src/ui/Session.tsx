@@ -420,12 +420,22 @@ export function SessionView(props: {
   return (
     <main className="page session">
       <div className="session-stage">
-        <p className="prompt session-prompt">
-          {prompt}
-          <span className="prompt-tools">
+        <p className="prompt session-prompt">{prompt}</p>
+        <div className={`session-stimulus${right ? ' right' : ''}`}>
+          {stimulus}
+          {pairLine && (
+            <p className={`pair-line${modality === 'pick' ? ' thai' : modality === 'th-en' ? '' : ' rom'}`}>
+              {pairLine}
+            </p>
+          )}
+          {sense && !right && <p className="sense-line">{sense}</p>}
+        </div>
+        {(!props.doc.settings.silent || fromVoice) && (
+          <p className="prompt-tools">
             {!props.doc.settings.silent && (
               <>
                 <TextBtn
+                  rank="quiet"
                   current={listenLocked}
                   onClick={() => {
                     setHeard(true)
@@ -436,6 +446,7 @@ export function SessionView(props: {
                   Hear
                 </TextBtn>
                 <TextBtn
+                  rank="quiet"
                   onClick={() => {
                     setHeard(true)
                     setHint(null)
@@ -447,23 +458,12 @@ export function SessionView(props: {
               </>
             )}
             {fromVoice && <span className="from-voice">You know this from Voice</span>}
-          </span>
-        </p>
-        <div className={`session-stimulus${right ? ' right' : ''}`}>
-          {stimulus}
-          {pairLine && (
-            <p className={`pair-line${modality === 'pick' ? ' thai' : modality === 'th-en' ? '' : ' rom'}`}>
-              {pairLine}
-            </p>
-          )}
-          {sense && !right && (
-            <p className="sense-line">{sense}</p>
-          )}
-        </div>
+          </p>
+        )}
+        <div className="session-desk">{desk}</div>
         <p className={`feedback session-feedback${ack ? (ack.ok ? ' ok' : ' miss') : hint ? ' miss' : ''}`} role="status">
           {hint ?? ack?.text ?? ''}
         </p>
-        <div className="session-desk">{desk}</div>
       </div>
     </main>
   )

@@ -6,8 +6,8 @@ export default phrases(12, [
   ['pǒm jèp', 'ผมเจ็บ', ['I am in pain', 'it hurts']],
   ['bpùat hǔa mâak', 'ปวดหัวมาก', ['I have a bad headache']],
   ['dtɔ̂ng bpai hǎa mɔ̌ɔ', 'ต้องไปหาหมอ', ['I have to see a doctor']],
-  ['pǒm nụ̀ai', 'ผมเหนื่อย', ['I am tired']],
-  ['pǒm bụ̀a', 'ผมเบื่อ', ['I am bored']],
+  ['pǒm nʉ̀ai', 'ผมเหนื่อย', ['I am tired']],
+  ['pǒm bʉ̀a', 'ผมเบื่อ', ['I am bored']],
   ['kǎo gròot', 'เขาโกรธ', ['he is angry', 'she is angry']],
   ['pǒm dii jai', 'ผมดีใจ', ['I am glad', 'I am happy']],
   ['pǒm sǐa jai', 'ผมเสียใจ', ['I am sad', 'I am sorry']],
@@ -17,6 +17,6 @@ export default phrases(12, [
   ['bpùat hǔa táng wan', 'ปวดหัวทั้งวัน', ['my head hurt all day']],
   ['bpùat fan', 'ปวดฟัน', ['toothache', 'my tooth hurts']],
   ['rao bpai roong-pá-yaa-baan', 'เราไปโรงพยาบาล', ['we are going to the hospital']],
-  ['pǒm rúu-sụ̀k dii kụ̂n', 'ผมรู้สึกดีขึ้น', ['I feel better']],
+  ['pǒm rúu-sʉ̀k dii kʉ̂n', 'ผมรู้สึกดีขึ้น', ['I feel better']],
   ['yang bpùai yùu', 'ยังป่วยอยู่', ['still sick', 'still ill']],
 ])

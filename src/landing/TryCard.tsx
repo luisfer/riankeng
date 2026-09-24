@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { clipUrl } from '@/audio/clip-url'
+import { stickPlaybackRate } from '@/audio/rate'
 import { gradeThai, type ThaiGrade } from '@/engine/grader-thai'
 import { RomanInput } from '@/input/RomanInput'
 import { Commit, TextBtn } from '@/ui/bits'
@@ -48,7 +49,7 @@ export function TryCard(props: { deck: DemoCard[] }) {
   const play = (rate: number) => {
     audio.current?.pause()
     const a = new Audio(clipUrl(card.id))
-    a.playbackRate = rate
+    stickPlaybackRate(a, rate)
     audio.current = a
     void a.play().catch(() => undefined)
   }
@@ -102,68 +103,77 @@ export function TryCard(props: { deck: DemoCard[] }) {
         )}
       </div>
       <div className="try-desk">
-        {!right && (
-          <p className="prompt">
-            {look ? null : chrome.writeRom}
-            <span className="prompt-tools">
-              <TextBtn onClick={() => play(1)}>{landing.hear}</TextBtn>
-              <TextBtn onClick={() => play(0.75)}>{landing.slower}</TextBtn>
-            </span>
-          </p>
-        )}
-        {look && (
-          <p className="try-rom rom" lang="th-Latn">
-            {card.rom}
-          </p>
-        )}
-        <p className="try-en">{card.en}</p>
-        {look ? (
-          <div className="answer-form">
-            <div />
-            <Commit onClick={goWrite}>{landing.continue}</Commit>
-          </div>
-        ) : right ? (
-          <div className="try-pair">
-            <p className="pair-line rom">
-              <span lang="th-Latn">{card.rom}</span>
+        <div className="try-stage">
+          {!right && (
+            <p className="prompt">
+              {look ? null : chrome.writeRom}
               <span className="prompt-tools">
-                <TextBtn onClick={() => play(1)}>{landing.hear}</TextBtn>
-                <TextBtn onClick={() => play(0.75)}>{landing.slower}</TextBtn>
+                <TextBtn rank="quiet" onClick={() => play(1)}>{landing.hear}</TextBtn>
+                <TextBtn rank="quiet" onClick={() => play(0.6)}>{landing.slower}</TextBtn>
               </span>
             </p>
-            <p className="pair-line thai" lang="th">
-              {card.thai}
-            </p>
+          )}
+          <div className="try-copy">
+            {look && (
+              <p className="try-rom rom" lang="th-Latn">
+                {card.rom}
+              </p>
+            )}
+            <p className="try-en">{card.en}</p>
+            {right && (
+              <div className="try-pair">
+                <p className="pair-line rom">
+                  <span lang="th-Latn">{card.rom}</span>
+                  <span className="prompt-tools">
+                    <TextBtn rank="quiet" onClick={() => play(1)}>{landing.hear}</TextBtn>
+                    <TextBtn rank="quiet" onClick={() => play(0.6)}>{landing.slower}</TextBtn>
+                  </span>
+                </p>
+                <p className="pair-line thai" lang="th">
+                  {card.thai}
+                </p>
+              </div>
+            )}
+            {!look && !right && (
+              <form
+                className="answer-form"
+                onSubmit={(e) => {
+                  e.preventDefault()
+                  check()
+                }}
+              >
+                <RomanInput
+                  value={value}
+                  onChange={(v) => {
+                    setValue(v)
+                    if (grade) setGrade(null)
+                  }}
+                  onSubmit={check}
+                  onPasteBlock={() => setPasted(true)}
+                  autoFocus={focusField}
+                />
+                <Commit type="submit">{landing.check}</Commit>
+              </form>
+            )}
           </div>
-        ) : (
-          <form
-            className="answer-form"
-            onSubmit={(e) => {
-              e.preventDefault()
-              check()
-            }}
-          >
-            <RomanInput
-              value={value}
-              onChange={(v) => {
-                setValue(v)
-                if (grade) setGrade(null)
-              }}
-              onSubmit={check}
-              onPasteBlock={() => setPasted(true)}
-              autoFocus={focusField}
-            />
-            <Commit type="submit">{landing.check}</Commit>
-          </form>
-        )}
-        <p className={`feedback session-feedback${right ? ' ok' : grade ? ' miss' : ''}`} role="status">
-          {line}
-        </p>
-        {right && (
-          <div className="try-next">
-            <Commit onClick={next}>{landing.next}</Commit>
+          <div className="try-act">
+            {look && (
+              <div className="try-go">
+                <Commit onClick={goWrite}>{landing.continue}</Commit>
+              </div>
+            )}
+            {line && (
+              <p className={`feedback session-feedback${right ? ' ok' : ' miss'}`} role="status">
+                {line}
+              </p>
+            )}
+            {right && (
+              <div className="try-next">
+                <Commit onClick={next}>{landing.next}</Commit>
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </div>
   )

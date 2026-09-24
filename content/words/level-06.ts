@@ -31,7 +31,7 @@ export default words(6, [
   ['pε̌εn-tîi', 'แผนที่', ['map'], 'n', ['travel']],
   ['bpai tîi-nǎi', 'ไปที่ไหน', ['where to', 'go where'], 'expr', ['travel']],
   ['long', 'ลง', ['get off', 'go down', 'descend'], 'v', ['travel']],
-  ['kụ̂n', 'ขึ้น', ['get on', 'go up', 'ascend'], 'v', ['travel']],
+  ['kʉ̂n', 'ขึ้น', ['get on', 'go up', 'ascend'], 'v', ['travel']],
   ['bplìan', 'เปลี่ยน', ['change', 'to change'], 'v', ['travel']],
   ['reo', 'เร็ว', ['fast', 'quick'], 'adj', []],
   ['taang ɔ̀ɔk', 'ทางออก', ['exit', 'way out'], 'n', ['travel']],

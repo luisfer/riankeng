@@ -40,7 +40,7 @@ RANGES = [
     (0x0250, 0x02FF),  # IPA (ɔ ɛ ə) and spacing modifiers
     (0x0300, 0x036F),  # every combining mark
     (0x0370, 0x03FF),  # Greek (ε έ), where the face has it
-    (0x1E00, 0x1EFF),  # Latin Extended Additional (ụ)
+    (0x1E00, 0x1EFF),  # Latin Extended Additional (ʉ)
     (0x1F00, 0x1FFF),  # Greek Extended (ὲ)
     (0x2000, 0x206F),  # punctuation
     (0x20A0, 0x20CF),  # currency

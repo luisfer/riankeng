@@ -1,5 +1,6 @@
 import { clipUrl } from './audio/clip-url.js'
 import { DEMO_IDS } from './landing/demo.js'
+import { PREVIEW_IDS } from './preview/catalog.js'
 
 export const GATE_COOKIE = 'rk_gate'
 
@@ -24,8 +25,8 @@ export function readCookie(header: string | null, name: string): string | null {
  */
 export type GateDecision = { kind: 'pass' } | { kind: 'shell' } | { kind: 'redirect'; to: '/?signin' | '/?signin=unset' }
 
-/** The clips the landing page plays. Public, whoever asks. */
-const PUBLIC_CLIPS = new Set(DEMO_IDS.map((id) => decode(clipUrl(id))))
+/** Landing demo clips, and the cards on /preview/. Public, whoever asks. */
+const PUBLIC_CLIPS = new Set([...DEMO_IDS, ...PREVIEW_IDS].map((id) => decode(clipUrl(id))))
 
 function decode(pathname: string): string {
   try {
@@ -40,9 +41,10 @@ export function isGated(pathname: string): boolean {
 }
 
 /**
- * The course and its audio sit behind the password. Everything else, and the
- * demo clips, are public. Without a secret the gate is open locally and shut
- * on Vercel, where an unset password is a mistake worth showing.
+ * The course and its audio sit behind the password. Everything else, the
+ * landing clips, and the sitting on /preview/ are public. Without a secret
+ * the gate is open locally and shut on Vercel, where an unset password is a
+ * mistake worth showing.
  */
 export async function decideGate(
   pathname: string,

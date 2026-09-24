@@ -15,7 +15,7 @@ export default phrases(25, [
   ['pǒm pέε aa-hǎan tá-lee', 'ผมแพ้อาหารทะเล', ['I am allergic to seafood']],
   ['rá-wang rót', 'ระวังรถ', ['watch out for cars', 'mind the traffic']],
   ['tîi nîi an-dtà-raai', 'ที่นี่อันตราย', ['it is dangerous here']],
-  ['nǎng-sụ̌ụ dəən taang hǎai', 'หนังสือเดินทางหาย', ['my passport is lost']],
+  ['nǎng-sʉ̌ʉ dəən taang hǎai', 'หนังสือเดินทางหาย', ['my passport is lost']],
   ['wii-sâa mòt wan tîi sìp', 'วีซ่าหมดวันที่สิบ', ['my visa runs out on the tenth']],
   ['chəən kráp/kâ', 'เชิญครับ/ค่ะ', ['please go ahead', 'after you']],
   ['lέεo dtὲε kun', 'แล้วแต่คุณ', ['up to you', 'whatever you like']],

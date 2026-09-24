@@ -1,0 +1,5 @@
+<div style="border-top:8px solid #9a2b1f;background:#f2ead8;padding:28px;font-family:Georgia,serif;color:#1c1710;font-size:18px;line-height:1.45;">
+  <p style="margin:0 0 18px;">{{ if .Data.display_name }}{{ .Data.display_name }}, this link opens rian gèng and asks for a new password.{{ else }}This link opens rian gèng and asks for a new password.{{ end }}</p>
+  <p style="margin:0 0 18px;"><a href="{{ .ConfirmationURL }}" style="color:#f2ead8;background:#9a2b1f;text-decoration:none;padding:10px 16px;display:inline-block;">Choose a new password</a></p>
+  <p style="margin:0;color:#5a5146;font-size:15px;">If you did not ask, ignore this email.</p>
+</div>

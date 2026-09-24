@@ -9,11 +9,12 @@ describe('analyseRom', () => {
     expect(a.nuclei.map((n) => n.tone)).toEqual(['low', 'mid'])
     expect(a.valid).toBe(true)
   })
-  it('handles ụ as one vowel unit', () => {
-    const a = analyseRom('sụ́ụ')
+  it('handles ʉ as one vowel unit', () => {
+    const a = analyseRom('sʉ́ʉ')
     expect(a.nuclei).toHaveLength(1)
     expect(a.nuclei[0]!.tone).toBe('high')
-    expect(a.collapsed).toBe('su\u0323')
+    expect(a.skeleton).toBe('sʉʉ')
+    expect(a.collapsed).toBe('sʉ')
   })
   it('treats -ay / -aw as -ai / -ao', () => {
     expect(analyseRom('sǔay').skeleton).toBe(analyseRom('sǔai').skeleton)

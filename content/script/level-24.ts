@@ -9,7 +9,7 @@ export default scriptWords(24, [
   ['gòt', 'กฎ', ['rule', 'law'], 'n', ['bridge', 'voice:w:gòt', 'parts:ก+ฎ'], 'ฎ at the end reads t.'],
   ['lɔɔ#2', 'ฬ', ['l', 'the letter l (lɔɔ jù-laa)'], 'n', ['letter'], 'Same sound as ล. กีฬา.'],
   ['gii-laa', 'กีฬา', ['sport', 'sports'], 'n', ['bridge', 'voice:w:gii-laa', 'parts:ก+ี+ฬ+า']],
-  ['rụ́', 'ฤ', ['rụ́', 'the vowel-letter ฤ'], 'n', ['letter', 'vowel'], 'A vowel that stands alone. Reads rụ́ or rí. พฤหัส, อังกฤษ.'],
-  ['wan pá-rụ́-hàt', 'วันพฤหัส', ['Thursday'], 'n', ['bridge', 'voice:w:wan pá-rụ́-hàt', 'parts:ว+ั+น+พ+ฤ+ห+ั+ส'], 'The short form people say. The calendar prints วันพฤหัสบดี.'],
+  ['rʉ́', 'ฤ', ['rʉ́', 'the vowel-letter ฤ'], 'n', ['letter', 'vowel'], 'A vowel that stands alone. Reads rʉ́ or rí. พฤหัส, อังกฤษ.'],
+  ['wan pá-rʉ́-hàt', 'วันพฤหัส', ['Thursday'], 'n', ['bridge', 'voice:w:wan pá-rʉ́-hàt', 'parts:ว+ั+น+พ+ฤ+ห+ั+ส'], 'The short form people say. The calendar prints วันพฤหัสบดี.'],
   ['paa-sǎa ang-grìt', 'ภาษาอังกฤษ', ['English'], 'n', ['bridge', 'voice:w:paa-sǎa ang-grìt', 'parts:ภ+า+ษ+า+อ+ั+ง+ก+ฤ+ษ']],
 ])

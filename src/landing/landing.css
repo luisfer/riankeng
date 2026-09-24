@@ -218,7 +218,8 @@ html:not([data-comic]) .comic { visibility: hidden; }
   /* The day of panels uses the viewport. The card and the close stay in the column. */
   max-width: none;
 }
-header.wrap { max-width: none; position: relative; z-index: 5; }
+/* The nav spans the same width as the day of panels, so its edges meet the strip's. */
+body:has(.comic) .nav.wrap { max-width: none; }
 .comic {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

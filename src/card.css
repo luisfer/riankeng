@@ -6,11 +6,27 @@ button, input { font: inherit; color: inherit; }
 button { background: none; border: 0; padding: 0; cursor: pointer; }
 button:disabled { cursor: default; opacity: 0.4; }
 
+/* Hear and Slower. The speaker sits outside the word, so the row leaves room for it. */
+.hear-key { position: relative; }
+.hear-mark {
+  position: absolute;
+  left: calc(100% + 6px);
+  top: 50%;
+  width: 16px;
+  height: 14px;
+  transform: translateY(-50%);
+  color: var(--lacquer);
+  opacity: 0;
+  pointer-events: none;
+}
+.hear-key:hover .hear-mark,
+.hear-key:focus-visible .hear-mark { opacity: 1; }
+.prompt-tools:has(> .hear-key) { column-gap: 36px; }
+
 .rom,
 .prompt-rom,
 .roman-field,
 .reveal,
-.strip-k,
 .pair-line.rom,
 .glyphs-tbl td,
 .tone-chart-rom {
@@ -191,7 +207,10 @@ input[type='checkbox']:disabled { cursor: default; opacity: 0.4; }
 .answer-said.en { font-family: var(--ui); font-size-adjust: none; font-size: 26px; font-weight: 400; }
 .roman-field::placeholder { color: var(--ink-2); }
 
-/* The tones of the vowel just typed, set as type under the line and keyed 1 to 4. They take the strip's place. */
+/*
+ * The vowel of the syllable being written, in each tone and keyed 1 to 4, then the
+ * typed vowel's own letters on their strip numbers. Type under the line, in the strip's place.
+ */
 .popover {
   grid-column: 1 / -1;
   grid-row: 2;
@@ -228,29 +247,35 @@ input[type='checkbox']:disabled { cursor: default; opacity: 0.4; }
   color: var(--ink-2);
 }
 
-/* The letters English has no key for, then the four marks. */
+/* The letters English has no key for, then the four marks, each with its number key. A narrow line breaks between the two. */
 .strip {
   grid-column: 1 / -1;
   grid-row: 2;
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  gap: 8px 20px;
+  gap: 8px 32px;
   margin-top: 12px;
   min-height: 30px;
 }
+.strip-group { display: flex; align-items: baseline; gap: 20px; }
 .strip-k {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
   padding: 2px 0;
+  color: var(--ink-2);
+}
+.strip-k .rom {
   font-size: 26px;
   line-height: 1;
-  color: var(--ink-2);
   text-decoration: underline;
   text-decoration-color: transparent;
   text-decoration-thickness: 2px;
   text-underline-offset: 7px;
 }
-.strip-k:nth-child(5) { margin-left: 12px; }
-.strip-k:hover { color: var(--ink); text-decoration-color: var(--lacquer); }
+.strip-k:hover { color: var(--ink); }
+.strip-k:hover .rom { text-decoration-color: var(--lacquer); }
 
 /*
  * A drawn panel with its phrase lettered into the empty balloon. The panel is a

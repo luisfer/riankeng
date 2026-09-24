@@ -100,12 +100,20 @@ export const VOWEL_VARIANTS: Record<string, string[]> = {
   u: [U_BAR],
 }
 
-/** Order the popover uses for tones: 1 low, 2 falling, 3 high, 4 rising. */
+/** Number keys for the tones, in the popover and on the strip: 1 low, 2 falling, 3 high, 4 rising. */
 export const POPOVER_TONES: Array<{ key: string; tone: Exclude<Tone, 'mid'>; mark: string; label: string }> = [
   { key: '1', tone: 'low', mark: TONE_MARKS.low, label: 'low' },
   { key: '2', tone: 'falling', mark: TONE_MARKS.falling, label: 'falling' },
   { key: '3', tone: 'high', mark: TONE_MARKS.high, label: 'high' },
   { key: '4', tone: 'rising', mark: TONE_MARKS.rising, label: 'rising' },
+]
+
+/** Number keys for the letters English has no key for, after the tones: 5 ε, 6 ɔ, 7 ə, 8 ʉ. */
+export const VOWEL_KEYS: Array<{ key: string; letter: string }> = [
+  { key: '5', letter: 'ε' },
+  { key: '6', letter: 'ɔ' },
+  { key: '7', letter: 'ə' },
+  { key: '8', letter: U_BAR },
 ]
 
 export const SYSTEM_SUMMARY = {

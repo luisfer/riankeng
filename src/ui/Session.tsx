@@ -26,7 +26,7 @@ import { judgeTonePick, toneBareShow } from '@/engine/tone-step'
 import { prefetchClip } from '@/audio/clips'
 import { canHearThai, onVoices, speakSlower, speakThai, speechUnlocked } from '@/audio/tts'
 import { RomanInput } from '@/input/RomanInput'
-import { Commit, TextBtn } from './bits'
+import { Commit, HearBtn } from './bits'
 import { chrome } from './copy'
 import { showThai } from './thai'
 
@@ -480,7 +480,7 @@ export function SessionView(props: {
           <p className="prompt-tools">
             {!props.doc.settings.silent && (
               <>
-                <TextBtn
+                <HearBtn
                   current={listenLocked}
                   ariaKeyshortcuts="Alt+H"
                   onClick={() => {
@@ -490,8 +490,8 @@ export function SessionView(props: {
                   }}
                 >
                   Hear
-                </TextBtn>
-                <TextBtn
+                </HearBtn>
+                <HearBtn
                   ariaKeyshortcuts="Alt+S"
                   onClick={() => {
                     setHeard(true)
@@ -500,7 +500,7 @@ export function SessionView(props: {
                   }}
                 >
                   Slower
-                </TextBtn>
+                </HearBtn>
               </>
             )}
             {fromVoice && <span className="from-voice">You know this from Voice</span>}

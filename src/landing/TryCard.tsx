@@ -3,7 +3,7 @@ import { clipUrl } from '@/audio/clip-url'
 import { stickPlaybackRate } from '@/audio/rate'
 import { gradeThai, type ThaiGrade } from '@/engine/grader-thai'
 import { RomanInput } from '@/input/RomanInput'
-import { Commit, TextBtn } from '@/ui/bits'
+import { Commit, HearBtn } from '@/ui/bits'
 import { chrome } from '@/ui/copy'
 import { landing } from './copy'
 import { sceneSrc, sceneSrcSet, type DemoCard } from './demo'
@@ -108,8 +108,8 @@ export function TryCard(props: { deck: DemoCard[] }) {
             <p className="prompt">
               {look ? null : chrome.writeRom}
               <span className="prompt-tools">
-                <TextBtn onClick={() => play(1)}>{landing.hear}</TextBtn>
-                <TextBtn onClick={() => play(0.6)}>{landing.slower}</TextBtn>
+                <HearBtn onClick={() => play(1)}>{landing.hear}</HearBtn>
+                <HearBtn onClick={() => play(0.6)}>{landing.slower}</HearBtn>
               </span>
             </p>
           )}
@@ -125,8 +125,8 @@ export function TryCard(props: { deck: DemoCard[] }) {
                 <p className="pair-line rom">
                   <span lang="th-Latn">{card.rom}</span>
                   <span className="prompt-tools">
-                    <TextBtn onClick={() => play(1)}>{landing.hear}</TextBtn>
-                    <TextBtn onClick={() => play(0.6)}>{landing.slower}</TextBtn>
+                    <HearBtn onClick={() => play(1)}>{landing.hear}</HearBtn>
+                    <HearBtn onClick={() => play(0.6)}>{landing.slower}</HearBtn>
                   </span>
                 </p>
                 <p className="pair-line thai" lang="th">

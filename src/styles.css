@@ -279,20 +279,6 @@ body::before {
 .preview-stage .session-no,
 .preview-stage .preview-word { grid-row: 1; }
 .preview-word .prompt-tools { margin-top: 18px; gap: 8px 36px; }
-.hear-key { position: relative; }
-.hear-mark {
-  position: absolute;
-  left: calc(100% + 6px);
-  top: 50%;
-  width: 16px;
-  height: 14px;
-  transform: translateY(-50%);
-  color: var(--lacquer);
-  opacity: 0;
-  pointer-events: none;
-}
-.hear-key:hover .hear-mark,
-.hear-key:focus-visible .hear-mark { opacity: 1; }
 .preview-desk {
   grid-row: 2;
   display: flex;

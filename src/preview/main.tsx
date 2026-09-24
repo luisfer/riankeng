@@ -4,22 +4,11 @@ import { clipUrl } from '@/audio/clip-url'
 import { stickPlaybackRate } from '@/audio/rate'
 import { gradeThai } from '@/engine/grader-thai'
 import { RomanInput } from '@/input/RomanInput'
-import { Commit, TextBtn, Trail } from '@/ui/bits'
+import { Commit, HearBtn, TextBtn, Trail } from '@/ui/bits'
 import { PREVIEW_VOICE } from './catalog'
 import '@/styles.css'
 
 type PlaySlot = { audio: HTMLAudioElement | null }
-
-function Speaker() {
-  return (
-    <svg className="hear-mark" viewBox="0 0 16 16" aria-hidden="true">
-      <path
-        fill="currentColor"
-        d="M2 6.2h2.2L8 3.2v9.6L4.2 9.8H2V6.2zm7.1-1.5a3.6 3.6 0 0 1 0 6.6l-.7-1.1a2.2 2.2 0 0 0 0-4.4l.7-1.1zm1.8-1.6a6 6 0 0 1 0 9.8l-.7-1.1a4.6 4.6 0 0 0 0-7.6l.7-1.1z"
-      />
-    </svg>
-  )
-}
 
 function play(id: string, rate: number, slot: PlaySlot) {
   slot.audio?.pause()
@@ -89,14 +78,8 @@ function Preview() {
                 ) : null}
                 <p className="prompt-en">{card.en[0]}</p>
                 <p className="prompt-tools">
-                  <TextBtn className="hear-key" onClick={() => play(card.id, 1, heard.current)}>
-                    Hear
-                    <Speaker />
-                  </TextBtn>
-                  <TextBtn className="hear-key" onClick={() => play(card.id, 0.7, heard.current)}>
-                    Slower
-                    <Speaker />
-                  </TextBtn>
+                  <HearBtn onClick={() => play(card.id, 1, heard.current)}>Hear</HearBtn>
+                  <HearBtn onClick={() => play(card.id, 0.7, heard.current)}>Slower</HearBtn>
                 </p>
               </div>
               <div className="preview-desk">

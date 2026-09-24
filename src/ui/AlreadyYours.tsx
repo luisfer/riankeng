@@ -6,7 +6,7 @@ import { prefetchClip } from '@/audio/clips'
 import { speakThai } from '@/audio/tts'
 import { SESSION_SIZE } from '@/engine/session'
 import { shuffleSeen } from '@/engine/scheduler'
-import { Commit, TextBtn } from './bits'
+import { Commit, HearBtn, TextBtn } from './bits'
 import { chrome } from './copy'
 
 type Filter = 'all' | string
@@ -30,14 +30,14 @@ function ReviewRows(props: { entries: Entry[]; audioRate: number }) {
           <span className="rom">{e.rom}</span>
           <span>{e.en[0]}</span>
           <span className="thai preview-thai">{e.thai}</span>
-          <TextBtn
+          <HearBtn
             rank="quiet"
             onClick={() => {
               void speakThai(e.thai, e.id, props.audioRate, { gesture: true })
             }}
           >
             Hear
-          </TextBtn>
+          </HearBtn>
         </li>
       ))}
     </ul>

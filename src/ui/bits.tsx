@@ -122,6 +122,27 @@ export function TextBtn({
   )
 }
 
+function Speaker() {
+  return (
+    <svg className="hear-mark" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+      <path
+        fill="currentColor"
+        d="M2 6.2h2.2L8 3.2v9.6L4.2 9.8H2V6.2zm7.1-1.5a3.6 3.6 0 0 1 0 6.6l-.7-1.1a2.2 2.2 0 0 0 0-4.4l.7-1.1zm1.8-1.6a6 6 0 0 1 0 9.8l-.7-1.1a4.6 4.6 0 0 0 0-7.6l.7-1.1z"
+      />
+    </svg>
+  )
+}
+
+/** Hear or Slower. The speaker shows beside it on hover and focus. */
+export function HearBtn(props: Parameters<typeof TextBtn>[0]) {
+  return (
+    <TextBtn {...props} className={props.className ? `hear-key ${props.className}` : 'hear-key'}>
+      {props.children}
+      <Speaker />
+    </TextBtn>
+  )
+}
+
 export function Trail(props: {
   onHome: () => void
   accountLabel?: string

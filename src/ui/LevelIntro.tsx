@@ -5,6 +5,7 @@ import { Commit, Meter, lessonRatio, startLabel, TextBtn } from './bits'
 import { chrome } from './copy'
 import { ToneCharts } from './ToneCharts'
 import { showParts, showThai } from './thai'
+import { cleanGloss } from '@/engine/grader-en'
 
 const THAI = /[\u0E00-\u0E7F]/
 const PHONETIC = /[àâáǎèêéěìîíǐòôóǒùûúǔÀÂÁǍεɔəʉ]/
@@ -114,7 +115,7 @@ export function LevelIntro(props: {
               <li key={e.id} className="quiet-row">
                 {script && <span className="thai preview-thai">{showThai(e.thai)}</span>}
                 <span className="rom">{e.rom}</span>
-                <span>{e.en[0]}</span>
+                <span>{cleanGloss(e.en[0] ?? '')}</span>
               </li>
             ))}
           </ul>

@@ -14,7 +14,7 @@ export default words(11, [
   ['sǐi chom-puu', 'สีชมพู', ['pink'], 'adj', ['colour']],
   ['lék', 'เล็ก', ['small'], 'adj', ['size']],
   ['yaao', 'ยาว', ['long'], 'adj', ['size']],
-  ['sân', 'สั้น', ['short (length)'], 'adj', ['size']],
+  ['sân', 'สั้น', ['short[, in length]'], 'adj', ['size']],
   ['gwâang', 'กว้าง', ['wide'], 'adj', ['size']],
   ['kε̂εp', 'แคบ', ['narrow'], 'adj', ['size']],
   ['lót', 'ลด', ['reduce', 'discount', 'come down'], 'v', ['shop']],

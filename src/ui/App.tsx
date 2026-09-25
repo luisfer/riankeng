@@ -161,6 +161,8 @@ export function App() {
     if (loadState !== 'ready' || !account) return
     let cancelled = false
     const timer = setTimeout(() => {
+      // Offline there is no one to sync with. The first change after the network returns will.
+      if (typeof navigator !== 'undefined' && navigator.onLine === false) return
       void syncAccount(docRef.current).then((next) => {
         if (cancelled || !next) return
         if (sameDocPayload(next, docRef.current)) return

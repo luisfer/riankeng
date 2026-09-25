@@ -3,7 +3,7 @@ import { words } from '../build'
 export default words(13, [
   ['bprà-chum', 'ประชุม', ['meeting'], 'n', ['work']],
   ['ɔ́ɔp-fít', 'ออฟฟิศ', ['office', 'the office'], 'n', ['work'], 'The everyday loanword. sǎm-nák-ngaan is the formal one.'],
-  ['sǎm-nák-ngaan', 'สำนักงาน', ['office (formal)', 'bureau'], 'n', ['work']],
+  ['sǎm-nák-ngaan', 'สำนักงาน', ['office[, formal]', 'bureau'], 'n', ['work']],
   ['nâa tîi', 'หน้าที่', ['duty', 'responsibility'], 'n', ['work']],
   ['ngaan#2', 'งาน', ['work', 'job', 'event'], 'n', ['work']],
   ['naai jâang', 'นายจ้าง', ['boss', 'employer'], 'n', ['work']],

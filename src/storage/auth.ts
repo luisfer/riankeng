@@ -99,18 +99,28 @@ function sessionFromToken(body: TokenBody, fallbackEmail: string): AccountSessio
   return { accessToken: body.access_token, refreshToken: body.refresh_token, expiresAt, email, displayName, userId }
 }
 
-async function tokenRequest(config: AccountConfig, grant: string, payload: Record<string, string>): Promise<TokenBody | null> {
+/** A token, a refusal of the credentials, or no answer at all (offline, or the server failed). */
+type TokenResult = { body: TokenBody } | { refused: true } | { unreachable: true }
+
+async function tokenCall(config: AccountConfig, grant: string, payload: Record<string, string>): Promise<TokenResult> {
   try {
     const res = await fetch(`${config.url}/auth/v1/token?grant_type=${grant}`, {
       method: 'POST',
       headers: { apikey: config.anon, 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     })
-    if (!res.ok) return null
-    return (await res.json()) as TokenBody
+    if (res.ok) return { body: (await res.json()) as TokenBody }
+    // Supabase answers a wrong password or a spent refresh token with 400 (invalid_grant) or 401.
+    if (res.status === 400 || res.status === 401) return { refused: true }
+    return { unreachable: true }
   } catch {
-    return null
+    return { unreachable: true }
   }
+}
+
+async function tokenRequest(config: AccountConfig, grant: string, payload: Record<string, string>): Promise<TokenBody | null> {
+  const result = await tokenCall(config, grant, payload)
+  return 'body' in result ? result.body : null
 }
 
 export async function signInAccount(email: string, password: string): Promise<AccountSession | null> {
@@ -213,8 +223,10 @@ export async function currentAccess(): Promise<AccountSession | null> {
   if (stored.expiresAt - Date.now() > 60_000) return stored
   if (!refreshing) {
     refreshing = (async () => {
-      const body = await tokenRequest(config, 'refresh_token', { refresh_token: stored.refreshToken })
-      const next = body ? sessionFromToken(body, stored.email) : null
+      const result = await tokenCall(config, 'refresh_token', { refresh_token: stored.refreshToken })
+      // Offline, or the server failed: keep the session. This sync is skipped and the next one tries again.
+      if ('unreachable' in result) return null
+      const next = 'body' in result ? sessionFromToken(result.body, stored.email) : null
       if (!next) {
         writeAccount(null)
         return null

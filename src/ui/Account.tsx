@@ -14,6 +14,7 @@ import {
   type AccountSession,
 } from '@/storage/auth'
 import { Commit, Meter, TextBtn } from './bits'
+import { cleanGloss } from '@/engine/grader-en'
 
 const MONTH_WORD = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] as const
 
@@ -47,7 +48,7 @@ export function dayWork(doc: ProgressDoc, key: string): { label: string; summary
       answered += attempts.length
       correct += attempts.filter((h) => h.ok).length
       const entry = getEntry(p.id)
-      const gloss = entry?.en[0] ?? entry?.rom ?? p.id
+      const gloss = entry?.en[0] ? cleanGloss(entry.en[0]) : entry?.rom ?? p.id
       const miss = attempts.some((h) => !h.ok)
       const t = attempts.reduce((n, h) => Math.max(n, h.t), 0)
       named.push({ text: miss ? `${gloss}, missed` : gloss, miss, t })

@@ -206,7 +206,7 @@ export function SessionView(props: {
         ...props.doc,
         items: {
           ...props.doc.items,
-          [entry.id]: applyAttempt(prev, { t: now, ok, v, m: modality, d: deviceId() }, { practice }),
+          [entry.id]: applyAttempt(prev, { t: now, ok, v, m: modality, d: deviceId(), ...(practice ? { p: 1 as const } : {}) }, { practice }),
         },
       }),
     )

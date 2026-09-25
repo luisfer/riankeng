@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { changePassword, takeRecoverySession } from '../src/storage/auth'
+import { changePassword, currentAccess, readAccount, takeRecoverySession } from '../src/storage/auth'
 
 function jwt(sub: string, email = 'luis@example.com'): string {
   const enc = (value: object) => btoa(JSON.stringify(value)).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_')
@@ -64,3 +64,61 @@ describe('takeRecoverySession', () => {
     expect(localStorage.getItem('riankeng:account')).toContain('user-9')
   })
 })
+
+describe('refreshing an expired session', () => {
+  const stored = () =>
+    localStorage.setItem(
+      'riankeng:account',
+      JSON.stringify({
+        accessToken: jwt('user-1'),
+        refreshToken: 'refresh',
+        expiresAt: Date.now() - 1000,
+        email: 'luis@example.com',
+        displayName: 'Luis',
+        userId: 'user-1',
+      }),
+    )
+
+  afterEach(() => {
+    vi.unstubAllEnvs()
+    vi.unstubAllGlobals()
+    localStorage.clear()
+  })
+
+  it('keeps the session when the network is down', async () => {
+    vi.stubEnv('VITE_SUPABASE_URL', 'https://example.supabase.co')
+    vi.stubEnv('VITE_SUPABASE_ANON_KEY', 'anon-key')
+    stored()
+    vi.stubGlobal('fetch', vi.fn(async () => { throw new TypeError('Failed to fetch') }))
+    expect(await currentAccess()).toBeNull()
+    expect(readAccount()?.refreshToken).toBe('refresh')
+  })
+
+  it('keeps the session when the server fails', async () => {
+    vi.stubEnv('VITE_SUPABASE_URL', 'https://example.supabase.co')
+    vi.stubEnv('VITE_SUPABASE_ANON_KEY', 'anon-key')
+    stored()
+    vi.stubGlobal('fetch', vi.fn(async () => tokenBody(503)))
+    expect(await currentAccess()).toBeNull()
+    expect(readAccount()).not.toBeNull()
+  })
+
+  it('signs out when the refresh token is refused', async () => {
+    vi.stubEnv('VITE_SUPABASE_URL', 'https://example.supabase.co')
+    vi.stubEnv('VITE_SUPABASE_ANON_KEY', 'anon-key')
+    stored()
+    vi.stubGlobal('fetch', vi.fn(async () => tokenBody(400)))
+    expect(await currentAccess()).toBeNull()
+    expect(readAccount()).toBeNull()
+  })
+
+  it('stores the fresh token when the refresh works', async () => {
+    vi.stubEnv('VITE_SUPABASE_URL', 'https://example.supabase.co')
+    vi.stubEnv('VITE_SUPABASE_ANON_KEY', 'anon-key')
+    stored()
+    vi.stubGlobal('fetch', vi.fn(async () => tokenBody(200)))
+    expect((await currentAccess())?.email).toBe('luis@example.com')
+    expect(readAccount()!.expiresAt).toBeGreaterThan(Date.now())
+  })
+})
+

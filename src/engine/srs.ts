@@ -39,6 +39,11 @@ export interface Attempt {
   m: Modality
   /** Which device answered. Absent on attempts written before devices had ids. */
   d?: string
+  /**
+   * 1 when this was a second miss on a card the sitting had already marked down. It left
+   * the stage alone when it was answered, so a replay on another device must too.
+   */
+  p?: 1
 }
 
 export type Modality = 'listen' | 'en-th' | 'th-en' | 'tone' | 'pick'
@@ -95,7 +100,7 @@ export function applyAttempt(
       history,
     }
   }
-  if (opts?.practice) {
+  if (opts?.practice || attempt.p === 1) {
     return { ...p, reps: p.reps + 1, lastSeen: attempt.t, history }
   }
   const slip = attempt.v === 'tone' || attempt.v === 'length'

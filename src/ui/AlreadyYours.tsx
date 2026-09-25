@@ -8,6 +8,7 @@ import { SESSION_SIZE } from '@/engine/session'
 import { shuffleSeen } from '@/engine/scheduler'
 import { Commit, HearBtn, TextBtn } from './bits'
 import { chrome } from './copy'
+import { cleanGloss } from '@/engine/grader-en'
 
 type Filter = 'all' | string
 
@@ -28,7 +29,7 @@ function ReviewRows(props: { entries: Entry[]; audioRate: number }) {
       {props.entries.map((e) => (
         <li key={e.id} className="quiet-row yours-row">
           <span className="rom">{e.rom}</span>
-          <span>{e.en[0]}</span>
+          <span>{cleanGloss(e.en[0] ?? '')}</span>
           <span className="thai preview-thai">{e.thai}</span>
           <HearBtn
             rank="quiet"

@@ -1,6 +1,7 @@
 import { ENTRIES, getEntry } from '@content/index'
 import { accuracy } from '@/engine/srs'
 import type { ProgressDoc, ProgressExport } from './progress-schema'
+import { cleanGloss } from '@/engine/grader-en'
 
 export function toExport(doc: ProgressDoc, now = Date.now()): ProgressExport {
   return {
@@ -25,7 +26,7 @@ export function exportCsv(doc: ProgressDoc): string {
   const rows = ENTRIES.map((e) => {
     const p = doc.items[e.id]
     const acc = p ? accuracy(p).toFixed(2) : ''
-    const en = (e.en[0] ?? '').replaceAll('"', '""')
+    const en = cleanGloss(e.en[0] ?? '').replaceAll('"', '""')
     return [
       e.id,
       `"${e.rom.replaceAll('"', '""')}"`,

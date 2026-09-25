@@ -51,6 +51,11 @@ export function validateEntries(
     for (const g of e.en) {
       if (!parseGloss(g).required.length) problems.push({ id: e.id, message: `gloss "${g}" has no required words` })
     }
+    // en[0] is the prompt, shown with its brackets dropped: "polite particle (male)" reads "polite particle male".
+    // A clarifier goes in as "polite particle[, male]"; an optional word as "one [thing]".
+    if (track === 'voice' && /\(/.test(e.en[0] ?? '')) {
+      problems.push({ id: e.id, message: `prompt "${e.en[0]}" uses ( ). Write "[, note]" or "[word]" so it reads as English` })
+    }
 
     const nfd = e.rom.normalize('NFD')
     for (const ch of nfd) {

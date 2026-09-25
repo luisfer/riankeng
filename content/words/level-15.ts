@@ -8,7 +8,7 @@ export default words(15, [
   ['lέ', 'และ', ['and'], 'conj', ['link']],
   ['gɔ̂', 'ก็', ['then', 'also', 'so'], 'adv', ['link']],
   ['ləəi', 'เลย', ['so', 'at all', 'altogether'], 'adv', ['link']],
-  ['tîi#2', 'ที่', ['that (relative)', 'which'], 'conj', ['link']],
+  ['tîi#2', 'ที่', ['that[, which]', 'which'], 'conj', ['link']],
   ['hàak', 'หาก', ['if, formal', 'if', 'in case'], 'conj', ['link']],
   ['dtὲε wâa', 'แต่ว่า', ['but', 'however'], 'conj', ['link']],
   ['rʉ̌ʉ wâa', 'หรือว่า', ['or', 'or perhaps'], 'conj', ['link']],

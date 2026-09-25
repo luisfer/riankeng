@@ -2,9 +2,9 @@ import { words } from '../build'
 
 export default words(1, [
   ['sà-wàt-dii', 'สวัสดี', ['hello', 'hi', 'goodbye', 'good day'], 'expr', ['greeting']],
-  ['kráp', 'ครับ', ['polite particle (male)', '(male) polite particle', 'yes (male)'], 'particle', ['polite'], 'Ends almost every sentence a man says politely. Alone it means "yes".'],
-  ['kâ', 'ค่ะ', ['polite particle (female)', '(female) polite particle', 'yes (female)'], 'particle', ['polite'], 'Female polite ending for statements. Alone it means "yes".'],
-  ['ká', 'คะ', ['polite particle (female, question)', '(female) question particle'], 'particle', ['polite'], 'Female polite ending for questions: sà-baai dii mái ká.'],
+  ['kráp', 'ครับ', ['polite particle[, male]', '(male) polite particle', 'yes (male)'], 'particle', ['polite'], 'Ends almost every sentence a man says politely. Alone it means "yes".'],
+  ['kâ', 'ค่ะ', ['polite particle[, female]', '(female) polite particle', 'yes (female)'], 'particle', ['polite'], 'Female polite ending for statements. Alone it means "yes".'],
+  ['ká', 'คะ', ['polite particle[, female, asking]', '(female) question particle'], 'particle', ['polite'], 'Female polite ending for questions: sà-baai dii mái ká.'],
   ['kɔ̀ɔp kun', 'ขอบคุณ', ['thank you', 'thanks'], 'expr', ['polite']],
   ['kɔ̌ɔ tôot', 'ขอโทษ', ['sorry', 'excuse me', 'I am sorry', 'apologies'], 'expr', ['polite']],
   ['châi', 'ใช่', ['yes', 'correct', 'right', 'that is right', 'true'], 'expr', ['yes-no']],
@@ -61,7 +61,7 @@ export default words(1, [
   ['sìp', 'สิบ', ['ten', '10'], 'num', ['number']],
   ['tai', 'ไทย', ['Thai'], 'adj', [], 'The country, the language, the people. kon tai, paa-sǎa tai.'],
   ['dûai', 'ด้วย', ['too', 'as well', 'with'], 'adv', [], 'After the verb: chûai dûai.'],
-  ['rai', 'ไร', ['anything (in never mind)'], 'n', [], 'Almost only in mâi bpen rai.'],
+  ['rai', 'ไร', ['anything[, as in never mind]'], 'n', [], 'Almost only in mâi bpen rai.'],
   ['ná', 'นะ', ['softener', 'you know'], 'particle', ['softener'], 'Softens a statement. bpai gɔ̀ɔn ná.'],
   ['gɔ̀ɔn', 'ก่อน', ['first', 'before', 'ahead'], 'adv', [], 'bpai gɔ̀ɔn: I go first. The everyday goodbye.'],
 ])

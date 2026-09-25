@@ -9,8 +9,8 @@ function word(rom: string, thai: string, en: string): Entry {
 export const PREVIEW_VOICE: Entry[] = [
   word('sà-wàt-dii', 'สวัสดี', 'hello'),
   word('kɔ̀ɔp kun', 'ขอบคุณ', 'thank you'),
-  word('kráp', 'ครับ', 'polite particle (male)'),
-  word('kâ', 'ค่ะ', 'polite particle (female)'),
+  word('kráp', 'ครับ', 'polite particle[, male]'),
+  word('kâ', 'ค่ะ', 'polite particle[, female]'),
   word('châi', 'ใช่', 'yes'),
   word('mâi châi', 'ไม่ใช่', 'no'),
   word('mâi', 'ไม่', 'not'),

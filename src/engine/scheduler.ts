@@ -250,7 +250,7 @@ export function sittingSense(entry: Entry, modality: Modality): string | null {
   const track = entryTrack(entry)
   if (track === 'script') {
     const twin = ENTRIES.some((e) => entryTrack(e) === 'script' && e.id !== entry.id && e.thai === entry.thai)
-    return twin ? (entry.en[0] ?? null) : null
+    return twin ? cleanGloss(entry.en[0] ?? '') || null : null
   }
   const twin = ENTRIES.some((e) => entryTrack(e) === 'voice' && e.id !== entry.id && e.rom === entry.rom)
   if (!twin) return null

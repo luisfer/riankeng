@@ -53,6 +53,28 @@ describe('mergeItem', () => {
   })
 })
 
+describe('a practice miss synced to another device', () => {
+  const DAY = 24 * 60 * 60 * 1000
+  const t0 = new Date(2026, 8, 1, 9).getTime()
+  const at = (t: number, ok: boolean, v = ok ? 'exact' : 'wrong', extra: { p?: 1 } = {}) => ({ t, ok, v, m: 'en-th' as const, d: 'x', ...extra })
+
+  it('leaves the stage where the device that answered it left it', () => {
+    let laptop = newItemProgress('w:maa')
+    for (let i = 0; i < 5; i++) laptop = applyAttempt(laptop, at(t0 + i * DAY, true))
+    expect(laptop.stage).toBeGreaterThanOrEqual(3)
+    const later = t0 + 6 * DAY
+    // The phone, one sitting: a miss, a second miss that only practises, then right.
+    let phone = mergeItem(undefined, laptop)
+    phone = applyAttempt(phone, at(later, false))
+    phone = applyAttempt(phone, at(later + 1000, false, 'wrong', { p: 1 }), { practice: true })
+    phone = applyAttempt(phone, at(later + 2000, true))
+    const merged = mergeItem(laptop, phone)
+    expect(merged.stage).toBe(phone.stage)
+    expect(merged.lapses).toBe(phone.lapses)
+    expect(mergeItem(phone, merged).stage).toBe(phone.stage)
+  })
+})
+
 describe('applyImport', () => {
   it('does not let a theme-only file wipe SRS', () => {
     const doc = emptyDoc(t0)

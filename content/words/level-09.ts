@@ -19,7 +19,7 @@ export default words(9, [
   ['sǔai', 'สวย', ['beautiful', 'pretty'], 'adj', ['describe']],
   ['lɔ̀ɔ', 'หล่อ', ['handsome'], 'adj', ['describe']],
   ['sǔung', 'สูง', ['tall', 'high'], 'adj', ['describe']],
-  ['dtîa', 'เตี้ย', ['short (height)'], 'adj', ['describe']],
+  ['dtîa', 'เตี้ย', ['short[, in height]'], 'adj', ['describe']],
   ['ûan', 'อ้วน', ['fat', 'overweight'], 'adj', ['describe']],
   ['pɔ̌ɔm', 'ผอม', ['thin', 'slim'], 'adj', ['describe']],
   ['nùm', 'หนุ่ม', ['young man', 'young (male)'], 'n', ['people']],

@@ -97,4 +97,24 @@ describe('gradeEnglish', () => {
     expect(gradeEnglish(getEntry('w:máa')!.en, 'house').correct).toBe(false)
     expect(gradeEnglish(getEntry('w:kâo jai')!.en, 'get').correct).toBe(false)
   })
+
+  it('does not take an answer that adds a not', () => {
+    expect(gradeEnglish(['that is right'], 'that is not right').correct).toBe(false)
+    expect(gradeEnglish(['I am fine'], 'I am not fine').correct).toBe(false)
+    expect(gradeEnglish(['I will take it'], "I won't take it").correct).toBe(false)
+    expect(gradeEnglish(['I am sorry'], 'I am never sorry').correct).toBe(false)
+    // A not the gloss has is still fine, and so is one of its own optional words.
+    expect(gradeEnglish(['I do not understand'], "I don't understand").correct).toBe(true)
+    expect(gradeEnglish(['no'], 'no').correct).toBe(true)
+  })
+
+  it('takes a singular for a plural and back', () => {
+    for (const [a, b] of [['shoes', 'shoe'], ['trees', 'tree'], ['cakes', 'cake'], ['noses', 'nose'], ['sizes', 'size'], ['glasses', 'glass'], ['buses', 'bus'], ['boxes', 'box'], ['cities', 'city']]) {
+      expect(tokensMatch(a!, b!), `${a} ${b}`).toBe(true)
+      expect(tokensMatch(b!, a!), `${b} ${a}`).toBe(true)
+    }
+    expect(tokensMatch('horse', 'house')).toBe(false)
+    expect(gradeEnglish(['shoes'], 'shoe').correct).toBe(true)
+  })
 })
+

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { clipUrl } from '@/audio/clip-url'
 import { stickPlaybackRate } from '@/audio/rate'
+import { cleanGloss } from '@/engine/grader-en'
 import { gradeThai } from '@/engine/grader-thai'
 import { RomanInput } from '@/input/RomanInput'
 import { Commit, HearBtn, TextBtn, Trail } from '@/ui/bits'
@@ -32,7 +33,7 @@ function Finish(props: { slot: PlaySlot; onAgain: () => void }) {
             <span className="rom" lang="th-Latn">
               {w.rom}
             </span>
-            <span>{w.en[0]}</span>
+            <span>{cleanGloss(w.en[0] ?? '')}</span>
             <span className="thai preview-thai" lang="th">
               {w.thai}
             </span>
@@ -157,7 +158,7 @@ function Preview() {
                     </p>
                   </>
                 ) : null}
-                <p className="prompt-en">{card.en[0]}</p>
+                <p className="prompt-en">{cleanGloss(card.en[0] ?? '')}</p>
                 <p className="prompt-tools">
                   <HearBtn onClick={() => play(card.id, 1, heard.current)}>Hear</HearBtn>
                   <HearBtn onClick={() => play(card.id, 0.7, heard.current)}>Slower</HearBtn>

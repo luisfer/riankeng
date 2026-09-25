@@ -18,5 +18,5 @@ export default words(21, [
   ['kwaam mǎai', 'ความหมาย', ['meaning'], 'n', ['fluency']],
   ['yâak', 'ยาก', ['difficult', 'hard'], 'adj', ['fluency']],
   ['than', 'ทัน', ['in time', 'keep up'], 'v', ['fluency']],
-  ['yin', 'ยิน', ['hear (in dâi yin)'], 'v', ['fluency']],
+  ['yin', 'ยิน', ['hear[, as in dâi yin]'], 'v', ['fluency']],
 ])

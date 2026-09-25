@@ -173,11 +173,16 @@ export function editDistance(a: string, b: string): number {
   return d[m]![n]!
 }
 
-function stem(w: string): string {
-  if (w.length > 4 && w.endsWith('ies')) return w.slice(0, -3) + 'y'
-  if (w.length > 4 && w.endsWith('es')) return w.slice(0, -2)
-  if (w.length > 3 && w.endsWith('s') && !w.endsWith('ss')) return w.slice(0, -1)
-  return w
+/**
+ * A word and the singulars it could be the plural of. Thai nouns have no plural, so
+ * shoe for shoes, tree for trees, glass for glasses and box for boxes are all the same answer.
+ */
+function forms(w: string): string[] {
+  const out = [w]
+  if (w.length > 4 && w.endsWith('ies')) out.push(w.slice(0, -3) + 'y')
+  if (w.length > 4 && w.endsWith('es')) out.push(w.slice(0, -2))
+  if (w.length > 3 && w.endsWith('s') && !w.endsWith('ss')) out.push(w.slice(0, -1))
+  return out
 }
 
 function fuzzyPair(a: string, b: string): string {
@@ -189,7 +194,8 @@ const FUZZY_BLOCK = new Set(['horse|house', 'eight|right'])
 
 export function tokensMatch(a: string, b: string): boolean {
   if (a === b) return true
-  if (stem(a) === stem(b)) return true
+  const fa = forms(a)
+  if (forms(b).some((f) => fa.includes(f))) return true
   const sa = SYNONYM_ID.get(a)
   const sb = SYNONYM_ID.get(b)
   if (sa !== undefined && sa === sb) return true
@@ -214,6 +220,9 @@ function allowedExtras(requiredCount: number): number {
   if (requiredCount <= 5) return 1
   return 2
 }
+
+/** Words that turn a meaning around. One the gloss does not have makes a different answer. */
+const NEGATORS = new Set(['not', 'no', 'never', 'none', 'nothing', 'nobody', 'cannot', 'neither', 'nor'])
 
 function matchGloss(gloss: ParsedGloss, answer: string[]): { ok: boolean; score: number } {
   const used = new Array<boolean>(answer.length).fill(false)
@@ -241,7 +250,9 @@ function matchGloss(gloss: ParsedGloss, answer: string[]): { ok: boolean; score:
   }
   const extras = used.filter((u) => !u).length
   const allRequired = matched === gloss.required.length
-  const ok = allRequired && extras <= allowedExtras(gloss.required.length)
+  // "that is not right" for châi is the opposite answer, not a word too many.
+  const flipped = answer.some((w, i) => !used[i] && NEGATORS.has(w))
+  const ok = allRequired && !flipped && extras <= allowedExtras(gloss.required.length)
   const score = matched / Math.max(1, gloss.required.length) - extras * 0.1
   return { ok, score }
 }

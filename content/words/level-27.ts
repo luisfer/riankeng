@@ -14,7 +14,6 @@ export default words(27, [
   ['wua', 'วัว', ['cow', 'cattle'], 'n', ['saying']],
   ['lɔ́ɔm', 'ล้อม', ['surround', 'to fence in'], 'v', ['saying']],
   ['kɔ̂ɔk', 'คอก', ['pen', 'stall', 'corral'], 'n', ['saying']],
-  ['pàk-chii', 'ผักชี', ['coriander', 'cilantro'], 'n', ['saying']],
   ['rooi', 'โรย', ['sprinkle', 'to sprinkle'], 'v', ['saying']],
   ['grà-dtàai', 'กระต่าย', ['rabbit', 'hare'], 'n', ['saying']],
   ['dtuum', 'ตูม', ['boom', 'a loud thud'], 'n', ['saying']],

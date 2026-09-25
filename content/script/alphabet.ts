@@ -98,6 +98,10 @@ export const VOWELS: Sign[] = [
   { char: 'เ◌ีย', reads: 'ia', where: 'around' },
   { char: 'เ◌ือ', reads: 'ʉa', where: 'around' },
   { char: '◌ัว', reads: 'ua', where: 'around' },
+  { char: 'เ◌ิ◌', reads: 'əə, before a final', where: 'around' },
+  { char: 'เ◌ย', reads: 'əəi', where: 'around' },
+  { char: '◌ว◌', reads: 'ua, before a final', where: 'around' },
+  { char: 'เ◌าะ', reads: 'ɔ, stops short', where: 'around' },
   { char: 'ฤ', reads: 'rʉ́', where: 'alone' },
 ]
 

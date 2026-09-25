@@ -44,7 +44,7 @@ describe('content', () => {
   })
 
   it('script levels 0–27 are authored, มา is one id, and tone marks are not cards', () => {
-    expect(SCRIPT_LEVELS).toHaveLength(28)
+    expect(SCRIPT_LEVELS).toHaveLength(29)
     for (const lvl of SCRIPT_LEVELS) {
       expect(entriesForLevel(lvl.n, 'script').length, `script ${lvl.n}`).toBeGreaterThanOrEqual(lvl.min)
     }

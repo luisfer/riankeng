@@ -22,4 +22,5 @@ export default phrases(24, [
   ['grɔ̀ɔk bὲεp fɔɔm nɔ̀i', 'กรอกแบบฟอร์มหน่อย', ['please fill in the form']],
   ['sen tîi nîi', 'เซ็นที่นี่', ['sign here']],
   ['ráp pát-sà-dù tîi bprai-sà-nii', 'รับพัสดุที่ไปรษณีย์', ['collect a parcel at the post office']],
+  ['kɔ̌ɔ lai dâi mái', 'ขอไลน์ได้ไหม', ['can I have your LINE', 'can I add you on LINE']],
 ])

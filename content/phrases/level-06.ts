@@ -16,4 +16,6 @@ export default phrases(6, [
   ['bpai dâi yang-ngai', 'ไปได้ยังไง', ['how do I get there', 'how can I go']],
   ['yùu dtrong kâam', 'อยู่ตรงข้าม', ['it is opposite', 'it is across the street']],
   ['yùu kâang sáai', 'อยู่ข้างซ้าย', ['it is on the left']],
+  ['bpə̀ət mí-dtəə dûai', 'เปิดมิเตอร์ด้วย', ['please use the meter', 'turn on the meter, please']],
+  ['jɔ̀ɔt dtrong níi', 'จอดตรงนี้', ['stop right here', 'stop here']],
 ])

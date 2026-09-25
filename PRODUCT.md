@@ -29,7 +29,7 @@ rian gèng (เรียนเก่ง, "learn well") is a local-first Thai pri
 
 ## Capabilities and Constraints
 
-- Voice has 28 levels (0 to 27) and Script has 28 (0 to 27). Script covers all 44 consonants, every vowel sign, the marks and the Thai digits. Always read counts from `content/levels.ts` and `content/script/levels.ts`.
+- Voice has 28 levels (0 to 27) and Script has 29 (0 to 28). Script covers all 44 consonants, every vowel sign, the marks and the Thai digits. Always read counts from `content/levels.ts` and `content/script/levels.ts`.
 - The romanization system in `content/system.ts` is fixed, and the data obeys it. The open e is stored as Greek ε (U+03B5).
 - Any font that sets romanization must carry ɔ ε ə ʉ with working tone-mark anchors. Fonts are self-hosted and OFL.
 - Copy uses commas and periods: no middots, no em dashes, no uppercase kickers. Name the words, do not coach. Tests and `slopless` lint it.

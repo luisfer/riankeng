@@ -20,4 +20,9 @@ export default phrases(12, [
   ['rao bpai roong-pá-yaa-baan', 'เราไปโรงพยาบาล', ['we are going to the hospital']],
   ['pǒm rúu-sʉ̀k dii kʉ̂n', 'ผมรู้สึกดีขึ้น', ['I feel better']],
   ['yang bpùai yùu', 'ยังป่วยอยู่', ['still sick', 'still ill']],
+  ['pǒm pέε tùa', 'ผมแพ้ถั่ว', ['I am allergic to peanuts', 'I am allergic to nuts']],
+  ['nûat tai', 'นวดไทย', ['Thai massage']],
+  ['nûat táo', 'นวดเท้า', ['foot massage']],
+  ['bao bao nɔ̀i', 'เบาๆหน่อย', ['gently, please', 'a bit softer']],
+  ['rεεng kʉ̂n nɔ̀i', 'แรงขึ้นหน่อย', ['a bit harder', 'a little stronger']],
 ])

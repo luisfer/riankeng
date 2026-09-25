@@ -41,4 +41,7 @@ export default words(6, [
   ['bai kàp kìi', 'ใบขับขี่', ['driving licence', 'driver license'], 'n', ['travel']],
   ['dtìt', 'ติด', ['stuck', 'stuck in traffic', 'attached'], 'v', ['travel']],
   ['rót dtìt', 'รถติด', ['traffic jam', 'the traffic is bad'], 'expr', ['travel']],
+  ['mí-dtəə', 'มิเตอร์', ['meter', 'taxi meter'], 'n', ['place']],
+  ['glàp rót', 'กลับรถ', ['make a U-turn', 'U-turn', 'turn around'], 'v', ['place']],
+  ['chít sáai', 'ชิดซ้าย', ['pull over to the left', 'keep left'], 'v', ['place']],
 ])

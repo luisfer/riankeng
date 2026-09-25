@@ -5,7 +5,6 @@ export default words(14, [
   ['fǒn dtòk', 'ฝนตก', ['it is raining', 'rain falls'], 'expr', ['weather']],
   ['nǎao', 'หนาว', ['cold'], 'adj', ['weather']],
   ['rɔ́ɔn#2', 'ร้อน', ['hot'], 'adj', ['weather']],
-  ['ùn', 'อุ่น', ['warm'], 'adj', ['weather']],
   ['chʉ́ʉn', 'ชื้น', ['humid', 'damp'], 'adj', ['weather']],
   ['hε̂εng', 'แห้ง', ['dry'], 'adj', ['weather']],
   ['lom', 'ลม', ['wind'], 'n', ['weather']],

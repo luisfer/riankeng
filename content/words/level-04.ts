@@ -72,4 +72,12 @@ export default words(4, [
   ['tîi nîi', 'ที่นี่', ['here', 'eat here', 'at this place'], 'expr', ['ordering'], 'gin tîi nîi = eat here.'],
   ['yang', 'ยัง', ['yet', 'still', 'not yet'], 'adv', [], 'gin kâao rʉ̌ʉ yang: have you eaten yet. The second greeting.'],
   ['gəən', 'เกิน', ['too', 'over', 'exceed'], 'v', [], 'wǎan gəən bpai: too sweet.'],
+  ['pàk-chii', 'ผักชี', ['coriander', 'cilantro'], 'n', ['dish']],
+  ['pàt', 'ผัด', ['stir-fry', 'fried'], 'v', ['dish']],
+  ['gà-prao', 'กะเพรา', ['holy basil'], 'n', ['dish']],
+  ['wǎan nɔ́ɔi', 'หวานน้อย', ['less sweet', 'not too sweet'], 'adj', ['taste'], 'Said on almost every coffee and tea.'],
+  ['pǒng-chuu-rót', 'ผงชูรส', ['MSG'], 'n', ['dish']],
+  ['pí-sèet', 'พิเศษ', ['extra', 'large portion', 'special'], 'adj', ['dish'], 'On a menu, the bigger plate for a few baht more.'],
+  ['hɔ̀ɔ', 'ห่อ', ['wrap', 'wrap to go'], 'v', ['dish']],
+  ['tùa', 'ถั่ว', ['peanuts', 'beans', 'nuts'], 'n', ['dish']],
 ])

@@ -17,4 +17,7 @@ export default phrases(11, [
   ['chút níi tâo-rài', 'ชุดนี้เท่าไร', ['how much is this outfit']],
   ['ao an níi', 'เอาอันนี้', ['I will take this one']],
   ['mâi ao an nán', 'ไม่เอาอันนั้น', ['I do not want that one']],
+  ['ùn mái', 'อุ่นไหม', ['heat it up?', 'shall I heat it up'], 'What the cashier asks with anything from the fridge.'],
+  ['ùn dûai', 'อุ่นด้วย', ['heat it up, please', 'please heat it up']],
+  ['mâi ao tǔng', 'ไม่เอาถุง', ['no bag, thanks', 'no bag']],
 ])

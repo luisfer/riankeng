@@ -29,6 +29,7 @@ import s24 from './script/level-24'
 import s25 from './script/level-25'
 import s26 from './script/level-26'
 import s27 from './script/level-27'
+import s28 from './script/level-28'
 
 import w00 from './words/level-00'
 import w01 from './words/level-01'
@@ -107,7 +108,7 @@ export const ENTRIES: Entry[] = [
   w10, p10, w11, p11, w12, p12, w13, p13, w14, p14, w15, p15, w16, p16, w17, p17, w18, p18, w19, p19,
   w20, p20, w21, p21, w22, p22, w23, p23, w24, p24, w25, p25, w26, p26, idiomList, w27, sayings, s00, s01, s02, s03, s04, s05, s06, s07, s08,
   s09, s10, s11, s12, s13, s14, s15, s16, s17, s18, s19,
-  s20, s21, s22, s23, s24, s25, s26, s27,
+  s20, s21, s22, s23, s24, s25, s26, s27, s28,
 ].flat()
 
 const BY_ID = new Map<string, Entry>()

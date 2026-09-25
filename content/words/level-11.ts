@@ -35,4 +35,10 @@ export default words(11, [
   ['tùuk', 'ถูก', ['cheap', 'correct'], 'adj', ['shop']],
   ['ʉ̀ʉn', 'อื่น', ['other', 'another'], 'adj', ['shop']],
   ['sǐi fáa', 'สีฟ้า', ['sky blue', 'light blue'], 'adj', ['colour']],
+  ['see-wên', 'เซเว่น', ['7-Eleven', 'the 7-Eleven'], 'n', ['shop']],
+  ['ùn', 'อุ่น', ['warm', 'heat up', 'warm up'], 'v', ['shop'], 'Warm, and to warm up. The 7-Eleven question: ùn mái.'],
+  ['tǔng#2', 'ถุง', ['bag', 'plastic bag'], 'n', ['shop'], 'Not ถึง, tʉ̌ng. That one is arrive.'],
+  ['lɔ̀ɔt', 'หลอด', ['straw', 'drinking straw'], 'n', ['shop']],
+  ['chɔ́ɔn', 'ช้อน', ['spoon'], 'n', ['shop']],
+  ['dtà-gìap', 'ตะเกียบ', ['chopsticks'], 'n', ['shop']],
 ])

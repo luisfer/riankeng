@@ -253,4 +253,19 @@ export const SCRIPT_LEVELS: LevelMeta[] = [
     focus: ['๐ ๑ ๒ ๓ ๔.', '๕ ๖ ๗ ๘ ๙.'],
     min: 10,
   },
+  {
+    n: 28,
+    title: 'Shapes that change',
+    rom: 'ngən chûai',
+    thai: 'เงินช่วย',
+    blurb: 'Some vowels change shape when a final follows them, and a silent ร hides after จ and ส. With these you can read money, help, because and finished.',
+    focus: [
+      'เงิน, เดิน. เ◌อ before a final: ิ above.',
+      'เลย. เ◌อ before ย: the อ drops.',
+      'ช่วย, ด้วย. ◌ัว before a final: the ั drops.',
+      'เพราะ, เกาะ. เ◌าะ, a short ɔ.',
+      'จริง, เสร็จ. ร after จ or ส is silent.',
+    ],
+    min: 10,
+  },
 ]

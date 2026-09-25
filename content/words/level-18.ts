@@ -26,4 +26,7 @@ export default words(18, [
   ['dtὲng dtua', 'แต่งตัว', ['get dressed'], 'v', ['city']],
   ['gii-laa', 'กีฬา', ['sport', 'sports'], 'n', ['city']],
   ['lên gii-laa', 'เล่นกีฬา', ['play sports', 'do sport'], 'v', ['city']],
+  ['bəə', 'เบอร์', ['phone number', 'number'], 'n', ['city']],
+  ['too', 'โทร', ['call', 'to phone', 'ring'], 'v', ['city']],
+  ['tàai rûup', 'ถ่ายรูป', ['take a photo', 'take a picture'], 'v', ['city']],
 ])

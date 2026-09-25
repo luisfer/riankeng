@@ -29,4 +29,7 @@ export default phrases(18, [
   ['pûak kǎo maa tîao', 'พวกเขามาเที่ยว', ['they are here to visit']],
   ['tîao grung-têep', 'เที่ยวกรุงเทพ', ['tour Bangkok']],
   ['nát tîi sà-tǎa-nii', 'นัดที่สถานี', ['meet at the station']],
+  ['kɔ̌ɔ bəə dâi mái', 'ขอเบอร์ได้ไหม', ['can I have your number', 'may I have your number']],
+  ['too maa ná', 'โทรมานะ', ['call me', 'give me a call']],
+  ['tàai rûup dâi mái', 'ถ่ายรูปได้ไหม', ['can I take a photo', 'may I take a picture']],
 ])

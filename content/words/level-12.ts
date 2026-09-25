@@ -35,4 +35,8 @@ export default words(12, [
   ['wàt', 'หวัด', ['cold', 'a cold'], 'n', ['feel']],
   ['ai', 'ไอ', ['cough', 'to cough'], 'v', ['feel']],
   ['táng', 'ทั้ง', ['all', 'whole', 'both'], 'adv', ['feel']],
+  ['nûat', 'นวด', ['massage', 'to massage'], 'v', ['body']],
+  ['táo', 'เท้า', ['foot', 'feet'], 'n', ['body']],
+  ['bao', 'เบา', ['light', 'gentle', 'soft'], 'adj', ['body']],
+  ['rεεng', 'แรง', ['strong', 'hard', 'forceful'], 'adj', ['body']],
 ])

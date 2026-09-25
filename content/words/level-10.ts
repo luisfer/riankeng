@@ -37,4 +37,5 @@ export default words(10, [
   ['bpìt fai', 'ปิดไฟ', ['turn off the light'], 'v', ['home']],
   ['bpə̀ət fai', 'เปิดไฟ', ['turn on the light'], 'v', ['home']],
   ['tɔ̀ɔt', 'ถอด', ['take off', 'remove'], 'v', ['home']],
+  ['εε', 'แอร์', ['air-con', 'air conditioner', 'AC'], 'n', ['home'], 'Everyday speech. krʉ̂ang bpràp aa-gàat is the formal word.'],
 ])

@@ -16,4 +16,6 @@ export default phrases(10, [
   ['tɔ̀ɔt rɔɔng táo', 'ถอดรองเท้า', ['take off your shoes']],
   ['sài rɔɔng táo', 'ใส่รองเท้า', ['put on your shoes', 'wear shoes']],
   ['bprεεng fan gɔ̀ɔn nɔɔn', 'แปรงฟันก่อนนอน', ['brush your teeth before bed']],
+  ['bpə̀ət εε', 'เปิดแอร์', ['turn on the air-con', 'switch on the AC']],
+  ['bpìt εε', 'ปิดแอร์', ['turn off the air-con', 'switch off the AC']],
 ])

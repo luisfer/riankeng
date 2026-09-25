@@ -31,4 +31,9 @@ export default phrases(4, [
   ['gin kâao rʉ̌ʉ yang', 'กินข้าวหรือยัง', ['have you eaten yet', 'have you eaten', 'did you eat yet'], 'The second Thai greeting. Not really about food.'],
   ['gin lέεo', 'กินแล้ว', ['I have eaten', 'already ate', 'eaten already']],
   ['yang mâi gin', 'ยังไม่กิน', ['not yet eaten', 'I have not eaten yet', 'not yet']],
+  ['pàt gà-prao gài kài daao', 'ผัดกะเพราไก่ไข่ดาว', ['chicken kra pao with a fried egg', 'stir-fried chicken with holy basil and a fried egg']],
+  ['mâi wǎan', 'ไม่หวาน', ['not sweet', 'no sugar']],
+  ['mâi sài pàk-chii', 'ไม่ใส่ผักชี', ['no coriander', 'without coriander']],
+  ['mâi sài pǒng-chuu-rót', 'ไม่ใส่ผงชูรส', ['no MSG', 'without MSG']],
+  ['hɔ̀ɔ glàp bâan', 'ห่อกลับบ้าน', ['wrap it to take home', 'to take away']],
 ])

@@ -28,10 +28,15 @@ function exampleWord(name: string): string {
   return parts[parts.length - 1] ?? name
 }
 
-/** The sound a letter makes at the start of a syllable, then the word that carries it. */
+/**
+ * The sound a letter makes at the start of a syllable, then the word that carries it.
+ * When it says something else at the end (ด ends in t, ร in n), that too. Glides are left alone.
+ */
 function consonantLine(c: Consonant): string {
   const word = exampleWord(c.name)
-  return c.initial ? `${c.initial}, ${word}` : word
+  const line = c.initial ? `${c.initial}, ${word}` : word
+  const ends = c.final && c.final !== c.initial && /^(k|p|t|n)$/.test(c.final)
+  return ends ? `${line}, ends ${c.final}` : line
 }
 
 function Grid(props: { cells: Cell[]; onOpen: (n: number) => void; unlocked?: (n: number) => boolean }) {
@@ -64,16 +69,16 @@ const CLASS_TITLE: Record<ConsonantClass, string> = {
 
 function classNote(cls: ConsonantClass): ReactNode {
   if (cls === 'mid') {
-    return 'A live syllable with no mark is mid. ก starts it as g, as in gài.'
+    return 'With no mark, a live syllable is mid and a dead one low. ก starts it as g, as in gài.'
   }
   if (cls === 'high') {
     return (
       <>
-        A live syllable with no mark is rising. <span className="thai">ห</span> in front lends this class to a low letter. ข starts it as k, as in kài.
+        With no mark, a live syllable is rising and a dead one low. <span className="thai">ห</span> in front lends this class to a low letter. ข starts it as k, as in kài.
       </>
     )
   }
-  return 'Twenty-four letters. ค starts a syllable as k, as in kwaai.'
+  return 'Twenty-four letters. With no mark, a live syllable is mid, and a dead one is high when short and falling when long. ค starts a syllable as k, as in kwaai.'
 }
 
 export function Alphabet(props: { doc: ProgressDoc; onOpen: (n: number) => void; unlocked?: (n: number) => boolean }) {
@@ -111,7 +116,8 @@ export function Alphabet(props: { doc: ProgressDoc; onOpen: (n: number) => void;
       note: (
         <>
           On a mid letter, <span className="thai">{showThai('่')}</span> is low, <span className="thai">{showThai('้')}</span> falling,{' '}
-          <span className="thai">{showThai('๊')}</span> high, <span className="thai">{showThai('๋')}</span> rising. ก่า is gàa.
+          <span className="thai">{showThai('๊')}</span> high, <span className="thai">{showThai('๋')}</span> rising. ก่า is gàa. On a low
+          letter, <span className="thai">{showThai('่')}</span> is falling and <span className="thai">{showThai('้')}</span> high. ค่า is kâa.
         </>
       ),
       body: (
@@ -131,6 +137,14 @@ export function Alphabet(props: { doc: ProgressDoc; onOpen: (n: number) => void;
           <li>
             <span className="thai">{showThai('ก๋า')}</span>
             <span className="rom">gǎa, rising</span>
+          </li>
+          <li>
+            <span className="thai">{showThai('ค่า')}</span>
+            <span className="rom">kâa, falling</span>
+          </li>
+          <li>
+            <span className="thai">{showThai('ค้า')}</span>
+            <span className="rom">káa, high</span>
           </li>
         </ul>
       ),

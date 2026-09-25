@@ -11,7 +11,7 @@ export default phrases(22, [
   ['nâa nǎao mâi nǎao', 'หน้าหนาวไม่หนาว', ['the cool season is not cold']],
   ['sǒng-graan dʉan mee-sǎa-yon', 'สงกรานต์เดือนเมษายน', ['Songkran is in April']],
   ['rao bpai lɔɔi grà-tong gan', 'เราไปลอยกระทงกัน', ['let us go to Loy Krathong']],
-  ['dtɔɔn nîi tîang', 'ตอนนี้เที่ยง', ['it is noon now']],
+  ['dtɔɔn níi tîang', 'ตอนนี้เที่ยง', ['it is noon now']],
   ['bàai sɔ̌ɔng moong krʉ̂ng', 'บ่ายสองโมงครึ่ง', ['half past two in the afternoon']],
   ['wan gə̀ət pǒm dʉan nâa', 'วันเกิดผมเดือนหน้า', ['my birthday is next month']],
   ['dʉan tîi lέεo pǒm mâi wâang', 'เดือนที่แล้วผมไม่ว่าง', ['I was busy last month']],

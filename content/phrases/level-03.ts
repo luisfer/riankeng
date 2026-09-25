@@ -13,7 +13,7 @@ export default phrases(3, [
   ['nîi à-rai', 'นี่อะไร', ['what is this']],
   ['hɔ̂ng náam yùu tîi-nǎi', 'ห้องน้ำอยู่ที่ไหน', ['where is the toilet', 'where is the bathroom']],
   ['roong-rεεm yùu tîi-nǎi', 'โรงแรมอยู่ที่ไหน', ['where is the hotel']],
-  ['kun maa tǔng mʉ̂a-rai', 'คุณมาถึงเมื่อไร', ['when did you arrive', 'when did you get here']],
+  ['kun maa tʉ̌ng mʉ̂a-rài', 'คุณมาถึงเมื่อไร', ['when did you arrive', 'when did you get here']],
   ['tam-mai kun rian paa-sǎa tai', 'ทำไมคุณเรียนภาษาไทย', ['why do you study Thai', 'why are you learning Thai']],
   ['nîi krai', 'นี่ใคร', ['who is this']],
   ['krai maa', 'ใครมา', ['who is coming', 'who came']],

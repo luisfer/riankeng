@@ -27,4 +27,6 @@ export default phrases(2, [
   ['kǎo bɔ̀ɔk pǒm', 'เขาบอกผม', ['he told me', 'she told me', 'they told me', 'he tells me']],
   ['bpə̀ət bpìt', 'เปิดปิด', ['open and close', 'on and off', 'open close']],
   ['sèt lέεo', 'เสร็จแล้ว', ['done', 'finished', 'it is done', 'all done', 'ready']],
+  ['jəə gan', 'เจอกัน', ['see you', 'see you around']],
+  ['lέεo jəə gan ná', 'แล้วเจอกันนะ', ['see you later', 'see you then']],
 ])

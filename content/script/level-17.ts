@@ -10,4 +10,6 @@ export default scriptWords(17, [
   ['jàak', 'จาก', ['from'], 'prep', ['bridge', 'voice:w:jàak', 'parts:จ+า+ก'], 'Dead: long, but it stops on k. จ is mid class, no mark: low tone.'],
   ['rák', 'รัก', ['love', 'to love'], 'v', ['bridge', 'voice:w:rák', 'parts:ร+ั+ก'], 'ร is low class. Dead and short, no mark: high tone.'],
   ['mâak', 'มาก', ['very', 'a lot'], 'adv', ['bridge', 'voice:w:mâak', 'parts:ม+า+ก'], 'ม is low class. Dead and long, no mark: falling tone.'],
+  ['pɔ̂ɔ#2', 'พ่อ', ['father'], 'n', ['bridge', 'voice:w:pɔ̂ɔ', 'parts:พ+่+อ'], 'พ is low class. ่ on a low letter: falling tone.'],
+  ['náam#2', 'น้ำ', ['water'], 'n', ['bridge', 'voice:w:náam', 'parts:น+้+ำ'], 'น is low class. ้ on a low letter: high tone.'],
 ])

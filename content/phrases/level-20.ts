@@ -1,8 +1,8 @@
 import { phrases } from '../build'
 
 export default phrases(20, [
-  ['jai yen nɔ̀i', 'ใจเย็นหน่อย', ['calm down a bit', 'be patient']],
-  ['yàa grεεng jai', 'อย่าเกรงใจ', ['do not be shy about asking', 'no need to hesitate']],
+  ['jai yen nɔ̀i', 'ใจเย็นหน่อย', ['calm down a bit', 'be patient', 'calm down', 'take it easy']],
+  ['yàa greeng jai', 'อย่าเกรงใจ', ['do not be shy about asking', 'no need to hesitate']],
   ['kun mii nám jai', 'คุณมีน้ำใจ', ['you are kind']],
   ['wan níi bpai tam bun', 'วันนี้ไปทำบุญ', ['today I go to make merit']],
   ['mâi sà-baai jai', 'ไม่สบายใจ', ['I am uneasy']],
@@ -11,15 +11,15 @@ export default phrases(20, [
   ['dtàt sǐn jai lέεo', 'ตัดสินใจแล้ว', ['I have decided']],
   ['yàak bplìan jai', 'อยากเปลี่ยนใจ', ['I want to change my mind']],
   ['rʉ̂ang sǎm-kan', 'เรื่องสำคัญ', ['an important matter']],
-  ['jai kwâang ná', 'ใจกว้างนะ', ['be generous, yeah']],
+  ['jai gwâang ná', 'ใจกว้างนะ', ['be generous, yeah']],
   ['yàa jai dam', 'อย่าใจดำ', ['do not be cruel']],
   ['pǒm sǐa nám jai', 'ผมเสียน้ำใจ', ['I feel let down', 'my feelings are hurt', 'I am hurt']],
   ['waang jai dâi', 'วางใจได้', ['you can rest easy']],
   ['jàp jai mâak', 'จับใจมาก', ['very touching']],
   ['bplɔ̀ɔp jai kun', 'ปลอบใจคุณ', ['I will comfort you']],
   ['tam bun lέεo dii jai', 'ทำบุญแล้วดีใจ', ['I made merit and I am glad']],
-  ['grεεng jai kun', 'เกรงใจคุณ', ['I do not want to impose on you']],
-  ['jai yen jai yen', 'ใจเย็นใจเย็น', ['calm, calm']],
+  ['greeng jai kun', 'เกรงใจคุณ', ['I do not want to impose on you']],
+  ['jai yen yen', 'ใจเย็นๆ', ['calm down', 'take it easy', 'relax', 'keep calm'], '', 'cool heart, cool'],
   ['mii nám jai mâak', 'มีน้ำใจมาก', ['so kind', 'so much kindness']],
   ['dtem jai tam', 'เต็มใจทำ', ['glad to do it', 'willing to do it']],
 ])

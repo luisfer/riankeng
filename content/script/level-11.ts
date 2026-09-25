@@ -6,5 +6,5 @@ export default scriptWords(11, [
   ['lɔɔ ling', 'ล', ['l', 'the letter l'], 'n', ['letter'], 'The letter in เล่น.'],
   ['lên', 'เล่น', ['play', 'to play'], 'v', ['bridge', 'voice:w:lên', 'parts:เ+ล+่+น']],
   ['sɔ̌ɔ', 'ส', ['high-class s', 'the letter s (sɔ̌ɔ sʉ̌a)'], 'n', ['letter'], 'The letter in สบาย.'],
-  ['sà-baai', 'สบาย', ['comfortable', 'well'], 'adj', ['bridge', 'voice:w:sà-baai', 'parts:ส+บ+า+ย']],
+  ['sà-baai', 'สบาย', ['comfortable', 'well'], 'adj', ['bridge', 'voice:w:sà-baai', 'parts:ส+บ+า+ย'], 'ส with no vowel before บ reads sà.'],
 ])

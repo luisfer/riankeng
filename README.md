@@ -30,13 +30,13 @@ Locally the course is open when `SITE_PASSWORD` is empty, and `/api/session` ans
 
 ## How a sitting works
 
-Type the answer. Paste is blocked. A correct card stays up with **Right.** until you hit Next. A miss keeps the grader's reason on screen and makes you retype the target. **Begin** unlocks speech; cards play once when autoplay is on. **Hear** and **Slower** play recorded Thai (Voice clips in `public/audio`). `npm run audio` rebuilds them.
+Type the answer. Paste is blocked. A correct card stays up with **Right.** until you hit Next. A miss keeps the grader's reason on screen and makes you retype the target. **Begin** unlocks speech; cards play once when autoplay is on. **Hear** and **Slower** play the card's Thai clip, one neural voice (Premwadee, through edge-tts) reading the Thai spelling (`public/audio`). `npm run audio` voices any card that has no clip yet.
 
 Voice unlocks the next level when the previous one is mastered. Script unlocks when every item on the previous level has been answered correctly.
 
 ## Tracks
 
-- Voice 0–26: tones, survival, verbs, food, time, the city, particles, heart words, months, kin, errands, trouble, jobs.
+- Voice 0–27: tones, survival, verbs, food, time, the city, particles, heart words, months, kin, errands, trouble, jobs, sayings.
 - Script 0–27: the whole script. All 44 consonants (including the two retired ones), every vowel sign, the short mark, the silent mark, ๆ, ฯ and the Thai digits. Each letter is taught before any word that uses it, and each bridge word is a Voice word. `content/script/alphabet.ts` is the checklist; tests hold the levels to it. `/learn/#/alphabet` shows the whole chart with where each letter is taught.
 
 Romanization follows the textbook system in `content/system.ts` (à â á ǎ, g/bp/dt, ε ɔ ə ʉ). The open e is stored as Greek ε.

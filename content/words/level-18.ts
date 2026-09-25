@@ -9,7 +9,7 @@ export default words(18, [
   ['baa', 'บาร์', ['bar'], 'n', ['city']],
   ['ráan gaa-fεε', 'ร้านกาแฟ', ['cafe', 'coffee shop'], 'n', ['city']],
   ['roong nǎng', 'โรงหนัง', ['cinema', 'movie theatre'], 'n', ['city']],
-  ['kâao sǎn', 'ข้าวสาร', ['Khao San'], 'n', ['city']],
+  ['kâao-sǎan', 'ข้าวสาร', ['Khao San'], 'n', ['city']],
   ['sǐi-lom', 'สีลม', ['Silom'], 'n', ['city']],
   ['sù-kǔm-wít', 'สุขุมวิท', ['Sukhumvit'], 'n', ['city']],
   ['jà-dtù-jàk', 'จตุจักร', ['Chatuchak'], 'n', ['city']],

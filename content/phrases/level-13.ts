@@ -13,7 +13,7 @@ export default phrases(13, [
   ['sɔ̀ɔp dtòk', 'สอบตก', ['I failed the exam', 'failed the exam']],
   ['wan yùt wan nǎi', 'วันหยุดวันไหน', ['which day is the holiday', 'when is the day off']],
   ['kɔ̌ɔ laa nʉ̀ng wan', 'ขอลาหนึ่งวัน', ['I would like one day off', 'may I take a day off']],
-  ['lûuk kâa maa lέεo', 'ลูกค้ามาแล้ว', ['the customer is here']],
+  ['lûuk káa maa lέεo', 'ลูกค้ามาแล้ว', ['the customer is here']],
   ['waang pε̌εn gan', 'วางแผนกัน', ['let us plan', 'let\'s plan']],
   ['ngaan mâak bpai', 'งานมากไป', ['too much work']],
   ['bɔɔ-rí-sàt yài', 'บริษัทใหญ่', ['a big company']],

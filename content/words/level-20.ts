@@ -2,6 +2,9 @@ import { words } from '../build'
 
 export default words(20, [
   ['jai yen', 'ใจเย็น', ['calm', 'cool-hearted', 'patient'], 'adj', ['heart']],
+  ['lɔɔi', 'ลอย', ['float', 'to float'], 'v', ['heart']],
+  ['sûu', 'สู้', ['fight', 'to fight', 'face up to'], 'v', ['heart']],
+  ['sʉ̌a', 'เสือ', ['tiger'], 'n', ['heart']],
   ['nám jai', 'น้ำใจ', ['kindness', 'generosity'], 'n', ['heart']],
   ['tam bun', 'ทำบุญ', ['make merit'], 'v', ['heart']],
   ['sǐa nám jai', 'เสียน้ำใจ', ['feel let down', 'be hurt', 'lose heart'], 'v', ['heart'], 'When the kindness you gave is not returned.'],
@@ -15,7 +18,7 @@ export default words(20, [
   ['dtàt sǐn jai', 'ตัดสินใจ', ['decide'], 'v', ['heart']],
   ['jàp jai', 'จับใจ', ['touching'], 'adj', ['heart']],
   ['sǎm-kan', 'สำคัญ', ['important'], 'adj', ['heart']],
-  ['jai kwâang', 'ใจกว้าง', ['generous', 'open-minded'], 'adj', ['heart']],
+  ['jai gwâang', 'ใจกว้าง', ['generous', 'open-minded'], 'adj', ['heart']],
   ['jai dam', 'ใจดำ', ['cruel', 'black-hearted'], 'adj', ['heart']],
   ['kέεn jai', 'แค้นใจ', ['resentful'], 'adj', ['heart']],
   ['bplɔ̀ɔp jai', 'ปลอบใจ', ['comfort', 'console'], 'v', ['heart']],

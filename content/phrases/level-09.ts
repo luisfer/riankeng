@@ -20,4 +20,9 @@ export default phrases(9, [
   ['dtua níi yài', 'ตัวนี้ใหญ่', ['this one is big', 'this animal is big']],
   ['pîi chûai nɔ́ɔng', 'พี่ช่วยน้อง', ['the older one helps the younger']],
   ['kǎo chà-làat mâak', 'เขาฉลาดมาก', ['he is very clever', 'she is very smart']],
+  ['nɔ́ɔng kráp/ká', 'น้องครับ/คะ', ['excuse me, to a waiter', 'excuse me'], 'Calling out, a woman ends with ká.'],
+  ['pîi kráp/ká', 'พี่ครับ/คะ', ['excuse me, to someone a bit older', 'excuse me']],
+  ['bpâa kráp/ká, an níi tâo-rài', 'ป้าครับ/คะ อันนี้เท่าไร', ['auntie, how much is this one', 'how much is this one, auntie']],
+  ['lung kráp/ká, jɔ̀ɔt tîi nîi', 'ลุงครับ/คะ จอดที่นี่', ['uncle, stop here', 'stop here, uncle']],
+  ['nǔu mâi kâo jai kâ', 'หนูไม่เข้าใจค่ะ', ['I do not understand, a young woman to an elder']],
 ])

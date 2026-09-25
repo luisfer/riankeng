@@ -57,6 +57,7 @@ import w23 from './words/level-23'
 import w24 from './words/level-24'
 import w25 from './words/level-25'
 import w26 from './words/level-26'
+import w27 from './words/level-27'
 
 import p00 from './phrases/level-00'
 import p01 from './phrases/level-01'
@@ -87,6 +88,7 @@ import p25 from './phrases/level-25'
 import p26 from './phrases/level-26'
 
 import idiomList from './idioms'
+import sayings from './sayings'
 
 export { LEVELS, SCRIPT_LEVELS }
 export type { Entry, TrackId }
@@ -103,7 +105,7 @@ export function entryTrack(e: Pick<Entry, 'track'>): TrackId {
 export const ENTRIES: Entry[] = [
   w00, p00, w01, p01, w02, p02, w03, p03, w04, p04, w05, p05, w06, p06, w07, p07, w08, p08, w09, p09,
   w10, p10, w11, p11, w12, p12, w13, p13, w14, p14, w15, p15, w16, p16, w17, p17, w18, p18, w19, p19,
-  w20, p20, w21, p21, w22, p22, w23, p23, w24, p24, w25, p25, w26, p26, idiomList, s00, s01, s02, s03, s04, s05, s06, s07, s08,
+  w20, p20, w21, p21, w22, p22, w23, p23, w24, p24, w25, p25, w26, p26, idiomList, w27, sayings, s00, s01, s02, s03, s04, s05, s06, s07, s08,
   s09, s10, s11, s12, s13, s14, s15, s16, s17, s18, s19,
   s20, s21, s22, s23, s24, s25, s26, s27,
 ].flat()

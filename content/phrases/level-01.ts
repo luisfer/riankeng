@@ -9,6 +9,7 @@ export default phrases(1, [
   ['sà-baai dii mái', 'สบายดีไหม', ['how are you', 'are you well', 'how are you doing'], 'Literally "well, yes?"'],
   ['sà-baai dii kráp/kâ', 'สบายดีครับ/ค่ะ', ['I am fine', 'fine thanks', 'I am well', 'I am good']],
   ['pǒm mâi kâo jai', 'ผมไม่เข้าใจ', ['I do not understand'], 'chǎn mâi kâo jai for a woman.'],
+  ['chǎn mâi kâo jai', 'ฉันไม่เข้าใจ', ['I do not understand, female speaker', 'I do not understand'], 'A woman says chǎn. pǒm mâi kâo jai for a man.'],
   ['kâo jai lέεo', 'เข้าใจแล้ว', ['I understand now', 'got it', 'I understand', 'understood']],
   ['pûut cháa cháa nɔ̀i', 'พูดช้าๆหน่อย', ['speak slowly please', 'please speak slowly', 'slower please', 'can you speak slowly']],
   ['pûut ìik tii dâi mái', 'พูดอีกทีได้ไหม', ['can you say it again', 'say it again please', 'could you repeat that', 'one more time please']],

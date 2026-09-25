@@ -10,7 +10,7 @@ export default phrases(18, [
   ['bpai ráan gaa-fεε gan', 'ไปร้านกาแฟกัน', ['let us go to a cafe']],
   ['bpai duu nǎng', 'ไปดูหนัง', ['go see a film']],
   ['yùu tε̌εo sǐi-lom', 'อยู่แถวสีลม', ['around Silom']],
-  ['bpai kâao sǎn mái', 'ไปข้าวสารไหม', ['shall we go to Khao San']],
+  ['bpai kâao-sǎan mái', 'ไปข้าวสารไหม', ['shall we go to Khao San']],
   ['dtà-làat nát wan sǎo', 'ตลาดนัดวันเสาร์', ['the Saturday market']],
   ['pûak rao tîao glaang kʉʉn', 'พวกเราเที่ยวกลางคืน', ['we go out at night']],
   ['mâi rúu-jàk', 'ไม่รู้จัก', ['I do not know them']],

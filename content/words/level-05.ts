@@ -24,7 +24,7 @@ export default words(5, [
   ['mʉ̀ʉn', 'หมื่น', ['ten thousand', '10000'], 'num', ['number']],
   ['sε̌εn', 'แสน', ['hundred thousand', '100000'], 'num', ['number']],
   ['láan', 'ล้าน', ['million', '1 million'], 'num', ['number']],
-  ['sà-dtang', 'สตางค์', ['satang', 'cent'], 'n', ['money']],
+  ['sà-dtaang', 'สตางค์', ['satang', 'cent'], 'n', ['money']],
   ['ngən tɔɔn', 'เงินทอน', ['change', 'change (money)'], 'n', ['money']],
   ['raa-kaa', 'ราคา', ['price', 'cost'], 'n', ['money']],
   ['dtǔa', 'ตั๋ว', ['ticket'], 'n', ['money']],
@@ -58,4 +58,7 @@ export default words(5, [
   ['wâang', 'ว่าง', ['free', 'available', 'empty'], 'adj', ['time']],
   ['tɔɔn', 'ทอน', ['give change', 'to give change', 'change (money)'], 'v', ['money'], 'mâi dtɔ̂ng tɔɔn: keep the change.'],
   ['jà', 'จะ', ['will', 'going to', 'about to'], 'adv', ['aspect']],
+  ['krʉ̂ng', 'ครึ่ง', ['half'], 'n', ['calendar'], 'After the hour: sɔ̌ɔng moong krʉ̂ng.'],
+  ['tîang', 'เที่ยง', ['noon', 'midday'], 'n', ['calendar']],
+  ['tîang kʉʉn', 'เที่ยงคืน', ['midnight'], 'n', ['calendar']],
 ])

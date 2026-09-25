@@ -17,7 +17,7 @@ export default phrases(4, [
   ['à-rɔ̀i mái', 'อร่อยไหม', ['is it delicious', 'is it good', 'is it tasty', 'do you like the food']],
   ['gèp dtang dûai', 'เก็บตังค์ด้วย', ['the bill please', 'can I pay please', 'check please']],
   ['chék bin kráp/kâ', 'เช็คบิลครับ/ค่ะ', ['the bill please', 'check please', 'bill please']],
-  ['tâo-rài kráp/kâ', 'เท่าไรครับ/ค่ะ', ['how much is it', 'how much', 'how much do I owe']],
+  ['tâo-rài kráp/ká', 'เท่าไรครับ/คะ', ['how much is it', 'how much', 'how much do I owe']],
   ['pǒm hǐu', 'ผมหิว', ['I am hungry']],
   ['pǒm ìm lέεo', 'ผมอิ่มแล้ว', ['I am full', 'I am full already', 'I have had enough']],
   ['gin tîi nîi', 'กินที่นี่', ['eat here', 'for here', 'I will eat here']],

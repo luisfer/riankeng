@@ -2,11 +2,10 @@ import { words } from '../build'
 
 export default words(23, [
   // the four grandparents. Thai names the side.
-  ['bpùu', 'ปู่', ['grandfather', '(paternal) grandfather', "father's father"], 'n', ['family'], "Father's father. Mother's father is dtaa."],
-  ['dtaa#2', 'ตา', ['grandfather', "(maternal) grandfather", "mother's father"], 'n', ['family'], 'Same letters as the eye you already read.'],
-  ['yaai', 'ยาย', ['grandmother', "(maternal) grandmother", "mother's mother"], 'n', ['family'], "Mother's mother. Father's mother is yâa."],
+  ['bpùu', 'ปู่', ["father's father", 'grandfather', '(paternal) grandfather'], 'n', ['family'], "Father's father. Mother's father is dtaa."],
+  ['dtaa#2', 'ตา', ["mother's father", 'grandfather', '(maternal) grandfather'], 'n', ['family'], 'Same letters as the eye you already read.'],
+  ['yaai', 'ยาย', ["mother's mother", 'grandmother', '(maternal) grandmother'], 'n', ['family'], "Mother's mother. Father's mother is yâa."],
   // aunts and uncles, by side and by age
-  ['lung', 'ลุง', ['uncle', '(older) uncle'], 'n', ['family'], 'Older brother of either parent.'],
   ['náa', 'น้า', ['aunt', 'uncle', "mother's younger sibling"], 'n', ['family'], "Mother's younger sibling, either sex."],
   ['yâat', 'ญาติ', ['relative', 'relatives'], 'n', ['family']],
   ['lǎan', 'หลาน', ['grandchild', 'niece', 'nephew'], 'n', ['family'], 'One word for the generation below, however it is related.'],

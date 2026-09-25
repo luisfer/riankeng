@@ -24,7 +24,7 @@ const rows = words(0, [
   // ── yaa family
   ['yaa', 'ยา', ['medicine', 'drug', 'medication'], 'n', ['tone-mid', 'pair-yaa']],
   ['yàa', 'อย่า', ["don't", 'do not'], 'adv', ['tone-low', 'pair-yaa']],
-  ['yâa', 'ย่า', ['grandmother', '(paternal) grandmother', "father's mother"], 'n', ['tone-falling', 'pair-yaa']],
+  ['yâa', 'ย่า', ["father's mother", 'grandmother', '(paternal) grandmother'], 'n', ['tone-falling', 'pair-yaa']],
   // ── glai / glâi
   ['glai', 'ไกล', ['far', 'far away'], 'adj', ['tone-mid', 'pair-glai']],
   ['glâi', 'ใกล้', ['near', 'close', 'nearby'], 'adj', ['tone-falling', 'pair-glai']],
@@ -66,7 +66,7 @@ const rows = words(0, [
   ['nguu', 'งู', ['snake'], 'n', ['ng-onset']],
   // ── ao and aa: short a with a glide, long aa with none
   ['ao', 'เอา', ['take', 'to take', 'want', "I'll have"], 'v', ['length']],
-  ['aa#2', 'อา', ['uncle', "(father's younger) brother"], 'n', ['length'], 'Long aa, nothing after it. Also the letter อ plus า.'],
+  ['aa#2', 'อา', ["father's younger sibling", 'uncle', 'aunt', "father's younger brother", "father's younger sister"], 'n', ['length'], 'Long aa, nothing after it. Also the letter อ plus า.'],
 ])
 
 // Link minimal pairs by shared "pair-*" tag.

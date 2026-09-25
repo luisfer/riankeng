@@ -2,8 +2,11 @@ import { ALLOWED_CODEPOINTS } from './system'
 import { LEVELS } from './levels'
 import type { Entry, LevelMeta, TrackId } from './types'
 import { analyseRom } from '../src/engine/normalize'
-import { parseGloss } from '../src/engine/grader-en'
+import { cleanGloss, parseGloss } from '../src/engine/grader-en'
 import { checkSequence } from './sequence'
+
+/** Thai that asks. A woman ends a question with ká (คะ), a statement with kâ (ค่ะ). */
+const ASKS = /ไหม|อะไร|ที่ไหน|เท่าไร|กี่|ยังไง|ใคร|เมื่อไร|หรือ/
 
 export interface Problem {
   id: string
@@ -56,6 +59,9 @@ export function validateEntries(
       }
     }
     if (/[A-Z]/.test(e.rom)) problems.push({ id: e.id, message: 'uppercase in rom' })
+    if (/kráp\/kâ$/.test(e.rom.normalize('NFC')) && ASKS.test(e.thai)) {
+      problems.push({ id: e.id, message: 'a question ends in kráp/ká (ครับ/คะ), not kráp/kâ' })
+    }
 
     const a = analyseRom(e.rom)
     if (!a.valid) problems.push({ id: e.id, message: 'rom does not parse: tone mark off a vowel or two tone marks in one syllable' })
@@ -91,3 +97,24 @@ export function validateEntries(
     },
   }
 }
+
+/**
+ * English prompts that more than one Voice card shows with a different answer. The sitting
+ * accepts the twin's answer, but a prompt that tells them apart reads better. Warnings only.
+ */
+export function sharedPrompts(entries: Entry[]): Map<string, string[]> {
+  const byPrompt = new Map<string, Set<string>>()
+  for (const e of entries) {
+    if ((e.track ?? 'voice') !== 'voice') continue
+    const prompt = cleanGloss(e.en[0] ?? '').toLowerCase()
+    // kráp/kâ on the end is politeness, not a different answer.
+    const rom = e.rom.normalize('NFC').replace(/ kráp\/k[âá]$/, '')
+    const roms = byPrompt.get(prompt) ?? new Set<string>()
+    roms.add(rom)
+    byPrompt.set(prompt, roms)
+  }
+  const shared = new Map<string, string[]>()
+  for (const [prompt, roms] of byPrompt) if (roms.size > 1) shared.set(prompt, [...roms])
+  return shared
+}
+

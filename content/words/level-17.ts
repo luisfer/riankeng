@@ -26,4 +26,10 @@ export default words(17, [
   ['jing ná', 'จริงนะ', ['really', 'I mean it']],
   ['jing', 'จริง', ['true', 'real', 'really'], 'adj', ['particle']],
   ['jing jing', 'จริงๆ', ['really', 'truly', 'for real'], 'adv', ['particle'], 'Doubling it means you mean it. Written with ๆ, the repeat mark.'],
+  ['máng', 'มั้ง', ['probably', 'I guess'], 'particle', ['particle'], 'At the end, a guess: kǎo mâi maa máng.'],
+  ['tə̀', 'เถอะ', ['let us', 'go ahead'], 'particle', ['particle'], 'At the end, a nudge: bpai tə̀.'],
+  ['nə́', 'เนอะ', ['right', 'is it not'], 'particle', ['particle'], 'At the end, asks you to agree: rɔ́ɔn nə́.'],
+  ['ɔ̌ɔ', 'อ๋อ', ['oh, I see', 'oh'], 'particle', ['particle']],
+  ['ngán', 'งั้น', ['in that case', 'then'], 'conj', ['particle']],
+  ['oo-kee', 'โอเค', ['okay', 'OK'], 'expr', ['particle']],
 ])

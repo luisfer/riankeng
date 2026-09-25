@@ -4,7 +4,7 @@ export default words(3, [
   ['à-rai', 'อะไร', ['what'], 'q', ['question']],
   ['tîi-nǎi', 'ที่ไหน', ['where'], 'q', ['question']],
   ['nǎi', 'ไหน', ['which', 'where (casual)', 'where'], 'q', ['question'], 'bpai nǎi = where to. an nǎi = which one.'],
-  ['mʉ̂a-rai', 'เมื่อไร', ['when'], 'q', ['question']],
+  ['mʉ̂a-rài', 'เมื่อไร', ['when'], 'q', ['question']],
   ['tam-mai', 'ทำไม', ['why'], 'q', ['question']],
   ['krai', 'ใคร', ['who', 'whom'], 'q', ['question']],
   ['yang-ngai', 'ยังไง', ['how', 'in what way'], 'q', ['question'], 'Spoken form of yàang-rai.'],
@@ -31,6 +31,7 @@ export default words(3, [
   ['an', 'อัน', ['one (thing)', 'piece', 'item', 'thing (classifier)'], 'clf', ['classifier'], 'Classifier for small things. an níi = this one.'],
   ['bàat', 'บาท', ['baht'], 'n', ['money']],
   ['kɔ̌ɔng kun', 'ของคุณ', ['your', 'yours'], 'pron', ['pronoun']],
-  ['kɔ̌ɔng pǒm', 'ของผม', ['my', 'mine', 'my (male speaker)'], 'pron', ['pronoun']],
+  ['kɔ̌ɔng pǒm', 'ของผม', ['my, male speaker', 'my', 'mine', 'my (male speaker)'], 'pron', ['pronoun']],
+  ['kɔ̌ɔng chǎn', 'ของฉัน', ['my, female speaker', 'my', 'mine', 'my (female speaker)'], 'pron', ['pronoun']],
   ['wâa', 'ว่า', ['that (complementizer)', 'that'], 'conj', [], 'mâi rúu wâa krai. Also "say that".'],
 ])

@@ -36,5 +36,8 @@ export default phrases(17, [
   ['ao ná', 'เอานะ', ['take it, okay?']],
   ['bpai ləəi ná', 'ไปเลยนะ', ['just go, you know']],
   ['sèt ná', 'เสร็จนะ', ['done, okay?']],
-  ['tǔng lέεo rə̌ə', 'ถึงแล้วเหรอ', ['already there, really?']],
+  ['tʉ̌ng lέεo rə̌ə', 'ถึงแล้วเหรอ', ['already there, really?']],
+  ['bpai tə̀', 'ไปเถอะ', ['let us go', 'come on, let us go']],
+  ['dâi ləəi', 'ได้เลย', ['no problem', 'sure', 'of course']],
+  ['ngán gɔ̂ dâi', 'งั้นก็ได้', ['okay then', 'fine, then']],
 ])

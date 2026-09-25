@@ -17,19 +17,19 @@ rian gèng (เรียนเก่ง, "learn well") is a local-first Thai pri
 ## Positioning
 
 - The romanization comes from "Getting to Know Thai, Level 1": à â á ǎ for tones, g/bp/dt for unaspirated stops, and ε ɔ ə ʉ for the vowels English has no letter for. That is the Paiboon system of Benjawan Poomsan Becker, and the course credits it on Voice 0 and in the landing footer. Grading is tone-aware, and names the syllable whose tone slipped.
-- Every Voice card has a recorded Thai clip (1,512 of 1,512), so tones are never a synthetic voice's guess.
+- Every Voice card has a Thai clip from one neural voice (Premwadee, through edge-tts), read from the Thai spelling, never from the romanization. It is a synthetic voice, so never call the clips recorded.
 - Voice comes first. Script then teaches each letter on words from Voice.
 - Local-first: there is no account. Progress lives on the device, with a backup file the learner keeps.
 
 ## Operating Context
 
-- A sitting: type the answer, with paste blocked. A miss makes the learner retype the target. Hear and Slower play the recorded clip.
+- A sitting: type the answer, with paste blocked. A miss makes the learner retype the target. Hear and Slower play the card's clip.
 - It is an installable PWA that opens without a network.
 - It is deployed on Vercel behind `SITE_PASSWORD`. The public landing page at `/` is the front door, and the course lives at `/learn/`.
 
 ## Capabilities and Constraints
 
-- Voice has 27 levels (0 to 26) and Script has 28 (0 to 27). Script covers all 44 consonants, every vowel sign, the marks and the Thai digits. Always read counts from `content/levels.ts` and `content/script/levels.ts`.
+- Voice has 28 levels (0 to 27) and Script has 28 (0 to 27). Script covers all 44 consonants, every vowel sign, the marks and the Thai digits. Always read counts from `content/levels.ts` and `content/script/levels.ts`.
 - The romanization system in `content/system.ts` is fixed, and the data obeys it. The open e is stored as Greek ε (U+03B5).
 - Any font that sets romanization must carry ɔ ε ə ʉ with working tone-mark anchors. Fonts are self-hosted and OFL.
 - Copy uses commas and periods: no middots, no em dashes, no uppercase kickers. Name the words, do not coach. Tests and `slopless` lint it.
@@ -43,7 +43,7 @@ rian gèng (เรียนเก่ง, "learn well") is a local-first Thai pri
 
 ## Evidence on Hand
 
-- Fifty comic panels at 1024² in `art/scenes/`, the 1,512 recorded clips in `public/audio/`, and the course itself.
+- Fifty comic panels at 1024² in `art/scenes/`, the neural-voice clips in `public/audio/`, and the course itself.
 - Absent, never fabricate: testimonials, learner counts, reviews, ratings, pricing, press, partner logos.
 
 ## Product Principles

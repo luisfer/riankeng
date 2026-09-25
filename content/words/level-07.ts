@@ -4,7 +4,7 @@ export default words(7, [
   ['gam-lang', 'กำลัง', ['in the middle of', 'currently', 'in the process of'], 'adv', ['aspect']],
   ['kəəi', 'เคย', ['ever', 'used to'], 'adv', ['aspect']],
   ['dtɔɔn', 'ตอน', ['when', 'at the time', 'period'], 'n', ['time']],
-  ['dtɔɔn nîi', 'ตอนนี้', ['now', 'at this moment'], 'adv', ['time']],
+  ['dtɔɔn níi', 'ตอนนี้', ['now', 'at this moment'], 'adv', ['time']],
   ['dtɔɔn nán', 'ตอนนั้น', ['then', 'at that time'], 'adv', ['time']],
   ['mʉ̂a', 'เมื่อ', ['when', 'when (in the past)'], 'conj', ['time']],
   ['mʉ̂a gɔ̀ɔn', 'เมื่อก่อน', ['before', 'in the past', 'formerly'], 'adv', ['time']],
@@ -32,4 +32,6 @@ export default words(7, [
   ['dʉan nâa', 'เดือนหน้า', ['next month'], 'n', ['time']],
   ['bpii nâa', 'ปีหน้า', ['next year'], 'n', ['time']],
   ['bpàt-jù-ban', 'ปัจจุบัน', ['now', 'the present'], 'n', ['time']],
+  ['bpέp', 'แป๊บ', ['a moment', 'a sec'], 'n', ['time']],
+  ['nʉng', 'นึง', ['one, said fast', 'one'], 'num', ['time'], 'nʉ̀ng as it is said after another word: bpέp nʉng.'],
 ])

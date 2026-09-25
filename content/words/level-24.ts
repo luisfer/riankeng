@@ -18,14 +18,14 @@ export default words(24, [
   ['ban-dai', 'บันได', ['stairs', 'ladder'], 'n', ['city']],
   ['kɔɔn-doo', 'คอนโด', ['condo', 'apartment'], 'n', ['city']],
   ['dtʉ̀k', 'ตึก', ['building'], 'n', ['city']],
-  ['bpâai', 'ป้าย', ['sign', 'stop', 'bus stop'], 'n', ['city']],
+  ['bpâai', 'ป้าย', ['signboard', 'sign', 'stop', 'bus stop'], 'n', ['city']],
   ['tîi jɔ̀ɔt rót', 'ที่จอดรถ', ['car park', 'parking'], 'n', ['city']],
   // getting there
   ['rʉa', 'เรือ', ['boat'], 'n', ['travel']],
   ['krʉ̂ang bin', 'เครื่องบิน', ['plane', 'aeroplane', 'airplane'], 'n', ['travel']],
   ['win', 'วิน', ['motorbike rank', 'motorbike taxi stand'], 'n', ['travel'], 'The orange vests at the mouth of a soi.'],
   // the phone words
-  ['lai', 'ไลน์', ['LINE', 'the LINE app'], 'n', ['phone'], 'How Thailand actually messages.'],
+  ['lai', 'ไลน์', ['LINE', 'the LINE app'], 'n', ['phone'], 'How most of Thailand messages.'],
   ['έp', 'แอป', ['app'], 'n', ['phone'], 'Said short and high, whatever the spelling suggests.'],
   ['sà-gεεn', 'สแกน', ['scan', 'to scan'], 'v', ['phone']],
   // paperwork
@@ -35,6 +35,6 @@ export default words(24, [
   ['èek-gà-sǎan', 'เอกสาร', ['document', 'papers'], 'n', ['errand']],
   ['grɔ̀ɔk', 'กรอก', ['fill in', 'fill out'], 'v', ['errand']],
   ['bὲεp fɔɔm', 'แบบฟอร์ม', ['form', 'a form'], 'n', ['errand']],
-  ['sen', 'เซ็น', ['sign', 'to sign'], 'v', ['errand']],
+  ['sen', 'เซ็น', ['sign your name', 'to sign', 'sign'], 'v', ['errand']],
   ['laai sen', 'ลายเซ็น', ['signature'], 'n', ['errand']],
 ])

@@ -14,7 +14,7 @@ export default words(4, [
   ['gǔai-dtǐao', 'ก๋วยเตี๋ยว', ['noodles', 'noodle soup', 'rice noodles'], 'n', ['dish']],
   ['kâao dtôm', 'ข้าวต้ม', ['rice porridge', 'boiled rice soup', 'congee'], 'n', ['dish']],
   ['kài jiao', 'ไข่เจียว', ['omelette', 'Thai omelette', 'omelet'], 'n', ['dish']],
-  ['kài dao', 'ไข่ดาว', ['fried egg', 'sunny side up egg'], 'n', ['dish'], 'Literally "star egg".'],
+  ['kài daao', 'ไข่ดาว', ['fried egg', 'sunny side up egg'], 'n', ['dish'], 'Literally "star egg".'],
   ['gài tɔ̂ɔt', 'ไก่ทอด', ['fried chicken'], 'n', ['dish']],
   ['mǔu bpîng', 'หมูปิ้ง', ['grilled pork', 'grilled pork skewers', 'pork skewers'], 'n', ['dish']],
   // ingredients

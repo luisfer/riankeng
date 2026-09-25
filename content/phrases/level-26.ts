@@ -13,7 +13,7 @@ export default phrases(26, [
   ['sà-mə̌ə nʉ̀ng nʉ̀ng', 'เสมอหนึ่งหนึ่ง', ['a one all draw']],
   ['pǒm chia tiim níi', 'ผมเชียร์ทีมนี้', ['I support this team']],
   ['bpai sà-nǎam prûng-níi', 'ไปสนามพรุ่งนี้', ['going to the ground tomorrow']],
-  ['dtὲ bɔn tîi sà-nǎam', 'เตะบอลที่สนาม', ['play football at the ground']],
+  ['dtè bɔn tîi sà-nǎam', 'เตะบอลที่สนาม', ['play football at the ground']],
   ['pǒm mâi kɔ̂i chɔ̂ɔp', 'ผมไม่ค่อยชอบ', ['I do not really like it']],
   ['gʉ̀ap lʉʉm lέεo', 'เกือบลืมแล้ว', ['I almost forgot']],
   ['bprà-maan hâa-sìp bàat', 'ประมาณห้าสิบบาท', ['about fifty baht']],

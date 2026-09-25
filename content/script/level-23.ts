@@ -8,4 +8,5 @@ export default scriptWords(23, [
   ['kun', 'คุณ', ['you', 'Mr/Ms'], 'pron', ['bridge', 'voice:w:kun', 'parts:ค+ุ+ณ']],
   ['kɔɔ#2', 'ฆ', ['low-class k', 'the letter k (kɔɔ rá-kang)'], 'n', ['letter'], 'Same sound as ค. เมฆ, cloud.'],
   ['mêek', 'เมฆ', ['cloud'], 'n', ['bridge', 'voice:w:mêek', 'parts:เ+ม+ฆ'], 'ฆ at the end reads k.'],
+  ['kɔ̀ɔp kun', 'ขอบคุณ', ['thank you'], 'expr', ['bridge', 'voice:w:kɔ̀ɔp kun', 'parts:ข+อ+บ+ค+ุ+ณ'], 'บ at the end says p. ณ at the end says n.'],
 ])

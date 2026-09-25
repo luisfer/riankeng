@@ -567,12 +567,14 @@ html[data-session="in"] .signin-row { grid-template-columns: auto; justify-conte
 .try .answer-form { margin-top: 0; }
 .try .roman-field { font-size: 34px; }
 .try .feedback { margin-top: 4px; }
+/* Right's lacquer square hangs in the margin, so the word lines up with everything above it. */
+.try .session-feedback.ok::before { margin-left: -20px; }
 .try-pair { display: grid; gap: 4px; padding: 8px 0 4px; }
 .try-pair .pair-line { font-size: 30px; }
 .try-pair .pair-line.rom {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: baseline;
   gap: 12px 20px;
 }
 .try-pair .prompt-tools {
@@ -765,6 +767,19 @@ html[data-session="in"] .signin-row { grid-template-columns: auto; justify-conte
   .signin-row .btn.commit { justify-self: start; }
   /* The bar has room for the mark and two keys, not the name. */
   html[data-stuck] .nav .wordmark-name { display: none; }
+  /* A phrase needs the card's width to be read while it is typed. The keys stay under the line,
+     and Check stands under them, where Continue and Next stand. */
+  .try .answer-form { grid-template-columns: minmax(0, 1fr); }
+  .try .roman-field { font-size: 28px; }
+  .try .answer-form > .btn.commit {
+    grid-column: 1;
+    grid-row: 3;
+    justify-self: end;
+    margin: 20px 0 0;
+    border-radius: 2px;
+  }
+  /* Four tone keys do not fit one phone row. Two by two, not three and one. */
+  .try .strip-group:has(.strip-k.tone) { display: grid; grid-template-columns: repeat(2, max-content); gap: 8px 28px; }
   /* The bar's form opens under the bar at the page's gutters, not under its key. */
   html[data-stuck] .nav .nav-wait[data-open] .waitlist-row {
     position: fixed;
@@ -777,16 +792,4 @@ html[data-session="in"] .signin-row { grid-template-columns: auto; justify-conte
 @media (max-width: 374px) {
   /* The narrowest phones keep one key in the bar. Log in waits at the top of the page. */
   html[data-stuck] .nav .nav-login { display: none; }
-  /* The line takes the card's width and Check stands under it, so the keys stay on the card. */
-  .try .answer-form { grid-template-columns: minmax(0, 1fr); }
-  .try .roman-field { font-size: 28px; }
-  .try .answer-form > .btn.commit {
-    grid-column: 1;
-    grid-row: 2;
-    justify-self: end;
-    margin: 14px 0 0;
-    border-radius: 2px;
-  }
-  .try .strip { grid-row: 3; }
-  .try .strip-group { flex-wrap: wrap; gap: 8px 18px; }
 }

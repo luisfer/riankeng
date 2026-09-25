@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import { clipUrl } from '@/audio/clip-url'
 import { stickPlaybackRate } from '@/audio/rate'
 import { gradeThai, type ThaiGrade } from '@/engine/grader-thai'
@@ -93,11 +93,13 @@ export function TryCard(props: { deck: DemoCard[] }) {
             lang="th"
             style={{ ['--em' as string]: card.balloon.em, ['--lines' as string]: card.balloon.lines.length }}
           >
+            {/* Text and breaks straight in the balloon, as comic.ts letters it. A span per line
+                would make each line its own flex item, side by side. */}
             {card.balloon.lines.map((line, i) => (
-              <span key={line}>
+              <Fragment key={line}>
                 {i > 0 && <br />}
                 {line}
-              </span>
+              </Fragment>
             ))}
           </span>
         )}
@@ -163,7 +165,8 @@ export function TryCard(props: { deck: DemoCard[] }) {
                 <Commit onClick={goWrite}>{landing.continue}</Commit>
               </div>
             )}
-            {line && (
+            {/* While writing, the line is there empty, so a miss fills it without moving the card. */}
+            {(line || !look) && (
               <p className={`feedback session-feedback${right ? ' ok' : ' miss'}`} role="status">
                 {line}
               </p>

@@ -228,7 +228,7 @@ input[type='checkbox']:disabled { cursor: default; opacity: 0.4; }
   margin-top: 12px;
   min-height: 30px;
 }
-.strip-group { display: flex; align-items: baseline; gap: 20px; }
+.strip-group { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 20px; }
 .strip-k {
   display: inline-flex;
   align-items: baseline;

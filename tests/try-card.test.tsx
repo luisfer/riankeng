@@ -107,4 +107,28 @@ describe('the live card', () => {
     expect(host.querySelector('.try')?.getAttribute('data-phase')).toBe('look')
     expect(host.querySelector('.try-rom')?.textContent).toBe(passenger.rom)
   })
+
+  it('letters a two-line balloon as one block, the way the comic does', () => {
+    const coffee = DEMO.find((d) => d.stem === 'coffee')!
+    expect(coffee.balloon.lines.length).toBe(2)
+    const host = render([coffee])
+    const balloon = host.querySelector('.try-panel .balloon')!
+    // Lines and a break straight in the balloon. A span per line lays them side by side in its flex box.
+    expect(balloon.querySelectorAll('span')).toHaveLength(0)
+    expect(balloon.querySelectorAll('br')).toHaveLength(1)
+    expect(balloon.textContent).toBe(coffee.balloon.lines.join(''))
+  })
+
+  it('keeps the feedback line in place while writing, so a miss does not move the card', () => {
+    const host = render()
+    expect(host.querySelector('.feedback')).toBeNull()
+    clickNamed(host, 'Continue')
+    const line = host.querySelector('.feedback')
+    expect(line?.textContent).toBe('')
+    expect(line?.getAttribute('role')).toBe('status')
+    type(host, 'abc')
+    check(host)
+    expect(host.querySelector('.feedback')?.textContent).toMatch(/It is/)
+  })
 })
+

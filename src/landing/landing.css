@@ -50,6 +50,8 @@ h3 {
   padding: 0 32px;
 }
 :focus-visible { outline: 2px solid var(--lacquer); outline-offset: 3px; }
+/* The answer line is its own focus mark: its rule turns lacquer while it holds the caret. */
+.roman-field:focus-visible { outline: none; }
 
 /* The thin lacquer line is body::before. Once the page moves, the nav sticks
    and that line grows into the bar. */
@@ -184,6 +186,7 @@ html[data-stuck] .nav .nav-wait {
 html[data-stuck] .nav-join {
   height: 36px;
   padding: 0 14px;
+  white-space: nowrap;
   background: var(--on-lacquer);
   color: var(--lacquer);
   border: 2px solid var(--on-lacquer);
@@ -662,7 +665,8 @@ html[data-session="in"] .signin-row { grid-template-columns: auto; justify-conte
     animation: ink-in 480ms var(--ease) both;
     animation-delay: calc(var(--i, 0) * 70ms);
   }
-  html[data-stuck] .nav-wait { animation: bar-join 420ms var(--ease) both; }
+  /* backwards, not both: a kept transform would trap the fixed form in the key's box. */
+  html[data-stuck] .nav-wait { animation: bar-join 420ms var(--ease) backwards; }
   .cell.title h1 em {
     animation: motto-speak 1100ms var(--ease) 420ms both;
   }
@@ -759,4 +763,30 @@ html[data-session="in"] .signin-row { grid-template-columns: auto; justify-conte
   .comic { gap: 10px; }
   .signin-row { grid-template-columns: minmax(0, 1fr); }
   .signin-row .btn.commit { justify-self: start; }
+  /* The bar has room for the mark and two keys, not the name. */
+  html[data-stuck] .nav .wordmark-name { display: none; }
+  /* The bar's form opens under the bar at the page's gutters, not under its key. */
+  html[data-stuck] .nav .nav-wait[data-open] .waitlist-row {
+    position: fixed;
+    top: 82px;
+    left: 20px;
+    right: 20px;
+    width: auto;
+  }
+}
+@media (max-width: 374px) {
+  /* The narrowest phones keep one key in the bar. Log in waits at the top of the page. */
+  html[data-stuck] .nav .nav-login { display: none; }
+  /* The line takes the card's width and Check stands under it, so the keys stay on the card. */
+  .try .answer-form { grid-template-columns: minmax(0, 1fr); }
+  .try .roman-field { font-size: 28px; }
+  .try .answer-form > .btn.commit {
+    grid-column: 1;
+    grid-row: 2;
+    justify-self: end;
+    margin: 14px 0 0;
+    border-radius: 2px;
+  }
+  .try .strip { grid-row: 3; }
+  .try .strip-group { flex-wrap: wrap; gap: 8px 18px; }
 }

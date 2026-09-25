@@ -7,6 +7,7 @@ import { RomanInput } from '@/input/RomanInput'
 import { Commit, HearBtn, TextBtn, Trail } from '@/ui/bits'
 import { PREVIEW_IDS, PREVIEW_VOICE } from './catalog'
 import { clearProgress, loadProgress, saveProgress } from './progress'
+import { rememberRef } from '@/landing/ref'
 import '@/styles.css'
 
 type PlaySlot = { audio: HTMLAudioElement | null }
@@ -219,4 +220,6 @@ function Preview() {
   )
 }
 
+// A link straight to the preview keeps its tag for the waitlist it leads to.
+rememberRef()
 createRoot(document.getElementById('root')!).render(<Preview />)

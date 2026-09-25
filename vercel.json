@@ -4,6 +4,10 @@
     { "source": "/gate.html", "destination": "/", "permanent": true },
     { "source": "/learn", "destination": "/learn/", "permanent": false }
   ],
+  "rewrites": [
+    { "source": "/privacy", "destination": "/privacy.html" },
+    { "source": "/terms", "destination": "/terms.html" }
+  ],
   "headers": [
     {
       "source": "/learn/(.*)",

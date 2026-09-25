@@ -270,8 +270,8 @@ def mark_png(optical: str, size: int) -> Image.Image:
 # ── the wordmark ──────────────────────────────────────────────────────────────
 
 
-def lockup() -> dict[str, str | int]:
-    """เรียนเก่ง over rian gèng, flush left, one vertical line through both tone marks."""
+def lockup_layout() -> tuple[list[Glyph], list[Glyph], float, float, float, float, float, int, int]:
+    """Glyphs and placement of the lockup: Thai at scale 1, the romanization at s."""
     th = thai("เรียนเก่ง")
     la = latin("rian gèng", TRACKING)
     tb, lb = bounds(th), bounds(la)
@@ -281,14 +281,20 @@ def lockup() -> dict[str, str | int]:
     th_base = tb[3]
     la_base = th_base + LEAD
     th_x, la_x = -tb[0], -lb[0] * s
+    width = round(max(tb[2] + th_x, lb[2] * s + la_x))
+    height = round(la_base - lb[1] * s)
+    return th, la, s, th_x, th_base, la_x, la_base, width, height
+
+
+def lockup() -> dict[str, str | int]:
+    """เรียนเก่ง over rian gèng, flush left, one vertical line through both tone marks."""
+    th, la, s, th_x, th_base, la_x, la_base, width, height = lockup_layout()
     parts = {
         "thaiInk": path([g for g in th if not g.tone], 1, th_x, th_base),
         "thaiMark": path([g for g in th if g.tone], 1, th_x, th_base),
         "romInk": path([g for g in la if not g.tone], s, la_x, la_base),
         "romMark": path([g for g in la if g.tone], s, la_x, la_base),
     }
-    width = round(max(tb[2] + th_x, lb[2] * s + la_x))
-    height = round(la_base - lb[1] * s)
     return {"width": width, "height": height, **parts}
 
 
@@ -320,6 +326,106 @@ def standalone(width, height, ink: str, mark: str) -> str:
         f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}"><title>{NAME}</title>'
         f'<path d="{ink}" fill="{INK}"/><path d="{mark}" fill="{LACQUER}"/></svg>\n'
     )
+
+
+# ── the share card ────────────────────────────────────────────────────────────
+
+SHARE = (1200, 630)
+SHARE_PANEL = "coffee"
+SHARE_FACES = {
+    "display": ROOT / "public/fonts/brygada-1918/brygada-1918-roman.woff2",
+    "display-italic": ROOT / "public/fonts/brygada-1918/brygada-1918-italic.woff2",
+    "ui": ROOT / "public/fonts/onest/onest.woff2",
+    "balloon": ROOT / "public/fonts/mali/mali-thai.woff2",
+}
+# The coffee panel's phrase and its balloon, as src/landing/demo.ts and scenes.css have them.
+SHARE_BALLOON = {"lines": ["ขอกาแฟเย็น", "หนึ่งแก้ว"], "em": 5.72, "bx": 44.4, "by": 15.9, "bw": 36.3, "bh": 18.6}
+
+
+def _face(key: str, size: int):
+    """A shipped woff2 as a Pillow face, shaped by Raqm so the headline keeps its kerning."""
+    from io import BytesIO
+
+    from PIL import ImageFont
+
+    f = TTFont(SHARE_FACES[key])
+    f.flavor = None
+    buf = BytesIO()
+    f.save(buf)
+    buf.seek(0)
+    return ImageFont.truetype(buf, size, layout_engine=ImageFont.Layout.RAQM)
+
+
+def _ink(canvas: Image.Image, contours: list[list[tuple[float, float]]], colour: str) -> None:
+    """Fill contours given in canvas pixels, at the canvas's own size."""
+    w, h = canvas.size
+    side = max(w, h)
+    grid = [[(x * 1000 / side, y * 1000 / side) for x, y in c] for c in contours]
+    cov = coverage(grid, side, 2).crop((0, 0, w, h))
+    canvas.paste(Image.new("RGB", (w, h), colour), (0, 0), cov)
+
+
+def share_card() -> Image.Image:
+    """1200x630 for link previews: the mark and lockup, the landing's headline, one drawn panel.
+    Drawn at twice the size and scaled down, so Mali's thin strokes survive at balloon size."""
+    from PIL import ImageDraw
+
+    u = 2
+    w, h = SHARE[0] * u, SHARE[1] * u
+    card = Image.new("RGB", (w, h), PAPER)
+    draw = ImageDraw.Draw(card)
+    margin = 72 * u
+
+    # The drawing, square, in the landing's ink frame, flush to the right margin.
+    side = h - 2 * margin
+    frame = 3 * u
+    art = Image.open(ROOT / f"art/scenes/{SHARE_PANEL}.png").convert("RGB")
+    inset = round(art.width * 22 / 1024)  # the crop gen-scenes.py makes, border and margin gone
+    panel = side - 2 * frame
+    art = art.crop((inset, inset, art.width - inset, art.height - inset)).resize((panel, panel), Image.Resampling.LANCZOS)
+    px = w - margin - side
+    card.paste(Image.new("RGB", (side, side), INK), (px, margin))
+    card.paste(art, (px + frame, margin + frame))
+
+    # Letter the balloon the way card.css does: Mali 500, centred, sized by the balloon's box.
+    b = SHARE_BALLOON
+    size = round(min(b["bw"] * 0.70 * panel / 100 / b["em"], b["bh"] * 0.58 * panel / 100 / len(b["lines"]) / 1.35))
+    face = _face("balloon", size)
+    cx, cy = px + frame + b["bx"] * panel / 100, margin + frame + b["by"] * panel / 100
+    for i, line in enumerate(b["lines"]):
+        y = cy + (i - (len(b["lines"]) - 1) / 2) * size * 1.35
+        draw.text((cx, y), line, font=face, fill="#1a1612", anchor="mm", language="th")
+
+    # The mark and the lockup beside it, as the site bar sets them.
+    mark = 96 * u
+    card.paste(mark_png("icon", mark), (margin, margin))
+    th, la, s, th_x, th_base, la_x, la_base, lw, lh = lockup_layout()
+    k = mark / lh
+    ox, oy = margin + mark + 22 * u, margin
+    parts = [
+        ([g for g in th if not g.tone], 1, th_x, th_base, INK),
+        ([g for g in th if g.tone], 1, th_x, th_base, LACQUER),
+        ([g for g in la if not g.tone], s, la_x, la_base, INK),
+        ([g for g in la if g.tone], s, la_x, la_base, LACQUER),
+    ]
+    for glyphs, scale, gx, gy, colour in parts:
+        _ink(card, polygons(glyphs, scale * k, ox + gx * k, oy + gy * k), colour)
+
+    # The headline, two lines, the second in lacquer italic as on the landing.
+    size = 64 * u
+    top = margin + mark + 92 * u
+    draw.text((margin - 3 * u, top), "Learn Thai as", font=_face("display", size), fill=INK, anchor="ls")
+    draw.text((margin - 3 * u, top + round(size * 1.18)), "Thais speak it.", font=_face("display-italic", size), fill=LACQUER, anchor="ls")
+    draw.text((margin, h - margin), "riangeng.com", font=_face("ui", 26 * u), fill="#5a5146", anchor="ls")
+    return card.resize(SHARE, Image.Resampling.LANCZOS)
+
+
+def write_share_card() -> None:
+    info = PngInfo()
+    info.add_text("Comment", "rian geng share card, drawn by scripts/gen-brand.py from Fahkwang, Didact Gothic, Brygada 1918, Onest (OFL) and the coffee panel")
+    out = ROOT / "public/og.png"
+    share_card().save(out, "PNG", optimize=True, pnginfo=info)
+    print(f"wrote public/og.png ({out.stat().st_size // 1024} KB)")
 
 
 # ── writing ───────────────────────────────────────────────────────────────────
@@ -388,7 +494,13 @@ def main() -> None:
     write("src/brand/paths.ts", "\n".join(ts))
 
     letter_landing(lockup_inline(lk))
+    write_share_card()
 
 
 if __name__ == "__main__":
-    main()
+    import sys
+
+    if "--og" in sys.argv:  # only the share card, leaving every other brand file as it is
+        write_share_card()
+    else:
+        main()

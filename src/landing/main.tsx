@@ -6,15 +6,13 @@ import { landing } from './copy'
 import { bindWaitlist } from './waitlist'
 import { DEMO, QUIET, TRY_ORDER } from './demo'
 import { TRY_EVENT, TryCard } from './TryCard'
+import { landingRedirect } from './redirect'
+import { rememberRef } from './ref'
 import './bar'
 
-// Old app URLs carried the route in the hash at /. The course lives at /learn/ now.
-if (location.hash.startsWith('#/')) {
-  location.replace(`/learn/${location.hash}`)
-} else if (matchMedia('(display-mode: standalone)').matches) {
-  // Installs from before the split start at /. They mean the course.
-  location.replace('/learn/')
-}
+const away = landingRedirect(location.hash, location.search, matchMedia('(display-mode: standalone)').matches)
+if (away) location.replace(away)
+rememberRef()
 
 const html = document.documentElement
 const forms = [...document.querySelectorAll<HTMLFormElement>('form[data-signin]')]

@@ -1,7 +1,8 @@
 import { Window } from 'happy-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { bindWaitlist } from '../src/landing/waitlist'
-import { handleWaitlist } from '../src/waitlist-join'
+import { currentRef, rememberRef } from '../src/landing/ref'
+import { handleWaitlist, normalizeEmail, normalizeSource } from '../src/waitlist-join'
 
 const thanks = "Thanks for joining the waitlist! We'll send you an email when this app is fully ready for you."
 
@@ -56,7 +57,7 @@ describe('waitlist form', () => {
     expect(el.querySelector('[data-waitlist-note]')?.textContent).toBe(thanks)
     expect(fetchMock).toHaveBeenCalledOnce()
     const [, init] = fetchMock.mock.calls[0] ?? []
-    expect(JSON.parse(String(init?.body))).toEqual({ email: 'ada@example.com', website: '' })
+    expect(JSON.parse(String(init?.body))).toEqual({ email: 'ada@example.com', website: '', source: null })
     close()
   })
 
@@ -123,3 +124,71 @@ describe('waitlist insert', () => {
     expect(fetchMock).not.toHaveBeenCalled()
   })
 })
+
+describe('waitlist addresses', () => {
+  it('keeps real addresses, lowercased', () => {
+    for (const ok of ['Ada@Example.com', 'first.last+tag@gmail.com', 'a@mail.go.th', 'a@xn--o3cw4h.xn--o3cw4h', ' ada@example.com ']) {
+      expect(normalizeEmail(ok), ok).toBe(ok.trim().toLowerCase())
+    }
+  })
+
+  it('refuses addresses no mail can reach', () => {
+    for (const bad of ['luis@gmail', 'luis@gmail,com', 'luis@@gmail.com', 'luis@.com', 'luis@gmail.com.', 'lu\tis@gmail.com', 'not-an-email', '@gmail.com', 'luis@', `${'a'.repeat(250)}@x.com`]) {
+      expect(normalizeEmail(bad), bad).toBeNull()
+    }
+  })
+
+  it('does not thank a mistyped address', async () => {
+    const fetchMock = vi.fn()
+    const res = await handleWaitlist(new Request('http://local/api/waitlist', {
+      method: 'POST',
+      body: JSON.stringify({ email: 'luis@gmail,com' }),
+    }), { url: 'https://example.supabase.co', key: 'service-role' }, fetchMock)
+    expect(res.status).toBe(400)
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+})
+
+describe('waitlist source tag', () => {
+  const env = { url: 'https://example.supabase.co', key: 'service-role' }
+  const post = (body: unknown) => new Request('http://local/api/waitlist', { method: 'POST', body: JSON.stringify(body) })
+
+  it('keeps short tags and drops anything else', () => {
+    expect(normalizeSource('X')).toBe('x')
+    expect(normalizeSource('li')).toBe('li')
+    expect(normalizeSource('cafe-cursor_bkk')).toBe('cafe-cursor_bkk')
+    expect(normalizeSource('a'.repeat(33))).toBeNull()
+    expect(normalizeSource('<script>')).toBeNull()
+    expect(normalizeSource(7)).toBeNull()
+    expect(normalizeSource('')).toBeNull()
+  })
+
+  it('stores the tag with the address', async () => {
+    const fetchMock = vi.fn<typeof fetch>(async () => new Response(null, { status: 201 }))
+    const res = await handleWaitlist(post({ email: 'ada@example.com', source: 'li' }), env, fetchMock)
+    expect(res.status).toBe(200)
+    expect(JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body))).toEqual({ email: 'ada@example.com', source: 'li' })
+  })
+
+  it('still saves the address when the table has no source column yet', async () => {
+    const fetchMock = vi.fn<typeof fetch>()
+      .mockResolvedValueOnce(jsonResponse(400, { code: 'PGRST204' }))
+      .mockResolvedValueOnce(new Response(null, { status: 201 }))
+    const res = await handleWaitlist(post({ email: 'ada@example.com', source: 'x' }), env, fetchMock)
+    expect(res.status).toBe(200)
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+    expect(JSON.parse(String(fetchMock.mock.calls[1]?.[1]?.body))).toEqual({ email: 'ada@example.com' })
+  })
+
+  it('keeps the tag for the tab, so it survives a trip through the preview', () => {
+    sessionStorage.clear()
+    rememberRef('?ref=LINE')
+    expect(currentRef('')).toBe('line')
+    expect(currentRef('?ref=fb')).toBe('fb')
+    rememberRef('?ref=%3Cscript%3E')
+    expect(currentRef('')).toBe('line')
+    sessionStorage.clear()
+    expect(currentRef('')).toBeNull()
+  })
+})
+

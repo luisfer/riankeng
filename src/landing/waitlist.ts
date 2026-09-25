@@ -1,4 +1,5 @@
 import { landing } from './copy'
+import { currentRef } from './ref'
 import { normalizeEmail } from '../waitlist-join'
 
 /** The field opens, then a saved address says it was sent. */
@@ -32,7 +33,7 @@ export function bindWaitlist(form: HTMLFormElement, onOpen?: () => void): void {
     void fetch('/api/waitlist', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, website: trap?.value ?? '' }),
+      body: JSON.stringify({ email, website: trap?.value ?? '', source: currentRef() }),
     })
       .then(async (res) => {
         const data = (await res.json().catch(() => null)) as { ok?: boolean } | null

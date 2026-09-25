@@ -83,6 +83,11 @@ export function MeetNotes(props: { entry: { note?: string; literal?: string } })
   )
 }
 
+/** The card's place in the sitting: every card finished so far, a Look included, plus this one. */
+export function cardNumber(session: LiveSession): number {
+  return (session.step ?? session.answered) + 1
+}
+
 export function SessionView(props: {
   doc: ProgressDoc
   session: LiveSession
@@ -499,7 +504,7 @@ export function SessionView(props: {
         <p className="prompt session-prompt">{prompt}</p>
         {/* The card's place in this sitting, hung in the margin the way a primer numbers its exercises. */}
         <span className="session-no" aria-hidden="true">
-          {props.session.cursor + 1}
+          {cardNumber(props.session)}
         </span>
         <div className={`session-stimulus${right ? ' right' : ''}`}>
           {stimulus}

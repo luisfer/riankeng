@@ -310,3 +310,24 @@ describe('pick prompt', () => {
     expect(prompt).not.toMatch(silk.rom)
   })
 })
+
+describe('the number in the margin', () => {
+  it('counts every card of the sitting, a Look included', async () => {
+    const { afterMeet, markCorrect, requeueCurrent } = await import('../src/engine/session')
+    const { cardNumber } = await import('../src/ui/Session')
+    const base = { startedAt: 1, level: 0, track: 'voice' as const, cursor: 0, answered: 0, correct: 0, hold: null, voiceOrder: 2 as const }
+    let s: import('../src/engine/session').LiveSession = { ...base, queue: [{ id: 'w:maa', modality: 'th-en', salt: '1', meet: true }, { id: 'w:máa', modality: 'th-en', salt: '2' }] }
+    expect(cardNumber(s)).toBe(1)
+    s = afterMeet(s)
+    expect(cardNumber(s)).toBe(2)
+    s = requeueCurrent(s)
+    expect(cardNumber(s)).toBe(3)
+    s = markCorrect(s)
+    expect(cardNumber(s)).toBe(4)
+  })
+
+  it('reads an older sitting by its answers', async () => {
+    const { cardNumber } = await import('../src/ui/Session')
+    expect(cardNumber({ startedAt: 1, level: 0, cursor: 0, answered: 5, correct: 4, hold: null, queue: [] })).toBe(6)
+  })
+})

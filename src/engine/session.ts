@@ -40,6 +40,15 @@ export interface LiveSession {
   pending?: { ok: boolean; text: string }
   /** 2 for a sitting started after the Voice reorder. An older one names a level by its old number. */
   voiceOrder?: 2
+  /**
+   * Cards finished in this sitting, a Look included. The queue turns and its cursor goes back to 0,
+   * so the number in the margin is this plus one. Older sittings count from their answers.
+   */
+  step?: number
+}
+
+function stepped(session: LiveSession): number {
+  return (session.step ?? session.answered) + 1
 }
 
 export const SESSION_SIZE = 16
@@ -210,8 +219,8 @@ export function afterMeet(session: LiveSession): LiveSession {
   if (!item?.meet) return session
   const tested = { ...item, meet: false }
   const rest = session.queue.slice(session.cursor + 1)
-  if (rest.length === 0) return { ...session, queue: [tested], cursor: 0 }
-  return { ...session, queue: [...rest, tested], cursor: 0 }
+  if (rest.length === 0) return { ...session, queue: [tested], cursor: 0, step: stepped(session) }
+  return { ...session, queue: [...rest, tested], cursor: 0, step: stepped(session) }
 }
 
 export function markCorrect(session: LiveSession): LiveSession {
@@ -222,6 +231,7 @@ export function markCorrect(session: LiveSession): LiveSession {
     correct: session.correct + 1,
     hold: null,
     pending: undefined,
+    step: stepped(session),
   }
 }
 
@@ -281,6 +291,7 @@ export function requeueCurrent(session: LiveSession): LiveSession {
     cursor: 0,
     hold: null,
     pending: undefined,
+    step: stepped(session),
   }
 }
 

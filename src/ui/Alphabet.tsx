@@ -36,7 +36,8 @@ function consonantLine(c: Consonant): string {
   const word = exampleWord(c.name)
   const line = c.initial ? `${c.initial}, ${word}` : word
   const ends = c.final && c.final !== c.initial && /^(k|p|t|n)$/.test(c.final)
-  return ends ? `${line}, ends ${c.final}` : line
+  // A no-break space keeps the sound with its word in the narrow cells.
+  return ends ? `${line}, ends\u00a0${c.final}` : line
 }
 
 function Grid(props: { cells: Cell[]; onOpen: (n: number) => void; unlocked?: (n: number) => boolean }) {

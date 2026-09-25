@@ -38,6 +38,11 @@ def dump_catalog() -> None:
     )
 
 
+def spoken(thai: str) -> str:
+    """What the voice says. Premwadee is a woman, so of ครับ/ค่ะ she says ค่ะ, not both."""
+    return thai.replace("ครับ/", "")
+
+
 def load_rows(level: int | None) -> list[dict]:
     rows = json.loads(CATALOG.read_text())
     if level is None:
@@ -95,7 +100,7 @@ async def run(rows: list[dict], force: bool, concurrency: int) -> tuple[int, int
             return
         if dest.exists():
             dest.unlink()
-        text = OVERRIDES.get(row["id"], row["thai"])
+        text = OVERRIDES.get(row["id"], spoken(row["thai"]))
         if not text.strip():
             async with lock:
                 fail += 1

@@ -1,6 +1,6 @@
 import { phrases } from '../build'
 
-export default phrases(15, [
+export default phrases(17, [
   ['tâa pǒm wâang pǒm jà maa', 'ถ้าผมว่างผมจะมา', ['if I am free I will come']],
   ['prɔ́ wâa fǒn dtòk', 'เพราะว่าฝนตก', ['because it is raining']],
   ['pǒm yàak bpai dtὲε mâi wâang', 'ผมอยากไปแต่ไม่ว่าง', ['I want to go but I am not free']],

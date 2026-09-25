@@ -1,6 +1,6 @@
 import { phrases } from '../build'
 
-export default phrases(22, [
+export default phrases(24, [
   ['wan níi wan tîi tâo-rài', 'วันนี้วันที่เท่าไร', ['what is the date today', 'what date is it today']],
   ['dʉan níi dʉan à-rai', 'เดือนนี้เดือนอะไร', ['what month is this', 'which month is it']],
   ['gə̀ət dʉan à-rai', 'เกิดเดือนอะไร', ['which month were you born', 'what month were you born in']],

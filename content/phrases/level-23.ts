@@ -1,6 +1,6 @@
 import { phrases } from '../build'
 
-export default phrases(21, [
+export default phrases(23, [
   ['pǒm pûut tai dâi lέεo', 'ผมพูดไทยได้แล้ว', ['I can speak Thai now']],
   ['bprà-yòok níi kâo jai ngâai', 'ประโยคนี้เข้าใจง่าย', ['this sentence is easy to understand']],
   ['kwaam mǎai kʉʉ à-rai', 'ความหมายคืออะไร', ['what does it mean']],

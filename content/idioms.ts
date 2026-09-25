@@ -1,6 +1,6 @@
 import { idioms } from './build'
 
-export default idioms(20, [
+export default idioms(22, [
   ['yàa jai rɔ́ɔn', 'อย่าใจร้อน', ['do not be impatient', 'do not be hot-headed'], '', 'do not have a hot heart'],
   ['greeng jai mâak', 'เกรงใจมาก', ['very reluctant to impose', 'I really do not want to impose']],
   ['mii nám jai', 'มีน้ำใจ', ['be kind', 'have a generous heart']],

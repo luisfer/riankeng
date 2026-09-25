@@ -14,6 +14,7 @@ export function toExport(doc: ProgressDoc, now = Date.now()): ProgressExport {
     items: Object.values(doc.items),
     sessions: doc.sessions,
     opened: doc.opened,
+    voiceOrder: 2,
   }
 }
 

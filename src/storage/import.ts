@@ -1,7 +1,7 @@
 import { getEntry } from '@content/index'
 import { currentId } from '@content/aliases'
 import { applyAttempt, newItemProgress, type Attempt, type ItemProgress } from '@/engine/srs'
-import { DEFAULT_SETTINGS, emptyDoc, type ProgressDoc, type ProgressExport, type Settings } from './progress-schema'
+import { DEFAULT_SETTINGS, emptyDoc, reorderedSession, reorderedVoiceFloor, type ProgressDoc, type ProgressExport, type Settings } from './progress-schema'
 
 export interface ImportPreview {
   ok: boolean
@@ -177,14 +177,19 @@ export function applyImport(doc: ProgressDoc, incoming: ProgressExport, now = Da
     items[item.id] = mergeItem(items[item.id], item)
   }
   const opened = incoming.opened
+  // A file saved before the Voice reorder carries the old level numbers.
+  const reordered = incoming.voiceOrder === 2
+  const incomingVoice = reordered ? level(opened?.voice) : reorderedVoiceFloor(level(opened?.voice))
+  const incomingSessions = reordered ? incoming.sessions : (incoming.sessions ?? []).map(reorderedSession)
   return {
     ...doc,
     updatedAt: now,
     settings: { ...DEFAULT_SETTINGS, ...doc.settings, ...presentSettings(incoming.settings) },
     items,
-    sessions: mergeSessions(doc.sessions, incoming.sessions),
+    sessions: mergeSessions(doc.sessions, incomingSessions),
+    voiceOrder: 2,
     opened: {
-      voice: Math.max(level(doc.opened?.voice), level(opened?.voice)),
+      voice: Math.max(level(doc.opened?.voice), incomingVoice),
       script: Math.max(level(doc.opened?.script), level(opened?.script)),
     },
   }

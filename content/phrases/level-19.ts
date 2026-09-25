@@ -1,6 +1,6 @@
 import { phrases } from '../build'
 
-export default phrases(17, [
+export default phrases(19, [
   ['gin ná', 'กินนะ', ['eat, will you', 'do eat']],
   ['bpai sì', 'ไปสิ', ['just go', 'go on']],
   ['jing rə̌ə', 'จริงเหรอ', ['really?', 'is that true']],

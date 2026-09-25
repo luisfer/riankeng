@@ -1,6 +1,6 @@
 import { phrases } from '../build'
 
-export default phrases(18, [
+export default phrases(20, [
   ['wan níi bpai tîao', 'วันนี้ไปเที่ยว', ['today I am going out']],
   ['nát gan tîi nǎi', 'นัดกันที่ไหน', ['where shall we meet']],
   ['kui gan ná', 'คุยกันนะ', ['let us chat', 'talk soon']],

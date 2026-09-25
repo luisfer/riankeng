@@ -1,6 +1,6 @@
 import { words } from '../build'
 
-export default words(17, [
+export default words(19, [
   ['sì', 'สิ', ['insist', 'do it'], 'particle', ['particle']],
   ['rə̌ə', 'เหรอ', ['oh really', 'is that so'], 'particle', ['particle']],
   ['rɔ̀k', 'หรอก', ['not at all', 'no way (soft)'], 'particle', ['particle']],

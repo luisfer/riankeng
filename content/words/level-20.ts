@@ -1,6 +1,6 @@
 import { words } from '../build'
 
-export default words(18, [
+export default words(20, [
   ['nát', 'นัด', ['appointment', 'to make a date'], 'n', ['city']],
   ['kui', 'คุย', ['chat', 'to chat', 'talk'], 'v', ['city']],
   ['dtòk long', 'ตกลง', ['agree', 'deal'], 'v', ['city']],

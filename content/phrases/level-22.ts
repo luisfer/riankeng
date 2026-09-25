@@ -1,6 +1,6 @@
 import { phrases } from '../build'
 
-export default phrases(20, [
+export default phrases(22, [
   ['jai yen nɔ̀i', 'ใจเย็นหน่อย', ['calm down a bit', 'be patient', 'calm down', 'take it easy']],
   ['yàa greeng jai', 'อย่าเกรงใจ', ['do not be shy about asking', 'no need to hesitate']],
   ['kun mii nám jai', 'คุณมีน้ำใจ', ['you are kind']],

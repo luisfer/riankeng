@@ -1,6 +1,6 @@
 import { words } from '../build'
 
-export default words(12, [
+export default words(13, [
   ['rúu-sʉ̀k', 'รู้สึก', ['feel', 'to feel'], 'v', ['feel']],
   ['bpùai', 'ป่วย', ['ill', 'sick'], 'adj', ['feel']],
   ['jèp', 'เจ็บ', ['hurt', 'in pain', 'painful'], 'v', ['feel']],

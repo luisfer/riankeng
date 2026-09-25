@@ -1,6 +1,6 @@
 import { words } from '../build'
 
-export default words(21, [
+export default words(23, [
   ['sǎm-nuan', 'สำนวน', ['proverb', 'saying', 'idiom'], 'n', ['fluency']],
   ['pûut dâi', 'พูดได้', ['can speak'], 'expr', ['fluency']],
   ['pûut dâi lέεo', 'พูดได้แล้ว', ['can speak already'], 'expr', ['fluency']],

@@ -1,6 +1,6 @@
 import { phrases } from '../build'
 
-export default phrases(23, [
+export default phrases(25, [
   ['mii pîi-nɔ́ɔng gìi kon', 'มีพี่น้องกี่คน', ['how many brothers and sisters do you have', 'how many siblings do you have']],
   ['pǒm mii nɔ́ɔng-sǎao sɔ̌ɔng kon', 'ผมมีน้องสาวสองคน', ['I have two younger sisters']],
   ['krɔ̂ɔp-krua pǒm mii hâa kon', 'ครอบครัวผมมีห้าคน', ['there are five in my family']],

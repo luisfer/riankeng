@@ -1,6 +1,6 @@
 import { phrases } from '../build'
 
-export default phrases(16, [
+export default phrases(18, [
   ['nîi dii gwàa', 'นี่ดีกว่า', ['this is better']],
   ['kâao pàt pεεng gwàa pàt tai', 'ข้าวผัดแพงกว่าผัดไทย', ['fried rice is more expensive than pad thai']],
   ['an nǎi yài tîi-sùt', 'อันไหนใหญ่ที่สุด', ['which one is the biggest']],

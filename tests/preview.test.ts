@@ -80,8 +80,8 @@ describe('public sitting', () => {
   it('closes on the twenty-five words and the waitlist, in plain copy', () => {
     const main = source('src/preview/main.tsx')
     const copy = [
-      'Congratulations. You learned your first {TOTAL} words in Thai.',
-      'Join the waitlist to continue your journey with Thai.',
+      '{TOTAL} words of daily speech, heard and written.',
+      'The course carries on from these words. It opens to the waitlist first.',
       'Start over',
       'Previous word',
       'Next word',

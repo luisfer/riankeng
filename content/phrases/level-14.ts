@@ -1,6 +1,6 @@
 import { phrases } from '../build'
 
-export default phrases(25, [
+export default phrases(14, [
   ['grà-bpǎo pǒm hǎai', 'กระเป๋าผมหาย', ['my bag is missing', 'I lost my bag']],
   ['mii kà-mooi', 'มีขโมย', ['there is a thief', 'we have been robbed']],
   ['chûai rîak dtam-rùat', 'ช่วยเรียกตำรวจ', ['please call the police']],

@@ -38,6 +38,8 @@ export interface LiveSession {
   review?: boolean
   /** Last Check on the current card, so resume and Pause know the verdict. */
   pending?: { ok: boolean; text: string }
+  /** 2 for a sitting started after the Voice reorder. An older one names a level by its old number. */
+  voiceOrder?: 2
 }
 
 export const SESSION_SIZE = 16
@@ -107,6 +109,7 @@ export function startSession(doc: ProgressDoc, now = Date.now(), level?: number,
     answered: 0,
     correct: 0,
     hold: null,
+    voiceOrder: 2,
   }
 }
 
@@ -144,6 +147,7 @@ export function startReviewSession(
     correct: 0,
     hold: null,
     review: true,
+    voiceOrder: 2,
   }
 }
 
@@ -169,6 +173,8 @@ export function sittingModality(item: QueueItem, canHear: boolean): QueueItem['m
 
 function sittingOpen(session: LiveSession | null): session is LiveSession {
   if (!session) return false
+  // A Voice sitting saved before the reorder names its level by the old number. Start afresh.
+  if ((session.track ?? 'voice') === 'voice' && session.voiceOrder !== 2) return false
   if (session.queue.length === 0 || session.cursor >= session.queue.length) return false
   return session.queue.every((q) => Boolean(getEntry(q.id)))
 }

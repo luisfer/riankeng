@@ -1,6 +1,6 @@
 import { phrases } from '../build'
 
-export default phrases(19, [
+export default phrases(21, [
   ['pǒm kít wâa dii', 'ผมคิดว่าดี', ['I think it is good']],
   ['pǒm rúu-sʉ̀k wâa pìt', 'ผมรู้สึกว่าผิด', ['I feel that it is wrong']],
   ['pǒm hěn dûai', 'ผมเห็นด้วย', ['I agree']],

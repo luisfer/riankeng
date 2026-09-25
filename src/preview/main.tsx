@@ -26,7 +26,7 @@ const TOTAL = PREVIEW_VOICE.length
 function Finish(props: { slot: PlaySlot; onAgain: () => void }) {
   return (
     <div className="preview-finish">
-      <h1 className="preview-finish-h">Congratulations. You learned your first {TOTAL} words in Thai.</h1>
+      <h1 className="preview-finish-h">{TOTAL} words of daily speech, heard and written.</h1>
       <ul className="preview yours-list">
         {PREVIEW_VOICE.map((w) => (
           <li key={w.id} className="quiet-row yours-row">
@@ -43,7 +43,7 @@ function Finish(props: { slot: PlaySlot; onAgain: () => void }) {
           </li>
         ))}
       </ul>
-      <p className="preview-finish-lede">Join the waitlist to continue your journey with Thai.</p>
+      <p className="preview-finish-lede">The course carries on from these words. It opens to the waitlist first.</p>
       <div className="preview-finish-act">
         <a className="btn commit" href="/#close">
           Join the waitlist

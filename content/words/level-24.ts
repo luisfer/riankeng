@@ -1,6 +1,6 @@
 import { words } from '../build'
 
-export default words(22, [
+export default words(24, [
   // the twelve months. -kom months are 31 days, -yon months are 30.
   ['má-gà-raa-kom', 'มกราคม', ['January'], 'n', ['month']],
   ['gum-paa-pan', 'กุมภาพันธ์', ['February'], 'n', ['month']],

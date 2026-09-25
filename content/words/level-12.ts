@@ -1,6 +1,6 @@
 import { words } from '../build'
 
-export default words(24, [
+export default words(12, [
   // booking and paying
   ['jɔɔng', 'จอง', ['book', 'reserve', 'to book'], 'v', ['errand']],
   ['châo', 'เช่า', ['rent', 'to rent', 'hire'], 'v', ['errand']],

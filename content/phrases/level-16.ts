@@ -1,6 +1,6 @@
 import { phrases } from '../build'
 
-export default phrases(14, [
+export default phrases(16, [
   ['wan níi fǒn dtòk', 'วันนี้ฝนตก', ['it is raining today']],
   ['aa-gàat rɔ́ɔn', 'อากาศร้อน', ['the weather is hot']],
   ['aa-gàat nǎao', 'อากาศหนาว', ['the weather is cold']],

@@ -1,3 +1,4 @@
+import { VOICE_REORDER } from '@content/levels'
 import type { TrackId } from '@content/types'
 import type { Attempt, ItemProgress, Modality } from '@/engine/srs'
 
@@ -56,6 +57,25 @@ export interface ProgressDoc {
   sessions: SessionLog[]
   /** Highest level that has opened on each track. A miss cannot lower this. */
   opened?: { voice: number; script: number }
+  /** 2 once Voice level numbers follow the order of 26 Sep 2026, Errands and Trouble early. */
+  voiceOrder?: 2
+}
+
+/**
+ * A Voice floor saved under the old order, in the new one. Every level that was open stays
+ * open: the floor becomes the highest new place of any level at or below the old floor.
+ */
+export function reorderedVoiceFloor(old: number): number {
+  if (old >= VOICE_REORDER.length) return old
+  let floor = 0
+  for (let l = 0; l <= old; l++) floor = Math.max(floor, VOICE_REORDER[l]!)
+  return floor
+}
+
+/** A Voice sitting in the log, renumbered. Script sittings keep their level. */
+export function reorderedSession(s: SessionLog): SessionLog {
+  if ((s.track ?? 'voice') !== 'voice' || !Number.isInteger(s.level) || s.level < 0 || s.level >= VOICE_REORDER.length) return s
+  return { ...s, level: VOICE_REORDER[s.level]! }
 }
 
 function isIsoDay(value: unknown): value is string {
@@ -88,15 +108,20 @@ export function sanitizeDoc(doc: ProgressDoc): ProgressDoc {
     if (item) items[item.id] = item
   }
   const opened = doc.opened
+  const voice = Number.isFinite(opened?.voice) ? Math.max(0, Math.trunc(opened!.voice)) : 0
+  const sessions = Array.isArray(doc.sessions) ? doc.sessions : []
+  // A document from before the reorder is renumbered once, and marked so it never is again.
+  const reordered = doc.voiceOrder === 2
   return {
     ...doc,
     settings: { ...DEFAULT_SETTINGS, ...doc.settings },
     items,
-    sessions: Array.isArray(doc.sessions) ? doc.sessions : [],
+    sessions: reordered ? sessions : sessions.map(reorderedSession),
     opened: {
-      voice: Number.isFinite(opened?.voice) ? Math.max(0, Math.trunc(opened!.voice)) : 0,
+      voice: reordered ? voice : reorderedVoiceFloor(voice),
       script: Number.isFinite(opened?.script) ? Math.max(0, Math.trunc(opened!.script)) : 0,
     },
+    voiceOrder: 2,
   }
 }
 
@@ -109,6 +134,7 @@ export function emptyDoc(now = Date.now()): ProgressDoc {
     settings: { ...DEFAULT_SETTINGS },
     items: {},
     sessions: [],
+    voiceOrder: 2,
   }
 }
 
@@ -206,6 +232,7 @@ export interface ProgressExport {
   items: ItemProgress[]
   sessions: SessionLog[]
   opened?: { voice: number; script: number }
+  voiceOrder?: 2
 }
 
 export type { ItemProgress, Modality }

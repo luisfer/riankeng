@@ -1,6 +1,6 @@
 import { words } from '../build'
 
-export default words(20, [
+export default words(22, [
   ['jai yen', 'ใจเย็น', ['calm', 'cool-hearted', 'patient'], 'adj', ['heart']],
   ['lɔɔi', 'ลอย', ['float', 'to float'], 'v', ['heart']],
   ['sûu', 'สู้', ['fight', 'to fight', 'face up to'], 'v', ['heart']],

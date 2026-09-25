@@ -4,7 +4,7 @@ import { bindWaitlist } from '../src/landing/waitlist'
 import { currentRef, rememberRef } from '../src/landing/ref'
 import { handleWaitlist, normalizeEmail, normalizeSource } from '../src/waitlist-join'
 
-const thanks = "Thanks for joining the waitlist! We'll send you an email when this app is fully ready for you."
+const thanks = 'Thanks. One email goes to this address when the course opens.'
 
 function form() {
   const window = new Window()

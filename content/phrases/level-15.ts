@@ -1,6 +1,6 @@
 import { phrases } from '../build'
 
-export default phrases(13, [
+export default phrases(15, [
   ['mii bprà-chum wan níi', 'มีประชุมวันนี้', ['there is a meeting today']],
   ['pǒm tam-ngaan tîi bâan', 'ผมทำงานที่บ้าน', ['I work at home', 'I work from home']],
   ['sòng ii-meen nɔ̀i', 'ส่งอีเมลหน่อย', ['please send an email']],

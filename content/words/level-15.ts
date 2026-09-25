@@ -1,6 +1,6 @@
 import { words } from '../build'
 
-export default words(13, [
+export default words(15, [
   ['bprà-chum', 'ประชุม', ['meeting'], 'n', ['work']],
   ['ɔ́ɔp-fít', 'ออฟฟิศ', ['office', 'the office'], 'n', ['work'], 'The everyday loanword. sǎm-nák-ngaan is the formal one.'],
   ['sǎm-nák-ngaan', 'สำนักงาน', ['office[, formal]', 'bureau'], 'n', ['work']],

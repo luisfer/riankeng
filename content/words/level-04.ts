@@ -80,4 +80,5 @@ export default words(4, [
   ['pí-sèet', 'พิเศษ', ['extra', 'large portion', 'special'], 'adj', ['dish'], 'On a menu, the bigger plate for a few baht more.'],
   ['hɔ̀ɔ', 'ห่อ', ['wrap', 'wrap to go'], 'v', ['dish']],
   ['tùa', 'ถั่ว', ['peanuts', 'beans', 'nuts'], 'n', ['dish']],
+  ['tá-lee', 'ทะเล', ['sea', 'ocean'], 'n', ['place']],
 ])

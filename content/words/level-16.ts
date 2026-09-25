@@ -1,6 +1,6 @@
 import { words } from '../build'
 
-export default words(14, [
+export default words(16, [
   ['fǒn', 'ฝน', ['rain'], 'n', ['weather']],
   ['fǒn dtòk', 'ฝนตก', ['it is raining', 'rain falls'], 'expr', ['weather']],
   ['nǎao', 'หนาว', ['cold'], 'adj', ['weather']],
@@ -15,7 +15,6 @@ export default words(14, [
   ['fai fáa', 'ไฟฟ้า', ['electricity'], 'n', ['weather']],
   ['fáa lε̂εp', 'ฟ้าแลบ', ['lightning'], 'n', ['weather']],
   ['náam tûam', 'น้ำท่วม', ['flood'], 'n', ['weather']],
-  ['tá-lee', 'ทะเล', ['sea', 'ocean'], 'n', ['place']],
   ['puu-kǎo', 'ภูเขา', ['mountain'], 'n', ['place']],
   ['mε̂ε náam', 'แม่น้ำ', ['river'], 'n', ['place']],
   ['gɔ̀', 'เกาะ', ['island'], 'n', ['place']],

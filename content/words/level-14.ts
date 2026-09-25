@@ -1,6 +1,6 @@
 import { words } from '../build'
 
-export default words(25, [
+export default words(14, [
   // when something goes wrong
   ['hǎai', 'หาย', ['lost', 'missing', 'disappear', 'gone'], 'v', ['trouble'], 'Also what an illness does when it goes.'],
   ['kà-mooi', 'ขโมย', ['thief', 'steal'], 'n', ['trouble']],

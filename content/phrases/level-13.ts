@@ -1,6 +1,6 @@
 import { phrases } from '../build'
 
-export default phrases(12, [
+export default phrases(13, [
   ['kun sà-baai dii mái', 'คุณสบายดีไหม', ['how are you', 'are you well']],
   ['pǒm mâi sà-baai', 'ผมไม่สบาย', ['I am unwell', 'I am not well']],
   ['pǒm jèp', 'ผมเจ็บ', ['I am in pain', 'it hurts']],

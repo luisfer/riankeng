@@ -4,7 +4,7 @@ export const landing = {
   waitlist: 'Join the waitlist',
   waitlistJoin: 'Join',
   waitlistJoined: 'Joined.',
-  waitlistThanks: "Thanks for joining the waitlist! We'll send you an email when this app is fully ready for you.",
+  waitlistThanks: 'Thanks. One email goes to this address when the course opens.',
   waitlistNeed: 'Type an email.',
   waitlistFail: 'Could not save this.',
   open: 'Open the course',

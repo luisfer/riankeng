@@ -36,7 +36,7 @@ Voice unlocks the next level when the previous one is mastered. Script unlocks w
 
 ## Tracks
 
-- Voice 0–27: tones, survival, verbs, food, time, the city, particles, heart words, months, kin, errands, trouble, jobs, sayings.
+- Voice 0–27: tones, survival, verbs, food, time, the city, shopping, errands, health, trouble, work, particles, heart words, months, kin, jobs, sayings. Errands and Trouble moved up on 26 Sep 2026; `VOICE_REORDER` in `content/levels.ts` maps the old numbers.
 - Script 0–28: the whole script. All 44 consonants (including the two retired ones), every vowel sign, the short mark, the silent mark, ๆ, ฯ and the Thai digits. Each letter is taught before any word that uses it, and each bridge word is a Voice word. `content/script/alphabet.ts` is the checklist; tests hold the levels to it. `/learn/#/alphabet` shows the whole chart with where each letter is taught.
 
 Romanization follows the textbook system in `content/system.ts` (à â á ǎ, g/bp/dt, ε ɔ ə ʉ). The open e is stored as Greek ε.

@@ -1,6 +1,6 @@
 import { words } from '../build'
 
-export default words(15, [
+export default words(17, [
   ['tâa', 'ถ้า', ['if'], 'conj', ['link']],
   ['prɔ́', 'เพราะ', ['because'], 'conj', ['link']],
   ['prɔ́ wâa', 'เพราะว่า', ['because'], 'conj', ['link']],

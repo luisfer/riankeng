@@ -10,6 +10,9 @@ export const BANNED: Array<[RegExp, string]> = [
   [/anywhere in Thailand tonight/i, 'anywhere in Thailand tonight'],
   [/—/, 'em dash'],
   [/·/, 'middot'],
+  // An exclamation mark that ends a word, as in prose. Code's !== and <!doctype are not copy.
+  [/[A-Za-z]!(?=\s|$|["'”])/, 'exclamation mark'],
+  [/\bjourney\b/i, 'journey'],
 ]
 
 /** Every banned pattern a line trips, named. */

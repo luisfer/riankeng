@@ -46,6 +46,8 @@ export function mergeAccount(local: ProgressDoc, remote: ProgressDoc): ProgressD
       voice: Math.max(openedLevel(local, 'voice'), openedLevel(remote, 'voice')),
       script: Math.max(openedLevel(local, 'script'), openedLevel(remote, 'script')),
     },
+    // Both sides were read through sanitizeDoc, so both are already in the new order.
+    voiceOrder: 2,
   })
 }
 

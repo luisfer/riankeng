@@ -1,6 +1,6 @@
 import { words } from '../build'
 
-export default words(23, [
+export default words(25, [
   // the four grandparents. Thai names the side.
   ['bpùu', 'ปู่', ["father's father", 'grandfather', '(paternal) grandfather'], 'n', ['family'], "Father's father. Mother's father is dtaa."],
   ['dtaa#2', 'ตา', ["mother's father", 'grandfather', '(maternal) grandfather'], 'n', ['family'], 'Same letters as the eye you already read.'],

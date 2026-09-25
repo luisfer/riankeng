@@ -1,6 +1,6 @@
 import { words } from '../build'
 
-export default words(19, [
+export default words(21, [
   ['kít wâa', 'คิดว่า', ['I think', 'to think that'], 'v', ['mind']],
   ['rúu-sʉ̀k wâa', 'รู้สึกว่า', ['I feel that'], 'v', ['mind']],
   ['hěn dûai', 'เห็นด้วย', ['agree', 'I agree'], 'v', ['mind']],

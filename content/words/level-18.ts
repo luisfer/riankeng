@@ -1,6 +1,6 @@
 import { words } from '../build'
 
-export default words(16, [
+export default words(18, [
   ['gwàa', 'กว่า', ['more than', 'than'], 'adv', ['compare']],
   ['tîi-sùt', 'ที่สุด', ['the most', 'the -est'], 'adv', ['compare']],
   ['tâo gan', 'เท่ากัน', ['the same', 'equal'], 'adj', ['compare']],

@@ -721,6 +721,17 @@ li.quiet-row { cursor: default; }
   color: var(--ink-2);
   font-size: 16px;
 }
+/* A card's usage note, under its gloss when the card is met. Type, not a box. */
+.prompt-note {
+  margin: 4px 0 0;
+  max-width: 34em;
+  color: var(--ink-2);
+  font-family: var(--ui);
+  font-size: 16px;
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+.prompt-note + .prompt-note { margin-top: 0; }
 .prompt-row {
   display: flex;
   flex-wrap: wrap;

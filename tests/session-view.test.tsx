@@ -110,4 +110,18 @@ describe('SessionView', () => {
     expect(host.querySelector('.roman-field.en')).not.toBeNull()
     expect(host.querySelector('.prompt')?.textContent).toContain(chrome.writeMeaning)
   })
+
+  it('shows a card its usage note when the card is met', () => {
+    const session: LiveSession = { ...sitting(), queue: [{ id: 'w:kǎo', modality: 'th-en', salt: '1', meet: true }] }
+    const { host } = render(session)
+    expect(host.querySelector('.prompt-note')?.textContent).toBe('Said káo (high) in everyday speech.')
+  })
+
+  it('sets the Thai inside a note in the Thai face', () => {
+    const session: LiveSession = { ...sitting(), queue: [{ id: 'w:aa#2', modality: 'th-en', salt: '1', meet: true }] }
+    const { host } = render(session)
+    const thai = host.querySelector('.prompt-note .thai')
+    expect(thai?.getAttribute('lang')).toBe('th')
+  })
 })
+

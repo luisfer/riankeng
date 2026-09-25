@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { ENTRIES } from '../content/index'
 import { LEVELS } from '../content/levels'
 import { SCRIPT_LEVELS } from '../content/script/levels'
 import { landing } from '../src/landing/copy'
@@ -11,6 +12,8 @@ function learnerLines(): string[] {
     ...SCRIPT_LEVELS.map((l) => l.blurb),
     ...Object.values(chrome),
     ...Object.values(landing),
+    // Notes and word-for-word readings show on the card when it is met.
+    ...ENTRIES.flatMap((e) => [e.note ?? '', e.literal ?? '']).filter(Boolean),
   ]
 }
 

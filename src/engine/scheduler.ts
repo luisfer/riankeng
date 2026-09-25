@@ -291,6 +291,8 @@ export function chooseModality(entry: Entry, p: ItemProgress, salt: string, canH
   else if (r < 0.7) next = 'en-th'
   else if (r < 0.85) next = 'listen'
   else next = 'tone'
+  // A tone drill on "sà-wàt-dii kráp/kâ" would ask for both particles' tones at once.
+  if (next === 'tone' && entry.rom.includes('/')) next = 'th-en'
   if ((next === 'listen' || next === 'tone') && !canHear) return 'th-en'
   return next
 }

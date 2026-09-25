@@ -23,6 +23,7 @@ import type { ProgressDoc } from '@/storage/progress-schema'
 import { entryOrThrow, fromVoiceKnown, pairRoms, pickChoices, sittingSense, stampOpened } from '@/engine/scheduler'
 import { entryTrack } from '@content/index'
 import { judgeTonePick, toneBareShow } from '@/engine/tone-step'
+import { enThTarget, twinAnswer } from '@/engine/twins'
 import { prefetchClip } from '@/audio/clips'
 import { canHearThai, onVoices, speakSlower, speakThai, speechUnlocked } from '@/audio/tts'
 import { RomanInput } from '@/input/RomanInput'
@@ -45,7 +46,9 @@ export function slipSpans(target: string, slips: number[]): ReactNode {
   if (!slips.length) return target
   const out: ReactNode[] = []
   let at = 0
-  for (const [i, syllable] of analyseRom(target).syllables.entries()) {
+  for (const [i, chunk] of analyseRom(target).syllables.entries()) {
+    // A glottal break is written as a hyphen in the target, not as the apostrophe the skeleton keeps.
+    const syllable = chunk.replaceAll("'", '')
     const from = target.indexOf(syllable, at)
     if (from < 0) return target
     if (from > at) out.push(target.slice(at, from))
@@ -54,6 +57,30 @@ export function slipSpans(target: string, slips: number[]): ReactNode {
   }
   if (at < target.length) out.push(target.slice(at))
   return out
+}
+
+/** A card's usage note and word-for-word reading, shown when the card is met. Thai in a note sets in the Thai face. */
+export function MeetNotes(props: { entry: { note?: string; literal?: string } }) {
+  const { note, literal } = props.entry
+  if (!note && !literal) return null
+  return (
+    <>
+      {literal && <p className="prompt-note">Literally, {literal}.</p>}
+      {note && (
+        <p className="prompt-note">
+          {note.split(/([\u0E00-\u0E7F]+)/).map((part, i) =>
+            /[\u0E00-\u0E7F]/.test(part) ? (
+              <span key={i} className="thai" lang="th">
+                {showThai(part)}
+              </span>
+            ) : (
+              part
+            ),
+          )}
+        </p>
+      )}
+    </>
+  )
 }
 
 export function SessionView(props: {
@@ -198,13 +225,18 @@ export function SessionView(props: {
       else setAck({ ok: false, text: `Type it exactly: ${hold.target}` })
       return
     }
-    const g = gradeThai(entry.rom, answer)
+    const writingFromEnglish = modality === 'en-th'
+    const g = gradeThai(writingFromEnglish ? enThTarget(entry) : entry.rom, answer)
     if (g.verdict === 'empty' || g.verdict === 'invalid' || /[\u0E00-\u0E7F]/.test(answer)) {
       setHint(g.verdict === 'empty' || !answer.trim() ? chrome.typeAnswer : g.verdict === 'invalid' ? g.message : chrome.writeRom)
       return
     }
+    // The English had two right answers, and this is the other one. It counts, and the card names its own.
+    const twin = !g.correct && writingFromEnglish ? twinAnswer(entry, answer, (id) => Boolean(props.doc.items[id])) : null
     if (g.correct) {
       noteAttempt(true, g.verdict, chrome.right)
+    } else if (twin) {
+      noteAttempt(true, 'exact', `${chrome.alsoRight} ${entry.rom}.`)
     } else if (g.verdict === 'tone' || g.verdict === 'length') {
       if (noteAttempt(false, g.verdict, g.message, 'move')) {
         setSlipLine({ target: g.matchedTarget ?? entry.rom, slips: g.toneSlips.map((s) => s.syllable) })
@@ -310,6 +342,7 @@ export function SessionView(props: {
             <p className="prompt-thai thai">{showThai(entry.thai)}</p>
             <p className="prompt-rom rom">{entry.rom}</p>
             <p className="prompt-en">{cleanGloss(entry.en[0] ?? '')}</p>
+            <MeetNotes entry={entry} />
           </>
         )
       }
@@ -317,6 +350,7 @@ export function SessionView(props: {
         <>
           <p className="prompt-rom rom">{entry.rom}</p>
           <p className="prompt-en">{cleanGloss(entry.en[0] ?? '')}</p>
+          <MeetNotes entry={entry} />
         </>
       )
     }

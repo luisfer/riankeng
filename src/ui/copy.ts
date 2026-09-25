@@ -21,5 +21,6 @@ export const chrome = {
   typeIt: 'Type it.',
   hearFirst: 'Hear it first.',
   right: 'Right.',
+  alsoRight: 'Also right. This card is',
   yoursEmpty: 'Clear a few cards. They will land here.',
 }

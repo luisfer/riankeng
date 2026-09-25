@@ -79,16 +79,21 @@ function isOpenSyllable(syllable: string): boolean {
   return Boolean(last && VOWEL_BASES.has(last[0]!))
 }
 
+/**
+ * Each alternative the learner wrote is held to its best match in the target, and the
+ * answer is only as good as its weakest one. "kráp/kâ" for "kráp/kâ" is exact, while
+ * hedging every tone ("kâao/kàao") is not.
+ */
 export function gradeThai(targetRom: string, answerRaw: string): ThaiGrade {
   const answers = expandAlternatives(displayRom(answerRaw))
-  const alternatives = expandAlternatives(displayRom(targetRom))
-  let best: ThaiGrade | null = null
-  for (const alt of alternatives) {
-    const t = analyseRom(alt)
-    for (const ans of answers) {
-      const r = compare(t, analyseRom(ans))
+  const alternatives = expandAlternatives(displayRom(targetRom)).map((alt) => ({ alt, t: analyseRom(alt) }))
+  let worst: ThaiGrade | null = null
+  for (const ans of answers) {
+    const a = analyseRom(ans)
+    let best: ThaiGrade | null = null
+    for (const { alt, t } of alternatives) {
       const grade: ThaiGrade = {
-        ...r,
+        ...compare(t, a),
         target: displayRom(targetRom),
         matchedTarget: displayRom(alt),
         answer: displayRom(answerRaw),
@@ -97,10 +102,10 @@ export function gradeThai(targetRom: string, answerRaw: string): ThaiGrade {
       if (!best || RANK[grade.verdict] > RANK[best.verdict]) best = grade
       if (grade.verdict === 'exact') break
     }
-    if (best?.verdict === 'exact') break
+    if (!worst || RANK[best!.verdict] < RANK[worst.verdict]) worst = best
   }
-  best!.message = describe(best!)
-  return best!
+  worst!.message = describe(worst!)
+  return worst!
 }
 
 function describe(g: ThaiGrade): string {

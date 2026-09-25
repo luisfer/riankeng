@@ -60,6 +60,7 @@ export function analyseRom(input: string): RomAnalysis {
   const nuclei: Nucleus[] = []
   let current: { letters: string; marks: Set<string> } | null = null
   const syllableToneMarks: string[] = [] // tone mark per nucleus, in order
+  const breaks: number[] = [] // skeleton unit index where a written word or syllable break falls
   let valid = true
 
   const closeNucleus = () => {
@@ -83,6 +84,8 @@ export function analyseRom(input: string): RomAnalysis {
       while (k < chars.length && (SEPARATORS.has(chars[k]!) || chars[k] === "'")) k++
       const nextIsVowel = k < chars.length && isVowelBase(chars[k]!)
       closeNucleus()
+      const at = toUnits(skeleton).length
+      if (breaks[breaks.length - 1] !== at) breaks.push(at)
       if (prevIsVowel && nextIsVowel) skeleton += "'"
       continue
     }
@@ -127,7 +130,7 @@ export function analyseRom(input: string): RomAnalysis {
     skeleton,
     collapsed: collapseLength(skeleton),
     nuclei,
-    syllables: chunkSyllables(skeleton, syllableToneMarks),
+    syllables: chunkSyllables(skeleton, syllableToneMarks, breaks),
     valid,
   }
 }
@@ -157,14 +160,17 @@ const ONSET_SET = new Set([
   'bpr', 'bpl', 'dtr', 'bp', 'dt', 'ch', 'ng', 'kr', 'kl', 'kw', 'gr', 'gl', 'gw', 'pr', 'pl', 'tr', 'fr', 'fl', 'sr',
   'k', 'g', 'j', 'p', 'b', 't', 'd', 'm', 'n', 'l', 'r', 'y', 'w', 'f', 's', 'h', "'",
 ])
-const FINAL_SET = new Set(['ng', 'k', 'p', 't', 'm', 'n', 'w', 'y', 'b', 'd', 'g', 'l', 'r', 's'])
+/** The finals the system writes (content/system.ts FINALS). b, d, l, r, s never end a syllable. */
+const FINAL_SET = new Set(['ng', 'k', 'p', 't', 'm', 'n', 'w', 'y'])
 
 /**
  * Chunk a skeleton into syllables and re-attach tone marks to the first vowel
- * letter of each nucleus. Ambiguous consonant clusters between nuclei are split
- * preferring the longest final that leaves a valid onset.
+ * letter of each nucleus. A written break (space, hyphen, apostrophe) always ends
+ * a syllable, so "dii kráp" is dii + kráp, never diik + ráp. Inside an unbroken
+ * run, a consonant cluster between nuclei is split preferring the longest final
+ * that leaves a valid onset.
  */
-export function chunkSyllables(skeleton: string, toneMarks: string[]): string[] {
+export function chunkSyllables(skeleton: string, toneMarks: string[], breaks: number[] = []): string[] {
   const units = toUnits(skeleton)
   const syllables: string[] = []
   let i = 0
@@ -190,7 +196,10 @@ export function chunkSyllables(skeleton: string, toneMarks: string[]): string[] 
       j++
     }
     let final = ''
-    if (j >= units.length) {
+    const cut = breaks.find((b) => b >= i && b <= j && b < units.length)
+    if (cut !== undefined) {
+      final = units.slice(i, cut).join('') // the written break ends the syllable
+    } else if (j >= units.length) {
       final = cons // word ends here
     } else {
       // choose longest final such that remainder is a valid onset

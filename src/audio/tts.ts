@@ -116,8 +116,12 @@ function playClip(thai: string, id: string, rate: number, gesture: boolean): Voi
       unlocked = true
       setClipCached(id, true)
     },
-    () => {
-      setClipCached(id, false)
+    (err: unknown) => {
+      const name = err instanceof Error ? err.name : ''
+      // Paused for the next card: nothing to say.
+      if (name === 'AbortError') return
+      // Refused before a tap is autoplay policy, not a missing file. The next Hear tries the clip again.
+      if (name !== 'NotAllowedError') setClipCached(id, false)
       speakNow(thai, rate, gesture)
     },
   )

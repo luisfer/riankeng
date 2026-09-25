@@ -37,6 +37,8 @@ export function clipResponseOk(res: Response): boolean {
 export async function hasClip(id: string): Promise<boolean> {
   const hit = cache.get(id)
   if (hit !== undefined) return hit
+  // The build ships this clip. Only a real failure to play it may say otherwise.
+  if (hasShippedClip(id)) return true
   try {
     const res = await Promise.race([
       fetch(clipUrl(id), { method: 'HEAD' }),
@@ -46,7 +48,7 @@ export async function hasClip(id: string): Promise<boolean> {
     cache.set(id, ok)
     return ok
   } catch {
-    cache.set(id, false)
+    // A slow or dropped probe says nothing about the file. Leave it unknown, and try again next time.
     return false
   }
 }

@@ -162,6 +162,8 @@ export function normalizeSession(session: LiveSession): LiveSession {
 /** Listen and tone become writing when the card cannot be heard. */
 export function sittingModality(item: QueueItem, canHear: boolean): QueueItem['modality'] {
   if ((item.modality === 'listen' || item.modality === 'tone') && !canHear) return 'th-en'
+  // A sitting saved before tone drills skipped kráp/kâ cards still holds one.
+  if (item.modality === 'tone' && getEntry(item.id)?.rom.includes('/')) return 'th-en'
   return item.modality
 }
 

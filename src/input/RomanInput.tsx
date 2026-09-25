@@ -19,9 +19,6 @@ const STRIP_GROUPS: StripKey[][] = [
 
 const STRIP = STRIP_GROUPS.flat()
 
-/** Open after a vowel. `typed` is the plain vowel just typed, whose other letters it offers. */
-type Pop = { at: number; typed: string | null }
-
 type Cluster = { start: number; end: number }
 
 function clampCaret(value: string, caret: number): number {
@@ -182,7 +179,7 @@ export function editRoman(value: string, caret: number, ch: string, end = caret)
 export type NumberKey = { kind: 'tone'; mark: string } | { kind: 'variant' | 'letter'; letter: string }
 
 /**
- * A number key in the field, the same with the popover open or closed: 1 to 4
+ * A number key in the field, and the strip key with the same number: 1 to 4
  * tone the syllable at the caret, 5 to 8 write ε ɔ ə ʉ there. Right after a
  * plain vowel, the number of one of its own letters replaces it: e then 5 is ε.
  */
@@ -194,7 +191,8 @@ export function numberKey(key: string, typed: string | null): NumberKey | null {
   return { kind: own ? 'variant' : 'letter', letter: k.ch }
 }
 
-const KEY_OF = new Map(STRIP.map((s) => [s.ch, s.key]))
+/** The plain vowel just typed, and the caret right after it. Its own strip letters swap it. */
+type Typed = { letter: string; at: number }
 
 export function RomanInput(props: {
   value: string
@@ -204,62 +202,95 @@ export function RomanInput(props: {
   disabled?: boolean
   placeholder?: string
   autoFocus?: boolean
+  /** Focus the field again whenever this changes to a new value, as after a check that missed. */
+  focusToken?: unknown
 }) {
   const ref = useRef<HTMLInputElement>(null)
   const place = useRef<number | null>(null)
-  const [pop, setPop] = useState<Pop | null>(null)
+  const last = useRef<{ start: number; end: number } | null>(null)
+  const token = useRef(props.focusToken)
+  const [caret, setCaret] = useState<number | null>(null)
+  const [typed, setTyped] = useState<Typed | null>(null)
 
   useEffect(() => {
     if (props.autoFocus) ref.current?.focus()
   }, [props.autoFocus, props.disabled])
 
   useEffect(() => {
+    if (Object.is(props.focusToken, token.current)) return
+    token.current = props.focusToken
+    if (props.focusToken !== undefined) ref.current?.focus()
+  }, [props.focusToken])
+
+  useEffect(() => {
     const el = ref.current
-    const caret = place.current
-    if (!el || caret == null) return
-    el.setSelectionRange(caret, caret)
+    const at = place.current
+    if (!el || at == null) return
+    el.setSelectionRange(at, at)
     place.current = null
   }, [props.value])
 
-  const typed = pop?.typed ?? null
-  const variants = typed ? (VOWEL_VARIANTS[typed] ?? []) : []
-
   const read = () => ref.current?.value ?? props.value
 
-  const commit = (value: string, caret: number) => {
-    place.current = caret
+  const remember = () => {
+    const el = ref.current
+    if (!el || el.selectionStart == null) return
+    last.current = { start: el.selectionStart, end: el.selectionEnd ?? el.selectionStart }
+    setCaret(el.selectionStart)
+  }
+
+  /** The live selection while the field has focus, else where it last was. */
+  const selection = (): { start: number; end: number } => {
+    const el = ref.current
+    const value = read()
+    if (el && document.activeElement === el && el.selectionStart != null) {
+      return { start: el.selectionStart, end: el.selectionEnd ?? el.selectionStart }
+    }
+    const held = last.current
+    if (held) return { start: Math.min(held.start, value.length), end: Math.min(held.end, value.length) }
+    return { start: value.length, end: value.length }
+  }
+
+  const commit = (value: string, at: number) => {
+    place.current = at
+    last.current = { start: at, end: at }
+    setCaret(at)
     props.onChange(value)
     queueMicrotask(() => {
       const el = ref.current
       if (!el || place.current == null || el.value !== value) return
-      el.setSelectionRange(caret, caret)
+      el.setSelectionRange(at, at)
       place.current = null
     })
   }
 
   const pickTone = (mark: string) => {
-    const caret = ref.current?.selectionStart ?? pop?.at ?? props.value.length
-    const next = toneAt(read(), caret, mark)
+    const next = toneAt(read(), selection().start, mark)
     commit(next.value, next.caret)
-    setPop(null)
+    setTyped(null)
     ref.current?.focus()
   }
 
-  const pickVariant = (letter: string) => {
-    const caret = pop?.typed ? pop.at : (ref.current?.selectionStart ?? props.value.length)
-    const next = replaceVowelAt(read(), caret, letter)
+  const swapTyped = (letter: string) => {
+    if (!typed) return
+    const next = replaceVowelAt(read(), typed.at, letter)
     commit(next.value, next.caret)
-    setPop({ at: next.caret, typed: null })
+    setTyped(null)
     ref.current?.focus()
   }
 
-  const insert = (letter: string) => {
-    const el = ref.current
-    const caret = el?.selectionStart ?? props.value.length
-    const next = editRoman(read(), caret, letter, el?.selectionEnd ?? caret)
+  const insertLetter = (letter: string) => {
+    const { start, end } = selection()
+    const next = editRoman(read(), start, letter, end)
     commit(next.value, next.caret)
-    setPop({ at: next.caret, typed: null })
-    el?.focus()
+    setTyped(null)
+    ref.current?.focus()
+  }
+
+  const run = (action: NumberKey) => {
+    if (action.kind === 'tone') pickTone(action.mark)
+    else if (action.kind === 'variant') swapTyped(action.letter)
+    else insertLetter(action.letter)
   }
 
   const onKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -267,42 +298,43 @@ export function RomanInput(props: {
     if (e.key === 'Enter') {
       if (e.repeat || composing) return
       e.preventDefault()
-      setPop(null)
+      setTyped(null)
       props.onSubmit()
       return
     }
     if (e.key === 'Escape') {
-      setPop(null)
+      setTyped(null)
       return
     }
     const plain = !e.metaKey && !e.ctrlKey && !e.altKey
-    const shortcut = plain && !composing ? numberKey(e.key, typed) : null
+    const shortcut = plain && !composing ? numberKey(e.key, typed?.letter ?? null) : null
     if (shortcut) {
       e.preventDefault()
-      if (shortcut.kind === 'tone') pickTone(shortcut.mark)
-      else if (shortcut.kind === 'variant') pickVariant(shortcut.letter)
-      else insert(shortcut.letter)
+      run(shortcut)
       return
     }
     if (e.key.length === 1 && TYPED_VOWELS.has(e.key.toLowerCase()) && plain) {
-      const caret = ref.current?.selectionStart ?? props.value.length
-      setPop({ at: caret + 1, typed: e.key.toLowerCase() })
+      const at = (ref.current?.selectionStart ?? props.value.length) + 1
+      setTyped({ letter: e.key.toLowerCase(), at })
     } else if ((e.key.length === 1 && !e.metaKey) || /^(Arrow|Home|End|Backspace|Delete|Tab)/.test(e.key)) {
-      setPop(null)
+      setTyped(null)
     }
   }
 
-  const onStrip = (e: MouseEvent<HTMLButtonElement>, ch: string) => {
+  const onStrip = (e: MouseEvent<HTMLButtonElement>, s: StripKey) => {
     e.preventDefault()
     e.stopPropagation()
-    if (TONE_MARK_SET.has(ch)) pickTone(ch)
-    else insert(ch)
+    const action = numberKey(s.key, typed?.letter ?? null)
+    if (action) run(action)
   }
 
   const blockPaste = (e: ClipboardEvent) => {
     e.preventDefault()
     props.onPasteBlock?.()
   }
+
+  const at = caret ?? props.value.length
+  const swaps = typed ? (VOWEL_VARIANTS[typed.letter] ?? []) : []
 
   return (
     <div className="roman">
@@ -319,58 +351,34 @@ export function RomanInput(props: {
           spellCheck={false}
           onChange={(e) => props.onChange(e.target.value)}
           onKeyDown={onKeyDown}
-          onPointerDown={() => setPop(null)}
+          onSelect={remember}
+          onBlur={remember}
+          onPointerDown={() => setTyped(null)}
           onPaste={blockPaste}
           onDrop={(e) => e.preventDefault()}
         />
       </div>
-      {pop && !props.disabled && (
-        <div className="popover" role="listbox" onMouseDown={(e) => e.preventDefault()}>
-          {POPOVER_TONES.map((t) => (
-            <button
-              key={t.key}
-              type="button"
-              className="pop-opt"
-              aria-keyshortcuts={t.key}
-              onMouseDown={(e) => e.preventDefault()}
-              onClick={() => pickTone(t.mark)}
-            >
-              <span className="pop-k">{t.key}</span>
-              <span className="rom">{tonedVowel(props.value, pop.at, t.mark)}</span>
-            </button>
-          ))}
-          {variants.map((v) => (
-            <button
-              key={v}
-              type="button"
-              className="pop-opt"
-              aria-keyshortcuts={KEY_OF.get(v)}
-              onMouseDown={(e) => e.preventDefault()}
-              onClick={() => pickVariant(v)}
-            >
-              <span className="pop-k">{KEY_OF.get(v)}</span>
-              <span className="rom">{v.normalize('NFC')}</span>
-            </button>
-          ))}
-        </div>
-      )}
       <div className="strip">
         {STRIP_GROUPS.map((group) => (
           <span key={group[0]!.key} className="strip-group">
-            {group.map((s) => (
-              <button
-                key={s.key}
-                type="button"
-                className="strip-k"
-                aria-keyshortcuts={s.key}
-                disabled={props.disabled}
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={(e) => onStrip(e, s.ch)}
-              >
-                <span className="pop-k">{s.key}</span>
-                <span className="rom">{s.label}</span>
-              </button>
-            ))}
+            {group.map((s) => {
+              const tone = TONE_MARK_SET.has(s.ch)
+              const swap = swaps.includes(s.ch)
+              return (
+                <button
+                  key={s.key}
+                  type="button"
+                  className={`strip-k${tone ? ' tone' : ''}${swap ? ' swap' : ''}`}
+                  aria-keyshortcuts={s.key}
+                  disabled={props.disabled}
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={(e) => onStrip(e, s)}
+                >
+                  <span className="pop-k">{s.key}</span>
+                  <span className="rom">{tone ? tonedVowel(props.value, at, s.ch) : s.label}</span>
+                </button>
+              )
+            })}
           </span>
         ))}
       </div>

@@ -1,5 +1,5 @@
 /*
- * One card: the answer field, the tone popover, the key strip, the commit key,
+ * One card: the answer field, the key strip, the commit key,
  * the feedback line. The course and the landing page both import this.
  */
 button, input { font: inherit; color: inherit; }
@@ -197,7 +197,6 @@ input[type='checkbox']:disabled { cursor: default; opacity: 0.4; }
 .answer-said { grid-column: 1; grid-row: 1; min-width: 0; min-height: 1.2em; color: var(--ink-2); overflow-wrap: anywhere; }
 .text-btn:focus-visible,
 .btn:focus-visible,
-.pop-opt:focus-visible,
 .strip-k:focus-visible {
   outline: 2px solid var(--lacquer);
   outline-offset: 3px;
@@ -207,39 +206,6 @@ input[type='checkbox']:disabled { cursor: default; opacity: 0.4; }
 .answer-said.en { font-family: var(--ui); font-size-adjust: none; font-size: 26px; font-weight: 400; }
 .roman-field::placeholder { color: var(--ink-2); }
 
-/*
- * The vowel of the syllable being written, in each tone and keyed 1 to 4, then the
- * typed vowel's own letters on their strip numbers. Type under the line, in the strip's place.
- */
-.popover {
-  grid-column: 1 / -1;
-  grid-row: 2;
-  z-index: 2;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 8px 26px;
-  margin-top: 12px;
-}
-.popover + .strip { visibility: hidden; }
-.pop-opt {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 7px;
-  padding: 2px 0;
-  color: var(--ink);
-}
-.pop-opt .rom {
-  font-size: 30px;
-  line-height: 1;
-  color: var(--ink);
-  text-decoration: underline;
-  text-decoration-color: transparent;
-  text-decoration-thickness: 2px;
-  text-underline-offset: 7px;
-}
-.pop-opt:hover .rom,
-.pop-opt:focus-visible .rom { text-decoration-color: var(--lacquer); }
 .pop-k {
   font-size: 13px;
   font-weight: 500;
@@ -247,7 +213,11 @@ input[type='checkbox']:disabled { cursor: default; opacity: 0.4; }
   color: var(--ink-2);
 }
 
-/* The letters English has no key for, then the four marks, each with its number key. A narrow line breaks between the two. */
+/*
+ * The letters English has no key for, then the four tones, each with its number
+ * key, always under the line. A tone key shows the syllable at the caret in its
+ * tone, so chai reads âi on 2. A narrow line breaks between the two groups.
+ */
 .strip {
   grid-column: 1 / -1;
   grid-row: 2;
@@ -274,8 +244,12 @@ input[type='checkbox']:disabled { cursor: default; opacity: 0.4; }
   text-decoration-thickness: 2px;
   text-underline-offset: 7px;
 }
+.strip-k.tone .rom { display: inline-block; min-width: 1.3em; text-align: left; }
 .strip-k:hover { color: var(--ink); }
 .strip-k:hover .rom { text-decoration-color: var(--lacquer); }
+/* Right after a plain e, o or u, the keys that swap it for its own letter. */
+.strip-k.swap { color: var(--ink); }
+.strip-k.swap .rom { text-decoration-color: var(--lacquer); }
 
 /*
  * A drawn panel with its phrase lettered into the empty balloon. The panel is a

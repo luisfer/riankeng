@@ -151,6 +151,7 @@ export function TryCard(props: { deck: DemoCard[] }) {
                   onSubmit={check}
                   onPasteBlock={() => setPasted(true)}
                   autoFocus={focusField}
+                  focusToken={grade && !grade.correct ? grade : undefined}
                 />
                 <Commit type="submit">{landing.check}</Commit>
               </form>

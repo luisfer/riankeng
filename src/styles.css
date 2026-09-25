@@ -293,6 +293,23 @@ body::before {
 .preview-desk > .btn.commit { align-self: flex-start; }
 .preview-stage .session-feedback.miss { display: flex; align-items: baseline; gap: 16px; }
 .preview-hint { margin: 0; color: var(--ink-2); font-size: 16px; max-width: 28em; }
+.preview-learned { margin: 0; color: var(--lacquer); font-size: 15px; }
+.preview-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 24px;
+  width: 100%;
+  margin: 12px 0 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--hair);
+  font-size: 16px;
+}
+.preview-count { color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.preview-finish { width: min(720px, 100%); }
+.preview-finish-h { margin: 0 0 28px; font-size: clamp(30px, 4vw, 44px); line-height: 1.15; text-wrap: balance; }
+.preview-finish-lede { margin: 28px 0 16px; color: var(--ink-2); max-width: 34em; }
+.preview-finish-act { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; }
 .preview-stage .answer-form { width: 100%; margin-top: 0; }
 .preview-word { display: flex; flex-direction: column; gap: 2px; }
 .preview-stage .prompt-thai { font-size: 72px; margin: 0; line-height: 1.1; }

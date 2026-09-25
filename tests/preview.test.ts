@@ -7,6 +7,7 @@ import { clipUrl } from '../src/audio/clip-url'
 import { decideGate } from '../src/gate-token'
 import { DEMO_IDS } from '../src/landing/demo'
 import { PREVIEW_IDS, PREVIEW_VOICE } from '../src/preview/catalog'
+import { clearProgress, loadProgress, PROGRESS_KEY, saveProgress } from '../src/preview/progress'
 import { slopHits } from './copy-rules'
 
 const root = process.cwd()
@@ -30,7 +31,8 @@ const LEAK = /@content\/index|content\/index|ui\/Session|ui\/App|engine\/session
 describe('public sitting', () => {
   it('links the landing section to /preview/ ahead of the close', () => {
     const html = source('index.html')
-    const sitting = html.indexOf('id="sitting"')
+    const sitting = html.indexOf('id="preview"')
+    expect(html).toContain('href="#preview"')
     expect(sitting).toBeGreaterThan(html.indexOf('id="try"'))
     expect(sitting).toBeLessThan(html.indexOf('id="close"'))
     expect(html).toContain('href="/preview/"')
@@ -73,5 +75,63 @@ describe('public sitting', () => {
     }
     const glosses = PREVIEW_VOICE.map((card) => card.en[0])
     expect(new Set(glosses).size).toBe(glosses.length)
+  })
+
+  it('closes on the twenty-five words and the waitlist, in plain copy', () => {
+    const main = source('src/preview/main.tsx')
+    const copy = [
+      'Congratulations. You learned your first {TOTAL} words in Thai.',
+      'Join the waitlist to continue your journey with Thai.',
+      'Start over',
+      'Previous word',
+      'Next word',
+      'Learned',
+    ]
+    for (const line of copy) expect(main).toContain(line)
+    expect(main).toContain('href="/#close"')
+    expect(copy.filter((line) => /[!?;:]/.test(line))).toEqual([])
+    expect(slopHits(copy)).toEqual([])
+  })
+})
+
+function memoryStore(): Storage {
+  const data = new Map<string, string>()
+  return {
+    get length() {
+      return data.size
+    },
+    clear: () => data.clear(),
+    key: (n: number) => [...data.keys()][n] ?? null,
+    getItem: (k: string) => data.get(k) ?? null,
+    setItem: (k: string, v: string) => void data.set(k, v),
+    removeItem: (k: string) => void data.delete(k),
+  }
+}
+
+describe('preview progress', () => {
+  const ids = PREVIEW_IDS
+
+  it('starts at the first word with nothing learned', () => {
+    expect(loadProgress(ids, memoryStore())).toEqual({ at: 0, done: [] })
+    expect(loadProgress(ids, null)).toEqual({ at: 0, done: [] })
+  })
+
+  it('keeps the card and the learned words across a reload', () => {
+    const store = memoryStore()
+    saveProgress({ at: 7, done: [ids[3]!, ids[0]!] }, store)
+    expect(store.getItem(PROGRESS_KEY)).not.toBeNull()
+    expect(loadProgress(ids, store)).toEqual({ at: 7, done: [ids[0], ids[3]] })
+    clearProgress(store)
+    expect(loadProgress(ids, store)).toEqual({ at: 0, done: [] })
+  })
+
+  it('drops unknown words, keeps the card in range, and survives a bad value', () => {
+    const store = memoryStore()
+    store.setItem(PROGRESS_KEY, JSON.stringify({ at: 99, done: ['w:glai', ids[1], 4] }))
+    expect(loadProgress(ids, store)).toEqual({ at: ids.length - 1, done: [ids[1]] })
+    store.setItem(PROGRESS_KEY, JSON.stringify({ at: -3.5, done: 'all' }))
+    expect(loadProgress(ids, store)).toEqual({ at: 0, done: [] })
+    store.setItem(PROGRESS_KEY, '{not json')
+    expect(loadProgress(ids, store)).toEqual({ at: 0, done: [] })
   })
 })

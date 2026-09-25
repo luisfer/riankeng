@@ -173,20 +173,28 @@ function click(el: Element) {
 
 const texts = (host: HTMLElement, selector: string) => [...host.querySelectorAll(selector)].map((b) => b.textContent)
 
+const tones = (host: HTMLElement) => texts(host, '.strip-k.tone')
+const toneKey = (host: HTMLElement, n: number) => host.querySelector(`.strip-k[aria-keyshortcuts="${n}"]`)!
+
 describe('RomanInput', () => {
-  it('numbers every strip key the way the popover numbers its own', () => {
-    const { host } = mount()
+  it('keeps one numbered strip in view, with no popover over it', () => {
+    const { host, field } = mount()
     expect(texts(host, '.strip-k')).toEqual(['5ε', '6ɔ', '7ə', '8ʉ', '1à', '2â', '3á', '4ǎ'])
     expect([...host.querySelectorAll('.strip-k')].map((b) => b.getAttribute('aria-keyshortcuts'))).toEqual([
       '5', '6', '7', '8', '1', '2', '3', '4',
     ])
     expect(host.querySelectorAll('.strip-k .pop-k')).toHaveLength(8)
+    typeKeys(field, 'mai2 chai')
+    expect(host.querySelector('.popover')).toBeNull()
+    expect(host.querySelectorAll('.strip-k')).toHaveLength(8)
   })
 
-  it('shows the whole vowel in each tone, so chai offers âi', () => {
+  it('labels the tone keys with the syllable at the caret, so chai reads âi on 2', () => {
     const { host, field } = mount()
     typeKeys(field, 'mai2 chai')
-    expect(texts(host, '.popover .pop-opt')).toEqual(['1ài', '2âi', '3ái', '4ǎi'])
+    expect(tones(host)).toEqual(['1ài', '2âi', '3ái', '4ǎi'])
+    typeKeys(field, ' k')
+    expect(tones(host)).toEqual(['1à', '2â', '3á', '4ǎ'])
   })
 
   it('writes mâi châi with 2 on each syllable, the caret at the end', () => {
@@ -197,25 +205,18 @@ describe('RomanInput', () => {
     expect(field.selectionStart).toBe(8)
   })
 
-  it('writes mâi châi from the popover and from the strip', () => {
-    const a = mount()
-    typeKeys(a.field, 'mai2 chai')
-    click(a.host.querySelectorAll('.popover .pop-opt')[1]!)
-    expect([a.field.value, a.field.selectionStart]).toEqual(['mâi châi', 8])
-
-    const b = mount()
-    typeKeys(b.field, 'mai2 chai')
-    press(b.field, 'Escape')
-    click(b.host.querySelectorAll('.strip-k')[5]!)
-    expect([b.field.value, b.field.selectionStart]).toEqual(['mâi châi', 8])
+  it('writes mâi châi from the strip without closing anything first', () => {
+    const { host, field } = mount()
+    typeKeys(field, 'mai2 chai')
+    click(toneKey(host, 2))
+    expect([field.value, field.selectionStart]).toEqual(['mâi châi', 8])
   })
 
   it('tones chai with the caret between a and i, and keeps it there', () => {
     const { host, field } = mount()
     typeKeys(field, 'mai2 chai')
     clickField(field, 7)
-    expect(host.querySelector('.popover')).toBeNull()
-    click(host.querySelectorAll('.strip-k')[5]!)
+    click(toneKey(host, 2))
     expect([field.value, field.selectionStart]).toEqual(['mâi châi', 7])
     clickField(field, 7)
     press(field, '3')
@@ -225,52 +226,94 @@ describe('RomanInput', () => {
   it('writes â after ch, on the new syllable', () => {
     const { host, field } = mount()
     typeKeys(field, 'mai2 ch')
-    click(host.querySelectorAll('.strip-k')[5]!)
+    click(toneKey(host, 2))
     expect([field.value, field.selectionStart]).toEqual(['mâi châ', 7])
     press(field, '3')
     expect([field.value, field.selectionStart]).toEqual(['mâi chá', 7])
   })
 
-  it('writes ε ɔ ə ʉ on 5 to 8 with no popover open', () => {
-    const { host, field } = mount()
+  it('writes ε ɔ ə ʉ on 5 to 8', () => {
+    const { field } = mount()
     typeKeys(field, 'k')
-    for (const key of ['5', '6', '7', '8']) {
-      press(field, 'Escape')
-      expect(host.querySelector('.popover')).toBeNull()
-      press(field, key)
-    }
+    for (const key of ['5', '6', '7', '8']) press(field, key)
     expect([field.value, field.selectionStart]).toEqual(['kεɔəʉ', 5])
   })
 
-  it('turns a typed vowel into its own letter on its strip number', () => {
+  it('writes a long vowel with two clicks on the same key', () => {
+    const { host, field } = mount()
+    typeKeys(field, 'p')
+    click(toneKey(host, 5))
+    click(toneKey(host, 5))
+    typeKeys(field, 'ng')
+    expect([field.value, field.selectionStart]).toEqual(['pεεng', 5])
+    click(toneKey(host, 1))
+    expect([field.value, field.selectionStart]).toEqual(['pὲεng', 'pὲεng'.length])
+  })
+
+  it('swaps a typed vowel for its own letter, and marks the keys that swap it', () => {
     const { host, field } = mount()
     typeKeys(field, 'pe')
-    expect(texts(host, '.popover .pop-opt')).toEqual(['1è', '2ê', '3é', '4ě', '5ε', '7ə'])
+    expect(texts(host, '.strip-k.swap')).toEqual(['5ε', '7ə'])
     press(field, '5')
     expect([field.value, field.selectionStart]).toEqual(['pε', 2])
+    expect(host.querySelector('.strip-k.swap')).toBeNull()
     press(field, '2')
     expect(field.value).toBe(`p\u03B5${TONE_MARKS.falling}`)
 
     const o = mount()
     typeKeys(o.field, 'ko')
-    expect(texts(o.host, '.popover .pop-opt').slice(4)).toEqual(['6ɔ'])
-    press(o.field, '6')
+    expect(texts(o.host, '.strip-k.swap')).toEqual(['6ɔ'])
+    click(toneKey(o.host, 6))
     expect(o.field.value).toBe('kɔ')
 
     const u = mount()
     typeKeys(u.field, 'su')
-    expect(texts(u.host, '.popover .pop-opt').slice(4)).toEqual(['8ʉ'])
+    expect(texts(u.host, '.strip-k.swap')).toEqual(['8ʉ'])
     press(u.field, '8')
     expect(u.field.value).toBe('sʉ')
   })
 
-  it('writes any other vowel number at the caret while the popover is open', () => {
+  it('writes any other vowel number at the caret after a typed vowel', () => {
     const { field } = mount()
     typeKeys(field, 'pe')
     press(field, '6')
     expect([field.value, field.selectionStart]).toEqual(['peɔ', 3])
     press(field, '7')
     expect(field.value).toBe('peɔə')
+  })
+
+  it('fixes a wrong tone from the strip after the field lost focus', () => {
+    const { host, field } = mount()
+    typeKeys(field, 'sa1-wa3t-dii')
+    expect(field.value).toBe('sà-wát-dii')
+    clickField(field, 5)
+    act(() => field.blur())
+    expect(document.activeElement).not.toBe(field)
+    click(toneKey(host, 1))
+    expect([field.value, field.selectionStart]).toEqual(['sà-wàt-dii', 5])
+    expect(document.activeElement).toBe(field)
+  })
+
+  it('takes focus back when focusToken changes, and leaves it alone on the first render', () => {
+    const host = document.createElement('div')
+    document.body.appendChild(host)
+    const other = document.createElement('button')
+    document.body.appendChild(other)
+    let miss: () => void = () => undefined
+    function Field() {
+      const [value, setV] = useState('')
+      const [token, setToken] = useState(0)
+      miss = () => setToken((n) => n + 1)
+      return createElement(RomanInput, { value, onChange: setV, onSubmit: () => undefined, focusToken: token })
+    }
+    other.focus()
+    act(() => {
+      createRoot(host).render(createElement(Field))
+    })
+    const field = host.querySelector<HTMLInputElement>('.roman-field')!
+    expect(document.activeElement).toBe(other)
+    act(() => miss())
+    expect(document.activeElement).toBe(field)
   })
 
   it('leaves 9, modified numbers, and composition to the field', () => {

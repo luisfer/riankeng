@@ -453,6 +453,7 @@ export function SessionView(props: {
         onSubmit={writeRom || modality === 'en-th' || hold?.kind === 'retype-th' ? trySubmitThai : trySubmitEn}
         onPasteBlock={onPaste}
         autoFocus
+        focusToken={ack?.ok === false ? ack : undefined}
       />
       <Commit type="submit">Check</Commit>
     </form>

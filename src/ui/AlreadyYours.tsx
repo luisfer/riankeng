@@ -23,7 +23,7 @@ function levelLabel(key: string): string {
   return title ? `${i} ${title}` : String(i)
 }
 
-function ReviewRows(props: { entries: Entry[]; audioRate: number }) {
+export function ReviewRows(props: { entries: Entry[]; audioRate: number }) {
   return (
     <ul className="preview yours-list">
       {props.entries.map((e) => (

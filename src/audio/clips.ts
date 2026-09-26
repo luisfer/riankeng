@@ -57,3 +57,19 @@ export function prefetchClip(id: string): void {
   if (cache.has(id)) return
   void hasClip(id)
 }
+
+const warmed = new Set<string>()
+
+/**
+ * Fetch a sitting's clips whole, once each, so the service worker keeps them for a sitting with no
+ * network. Playback alone would not: it asks in byte ranges, and a partial answer is not kept.
+ */
+export function warmClips(ids: Iterable<string>): void {
+  for (const id of ids) {
+    if (warmed.has(id) || !hasShippedClip(id)) continue
+    warmed.add(id)
+    void fetch(clipUrl(id))
+      .then((res) => res.arrayBuffer())
+      .catch(() => warmed.delete(id))
+  }
+}

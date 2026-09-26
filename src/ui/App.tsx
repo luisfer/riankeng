@@ -43,6 +43,7 @@ import { Journey } from './Journey'
 import { TrackPage } from './TrackPage'
 import { ReviewPage } from './AlreadyYours'
 import { HerDay, saidStems } from './HerDay'
+import { Finish } from './Finish'
 import { chrome } from './copy'
 import { LevelIntro } from './LevelIntro'
 import { SessionView } from './Session'
@@ -69,6 +70,8 @@ export function App() {
   const [sessionEnded, setSessionEnded] = useState(false)
   const [keptApart, setKeptApart] = useState(false)
   const [newer, setNewer] = useState(false)
+  /** The sitting just finished, for the page that closes it. Gone on reload: the page then goes home. */
+  const [lastSitting, setLastSitting] = useState<LiveSession | null>(null)
   const mirrorRead = useRef(false)
   const persistOk = useRef(false)
   const skipSave = useRef(false)
@@ -89,6 +92,10 @@ export function App() {
     if (session && !isFinished(session)) return
     replace({ name: 'journey' })
   }, [loadState, route.name, session])
+
+  useEffect(() => {
+    if (loadState === 'ready' && route.name === 'done' && !lastSitting) replace({ name: 'journey' })
+  }, [loadState, route.name, lastSitting])
 
   useEffect(() => {
     let alive = true
@@ -374,8 +381,11 @@ export function App() {
         }),
       )
       setSession(null)
+      setLastSitting(s)
       askToKeep()
-      go({ name: 'journey' })
+      // In the same render as the sitting ending, so the guard that leaves a dead #/session never sees one.
+      setRoute({ name: 'done' })
+      go({ name: 'done' })
       return
     }
     setSession(s)
@@ -405,16 +415,26 @@ export function App() {
 
   const inSession = route.name === 'session' && session && !isFinished(session)
   const inIntro = route.name === 'intro'
+  // The page closing a level's sitting keeps that level in the trail, as the sitting did.
+  const doneLevel = route.name === 'done' && lastSitting && !lastSitting.review ? lastSitting : null
   const trailTrack =
     inSession && session && !session.review
       ? (session.track ?? 'voice')
       : inIntro && route.name === 'intro'
         ? route.track
-        : undefined
+        : doneLevel
+          ? (doneLevel.track ?? 'voice')
+          : undefined
   const trailLevel =
-    inSession && session && !session.review ? session.level : inIntro && route.name === 'intro' ? route.n : undefined
+    inSession && session && !session.review
+      ? session.level
+      : inIntro && route.name === 'intro'
+        ? route.n
+        : doneLevel
+          ? doneLevel.level
+          : undefined
   const trailPlace =
-    route.name === 'review' || (inSession && session?.review)
+    route.name === 'review' || (inSession && session?.review) || (route.name === 'done' && lastSitting?.review)
       ? 'Already yours'
       : route.name === 'alphabet'
         ? 'The whole script'
@@ -430,7 +450,9 @@ export function App() {
       ? (session.track === 'script' ? scriptStatuses : voiceStatuses)[session.level]
       : inIntro && route.name === 'intro'
         ? (route.track === 'script' ? scriptStatuses : voiceStatuses)[route.n]
-        : undefined
+        : doneLevel
+          ? (doneLevel.track === 'script' ? scriptStatuses : voiceStatuses)[doneLevel.level]
+          : undefined
   const leaveSitting = () => {
     if (inSession && session) {
       const next = pauseSession(session)
@@ -479,6 +501,19 @@ export function App() {
           />
         )}
         {loadState === 'ready' && route.name === 'day' && <HerDay doc={doc} audioRate={doc.settings.audioRate} />}
+        {loadState === 'ready' && route.name === 'done' && lastSitting && (
+          <Finish
+            sitting={lastSitting}
+            status={lessonStatus}
+            audioRate={doc.settings.audioRate}
+            onAgain={() =>
+              lastSitting.review ? go({ name: 'review' }) : beginLevel(lastSitting.level, lastSitting.track ?? 'voice')
+            }
+            onBack={() =>
+              go(lastSitting.review ? { name: 'review' } : { name: 'track', track: lastSitting.track ?? 'voice' })
+            }
+          />
+        )}
         {loadState === 'ready' && route.name === 'track' && (
           <TrackPage
             track={route.track}

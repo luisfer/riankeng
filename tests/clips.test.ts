@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
   clipResponseOk,
   clipStem,
@@ -55,5 +55,21 @@ describe('clip-first Hear', () => {
     expect(typeof speechSynthesis).toBe('undefined')
     expect(canHearThai('w:maa')).toBe(true)
     expect(canHearThai('s:mɔɔ')).toBe(false)
+  })
+})
+
+describe('warmClips', () => {
+  it('fetches each shipped clip whole, once, so the service worker can keep it for an offline sitting', async () => {
+    const { warmClips } = await import('../src/audio/clips')
+    const fetchMock = vi.fn<typeof fetch>(async () => new Response(new Uint8Array([1, 2, 3]), { status: 200, headers: { "Content-Type": "audio/mpeg" } }))
+    vi.stubGlobal('fetch', fetchMock)
+    warmClips(['w:maa', 'w:maa', 'w:not-a-card'])
+    warmClips(['w:maa'])
+    await Promise.resolve()
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+    expect(String(fetchMock.mock.calls[0]?.[0])).toContain('/audio/')
+    const init = fetchMock.mock.calls[0]?.[1] as RequestInit | undefined
+    expect(new Headers(init?.headers).has('range')).toBe(false)
+    vi.unstubAllGlobals()
   })
 })

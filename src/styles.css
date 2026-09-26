@@ -226,6 +226,10 @@ body::before {
   height: 2px;
 }
 .lede:has(+ .lesson-progress) { margin-bottom: 12px; }
+/* The end of a sitting: its tally as the page's line, the level's meter, the words just worked, Sit again. */
+.finish .finish-line { margin: 6px 0 24px; }
+.finish .lesson-progress { margin-bottom: 28px; }
+.finish-actions { display: flex; align-items: center; gap: 28px; margin: 24px 0 56px; }
 .lede:has(+ .lede) { margin-bottom: 12px; }
 .lesson-progress {
   display: grid;

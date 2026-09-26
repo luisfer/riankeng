@@ -167,8 +167,21 @@ export default defineConfig(({ mode }) => {
               handler: 'CacheFirst',
               options: {
                 cacheName: 'riankeng-scenes',
-                expiration: { maxEntries: 48, maxAgeSeconds: 60 * 60 * 24 * 90 },
+                // Her day draws 41 panels and the home two more, each in two sizes.
+                expiration: { maxEntries: 130, maxAgeSeconds: 60 * 60 * 24 * 90 },
                 cacheableResponse: { statuses: [0, 200] },
+              },
+            },
+            {
+              // Her voice, offline. A sitting fetches its clips whole as it opens (warmClips); playback
+              // asks in byte ranges, which rangeRequests answers from the whole clip in the cache.
+              urlPattern: ({ url }) => url.pathname.startsWith('/audio/') && url.pathname.endsWith('.mp3'),
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'riankeng-audio',
+                expiration: { maxEntries: 2000, maxAgeSeconds: 60 * 60 * 24 * 180 },
+                cacheableResponse: { statuses: [200] },
+                rangeRequests: true,
               },
             },
           ],

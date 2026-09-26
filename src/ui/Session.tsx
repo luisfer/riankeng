@@ -24,7 +24,7 @@ import { entryOrThrow, fromVoiceKnown, pairRoms, pickChoices, sittingSense, stam
 import { entryTrack } from '@content/index'
 import { judgeTonePick, toneBareShow } from '@/engine/tone-step'
 import { enThTarget, twinAnswer } from '@/engine/twins'
-import { prefetchClip } from '@/audio/clips'
+import { prefetchClip, warmClips } from '@/audio/clips'
 import { canHearThai, onVoices, speakSlower, speakThai, speechUnlocked } from '@/audio/tts'
 import { RomanInput } from '@/input/RomanInput'
 import { Commit, HearBtn } from './bits'
@@ -141,6 +141,7 @@ export function SessionView(props: {
 
   useEffect(() => {
     for (const q of props.session.queue) prefetchClip(q.id)
+    warmClips(props.session.queue.map((q) => q.id))
   }, [props.session.queue])
 
   useEffect(() => {

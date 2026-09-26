@@ -9,6 +9,7 @@ export default phrases(25, [
   ['náa bpen kon jai dii', 'น้าเป็นคนใจดี', ['my aunt is kind']],
   ['lung tam-ngaan tîi dtà-làat', 'ลุงทำงานที่ตลาด', ['my uncle works at the market']],
   ['lǎan sǎam kon', 'หลานสามคน', ['three grandchildren']],
+  ['nǔu aa-yú gìi kùap', 'หนูอายุกี่ขวบ', ['how old are you[, to a child]']],
   ['kǎo dtὲng-ngaan lέεo', 'เขาแต่งงานแล้ว', ['they are married already']],
   ['pǒm yang sòot', 'ผมยังโสด', ['I am still single']],
   ['glûai hâa lûuk', 'กล้วยห้าลูก', ['five bananas']],

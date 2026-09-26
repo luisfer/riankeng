@@ -30,6 +30,7 @@ export default words(25, [
   ['dtôn', 'ต้น', ['classifier for trees', 'plant', 'trunk'], 'clf', ['classifier'], 'A tree on its own is dtôn-mái.'],
   ['gɔ̂ɔn', 'ก้อน', ['lump', 'classifier for lumps'], 'clf', ['classifier']],
   ['duang', 'ดวง', ['classifier for lights', 'classifier for stars'], 'clf', ['classifier']],
+  ['kùap', 'ขวบ', ['years old, of a young child', 'classifier for a child\'s age'], 'clf', ['classifier'], 'A small child counts years in kùap. Older, it is bpii.'],
   ['táng mòt', 'ทั้งหมด', ['altogether', 'all of it', 'in total'], 'adv', ['classifier']],
   ['dtὲε lá', 'แต่ละ', ['each', 'every one'], 'adj', ['classifier']],
   ['tîi nʉ̀ng', 'ที่หนึ่ง', ['first', 'the first'], 'adj', ['classifier'], 'tîi plus a number is the order.'],

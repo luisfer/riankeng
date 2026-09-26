@@ -95,10 +95,11 @@ describe('the landing page', () => {
     expect(html).not.toMatch(/[—·]/)
   })
 
-  it('names the extra vowels on the try card, without coaching the sitting', () => {
+  it('names the extra vowels on the try card, and the keys that type them, a sentence to a line', () => {
     expect(text(doc.querySelector('#try .lede'))).toBe(
-      'Thai has more vowels than English, and five tones. The keys write ε, ɔ, ə, ʉ and the marks.',
+      'Thai has more vowels than English, and five tones. Keys 5 to 8 type ε, ɔ, ə and ʉ. Keys 1 to 4 mark the tone.',
     )
+    expect(doc.querySelectorAll('#try .lede br:not(.narrow)')).toHaveLength(1)
   })
 
   it('keeps Log in in the nav, and the waitlist alone in the title cell', () => {

@@ -62,3 +62,23 @@ export function setSyncedAt(t: number): void {
     /* nothing to do: the watermark is an optimisation, not a source of truth */
   }
 }
+
+const ACCOUNT_SAVED_KEY = 'riankeng:account-saved:v1'
+
+/** When this browser last saw the account hold everything it had. 0: never, or not since a switch. */
+export function accountSavedAt(): number {
+  try {
+    return Number(localStorage.getItem(ACCOUNT_SAVED_KEY) ?? 0) || 0
+  } catch {
+    return 0
+  }
+}
+
+export function setAccountSavedAt(t: number): void {
+  try {
+    if (t) localStorage.setItem(ACCOUNT_SAVED_KEY, String(t))
+    else localStorage.removeItem(ACCOUNT_SAVED_KEY)
+  } catch {
+    /* the line on the Account page falls back to "not saved yet" */
+  }
+}

@@ -19,4 +19,11 @@ describe('landingRedirect', () => {
     expect(landingRedirect('', '', false)).toBeNull()
     expect(landingRedirect('#close', '', false)).toBeNull()
   })
+
+  it('keeps a link from an email on the landing, installed or not', () => {
+    const token = '#access_token=abc&refresh_token=r&type=recovery'
+    expect(landingRedirect(token, '', false)).toBeNull()
+    expect(landingRedirect(token, '', true)).toBeNull()
+    expect(landingRedirect('#error=access_denied&error_code=otp_expired', '', true)).toBeNull()
+  })
 })

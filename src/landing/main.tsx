@@ -1,6 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { signInAccount } from '../storage/auth'
+import { parseAuthLink, saveAccount, sendPasswordReset, signInResult, updatePassword, type AccountSession } from '../storage/auth'
 import { COMIC_SLOTS, fillClose, fillScene, mountComic, pickComic, pickLayout, pickPhone, placeComic, swapComicStem } from './comic'
 import { landing } from './copy'
 import { bindWaitlist, openWaitlistAt } from './waitlist'
@@ -13,6 +13,13 @@ import './bar'
 const away = landingRedirect(location.hash, location.search, matchMedia('(display-mode: standalone)').matches)
 if (away) location.replace(away)
 rememberRef()
+
+// A reset or invite email lands here with a session in the hash (a link to /learn/ is bounced here
+// with its hash kept). Read it once and take it out of the address bar.
+const link = parseAuthLink(location.hash)
+if (link) history.replaceState(null, '', `${location.pathname}${location.search}`)
+/** Set while the Log in panel is setting a password with a link's session. */
+let setting: AccountSession | null = null
 
 const html = document.documentElement
 const forms = [...document.querySelectorAll<HTMLFormElement>('form[data-signin]')]
@@ -29,6 +36,8 @@ function openCourse() {
 }
 
 function markSignedIn() {
+  // A link's password comes first: the panel stays open to set it, whatever the cookie says.
+  if (setting) return
   html.dataset.session = 'in'
   delete html.dataset.gate
   if (navSign) {
@@ -66,7 +75,7 @@ void fetch('/api/session', { cache: 'no-store' })
 for (const form of forms) {
   form.addEventListener('submit', async (e) => {
     e.preventDefault()
-    if (html.dataset.session === 'in') return openCourse()
+    if (html.dataset.session === 'in' && !setting) return openCourse()
     const emailField = form.querySelector<HTMLInputElement>('input[name="email"]')
     const field = form.querySelector<HTMLInputElement>('input[name="password"]')
     const email = emailField?.value.trim() ?? ''
@@ -83,11 +92,31 @@ for (const form of forms) {
       return
     }
     try {
-      const session = await signInAccount(email, password)
-      if (!session) {
-        missLine(form, landing.couldNot)
-        field?.select()
-        return
+      let session: AccountSession
+      if (setting) {
+        // The course opens only once the password is set, so an invited learner always has one.
+        if (!(await updatePassword(password, setting))) {
+          missLine(form, landing.setFail)
+          return
+        }
+        saveAccount(setting)
+        session = setting
+      } else {
+        const result = await signInResult(email, password)
+        if (!('session' in result)) {
+          const line =
+            'refused' in result
+              ? landing.wrong
+              : 'unset' in result
+                ? landing.unset
+                : navigator.onLine === false
+                  ? landing.offline
+                  : landing.couldNot
+          missLine(form, line)
+          field?.select()
+          return
+        }
+        session = result.session
       }
       const res = await fetch('/api/gate', {
         method: 'POST',
@@ -109,6 +138,45 @@ if (params.has('signin')) {
   openGate()
   history.replaceState(null, '', '/')
 }
+
+// A link from an email: set a password with its session, or say it is spent and offer a new one.
+const gateForm = document.querySelector<HTMLFormElement>('form#gate')
+if (link && gateForm) {
+  openGate()
+  if (link.kind === 'session') {
+    setting = link.session
+    const emailField = gateForm.querySelector<HTMLInputElement>('input[name="email"]')
+    const field = gateForm.querySelector<HTMLInputElement>('input[name="password"]')
+    if (emailField) {
+      emailField.value = link.session.email
+      emailField.readOnly = true
+    }
+    const label = gateForm.querySelector<HTMLElement>('[data-password-label]')
+    if (label) label.textContent = landing.newPassword
+    if (field) field.autocomplete = 'new-password'
+    const commit = gateForm.querySelector<HTMLButtonElement>('button[type="submit"]')
+    if (commit) commit.textContent = landing.setPassword
+    gateForm.dataset.mode = 'set'
+    field?.focus()
+  } else {
+    missLine(gateForm, landing.linkSpent)
+    // The next step is a new link, which starts from the email.
+    gateForm.querySelector<HTMLInputElement>('input[name="email"]')?.focus()
+  }
+}
+
+// Send a reset link to the address in the field. It lands on /learn/, which brings it back here.
+gateForm?.querySelector<HTMLButtonElement>('[data-reset]')?.addEventListener('click', async () => {
+  const emailField = gateForm.querySelector<HTMLInputElement>('input[name="email"]')
+  const email = emailField?.value.trim() ?? ''
+  if (!email.includes('@')) {
+    missLine(gateForm, landing.typeEmail)
+    emailField?.focus()
+    return
+  }
+  const sent = await sendPasswordReset(email, `${location.origin}/learn/`)
+  missLine(gateForm, sent ? landing.resetSent : landing.resetFail)
+})
 
 // Log in lives in the nav. The same control closes the panel.
 navSign?.addEventListener('click', (e) => {

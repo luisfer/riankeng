@@ -59,6 +59,11 @@ export interface ProgressDoc {
   opened?: { voice: number; script: number }
   /** 2 once Voice level numbers follow the order of 26 Sep 2026, Errands and Trouble early. */
   voiceOrder?: 2
+  /**
+   * The account these cards belong to, once one has synced them. A document with no owner is this
+   * browser's own, and joins the first account that signs in. Never written to an export file.
+   */
+  owner?: string
 }
 
 /**

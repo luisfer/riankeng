@@ -15,6 +15,7 @@ import {
 import type { TrackId } from '@content/types'
 import {
   fromMirror,
+  isDoc,
   loadDoc,
   loadSession,
   MIRROR_KEY,
@@ -28,9 +29,10 @@ import { emptyDoc, stampDoc, type ProgressDoc } from '@/storage/progress-schema'
 import { resetDoc } from '@/storage/import'
 import { exportJson } from '@/storage/export'
 import { mergeWork } from '@/storage/sync'
-import { readAccount, signOutAccount, takeRecoverySession, type AccountSession } from '@/storage/auth'
-import { syncAccount } from '@/storage/account-sync'
-import { setMirrorWrittenAt } from '@/storage/device'
+import { ACCOUNT_KEY, readAccount, signOutAccount, takeRecoverySession, type AccountSession } from '@/storage/auth'
+import { syncAccount, type SyncState } from '@/storage/account-sync'
+import { accountSavedAt, setAccountSavedAt, setMirrorWrittenAt } from '@/storage/device'
+import { clearStash, switchOwner } from '@/storage/owner'
 import * as mirrorFile from '@/storage/mirror-file'
 import type { MirrorState } from '@/storage/mirror-file'
 import { onVoices } from '@/audio/tts'
@@ -61,6 +63,12 @@ export function App() {
   })
   const [account, setAccount] = useState<AccountSession | null>(boot.session)
   const [recovery, setRecovery] = useState(boot.recovery)
+  const [syncState, setSyncState] = useState<SyncState | 'idle'>('idle')
+  const [syncTick, setSyncTick] = useState(0)
+  const [savedAt, setSavedAt] = useState(() => accountSavedAt())
+  const [sessionEnded, setSessionEnded] = useState(false)
+  const [keptApart, setKeptApart] = useState(false)
+  const [newer, setNewer] = useState(false)
   const mirrorRead = useRef(false)
   const persistOk = useRef(false)
   const skipSave = useRef(false)
@@ -91,15 +99,34 @@ export function App() {
       const live = stored ? normalizeSession(stored) : null
       if ((result.status === 'timeout' || result.status === 'failed') && !result.doc) {
         persistOk.current = false
+        setNewer(result.status === 'failed' && Boolean(result.newer))
         setSession(null)
         setLoadState('failed')
         return
       }
-      const nextDoc = stampOpened(result.doc ?? emptyDoc())
+      let nextDoc = stampOpened(result.doc ?? emptyDoc())
+      let switched = false
+      // Signed in as someone other than the owner of these cards (the landing's sign-in, or a
+      // recovery link): set them aside and open this account's own, before anything shows.
+      const signed = boot.session
+      if (signed && nextDoc.owner && nextDoc.owner !== signed.userId) {
+        const theirs = await switchOwner(nextDoc, signed.userId)
+        if (!alive) return
+        if (theirs) {
+          nextDoc = stampOpened(theirs)
+          switched = true
+        }
+      }
       setDoc(nextDoc)
-      hydratedSnapshot.current = nextDoc
+      hydratedSnapshot.current = switched ? null : nextDoc
       persistOk.current = true
-      setSession(live && sessionStillValid(live, nextDoc.createdAt) ? live : null)
+      if (switched) {
+        void saveDoc(nextDoc)
+        setAccountSavedAt(0)
+        setSavedAt(0)
+        setKeptApart(true)
+      }
+      setSession(!switched && live && sessionStillValid(live, nextDoc.createdAt) ? live : null)
       setLoadState('ready')
     })()
     return () => {
@@ -162,12 +189,34 @@ export function App() {
   useEffect(() => {
     if (loadState !== 'ready' || !account) return
     let cancelled = false
+    let retry: ReturnType<typeof setTimeout> | undefined
     const timer = setTimeout(() => {
-      // Offline there is no one to sync with. The first change after the network returns will.
-      if (typeof navigator !== 'undefined' && navigator.onLine === false) return
-      void syncAccount(docRef.current).then((next) => {
-        if (cancelled || !next) return
-        if (sameDocPayload(next, docRef.current)) return
+      // Offline there is no one to sync with. The network coming back tries again.
+      if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+        setSyncState('failed')
+        return
+      }
+      void syncAccount(docRef.current).then((result) => {
+        if (cancelled) return
+        setSyncState(result.state)
+        if (result.state === 'signed-out') {
+          setAccount(null)
+          setSessionEnded(true)
+          return
+        }
+        if (result.state === 'foreign') {
+          if (result.userId) void takeOwner(result.userId)
+          return
+        }
+        if (result.state === 'saved') {
+          const t = Date.now()
+          setAccountSavedAt(t)
+          setSavedAt(t)
+        } else {
+          retry = setTimeout(() => setSyncTick((n) => n + 1), 60_000)
+        }
+        const next = result.doc
+        if (!next || sameDocPayload(next, docRef.current)) return
         skipSave.current = false
         setDoc(next)
       })
@@ -175,8 +224,29 @@ export function App() {
     return () => {
       cancelled = true
       clearTimeout(timer)
+      clearTimeout(retry)
     }
-  }, [doc, loadState, account])
+  }, [doc, loadState, account, syncTick])
+
+  // A sync that did not get through tries again when the network returns or the tab comes back.
+  // Another tab signing in or out is followed here too.
+  useEffect(() => {
+    const again = () => setSyncTick((n) => n + 1)
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') again()
+    }
+    const onAccountKey = (ev: StorageEvent) => {
+      if (ev.key === ACCOUNT_KEY) setAccount(readAccount())
+    }
+    window.addEventListener('online', again)
+    document.addEventListener('visibilitychange', onVisible)
+    window.addEventListener('storage', onAccountKey)
+    return () => {
+      window.removeEventListener('online', again)
+      document.removeEventListener('visibilitychange', onVisible)
+      window.removeEventListener('storage', onAccountKey)
+    }
+  }, [])
 
   useEffect(() => {
     const applyRemote = (incoming: ProgressDoc) => {
@@ -193,7 +263,14 @@ export function App() {
         const at = (ev.data as { updatedAt?: number } | null)?.updatedAt
         if (typeof at !== 'number' || at <= docRef.current.updatedAt) return
         const mirrored = fromMirror()
-        if (mirrored) applyRemote(mirrored)
+        if (mirrored && mirrored.updatedAt >= at) {
+          applyRemote(mirrored)
+          return
+        }
+        // The mirror did not keep up (full, so removed). IndexedDB has the write.
+        void loadDoc().then((r) => {
+          if (r.status === 'ready' && r.doc.updatedAt >= at) applyRemote(r.doc)
+        })
       }
     } catch {
       /* unsupported */
@@ -201,8 +278,8 @@ export function App() {
     const onStorage = (ev: StorageEvent) => {
       if (ev.key !== MIRROR_KEY || !ev.newValue) return
       try {
-        const parsed = JSON.parse(ev.newValue) as ProgressDoc
-        if (parsed.app === 'riankeng') applyRemote(normalizeDoc(parsed))
+        const parsed = JSON.parse(ev.newValue) as unknown
+        if (isDoc(parsed)) applyRemote(normalizeDoc(parsed))
       } catch {
         /* ignore */
       }
@@ -238,6 +315,45 @@ export function App() {
 
   const commitDoc = (next: ProgressDoc) => setDoc(stampDoc(stampOpened(next)))
 
+  /**
+   * These cards belong to another account than the one now signed in. They go aside under their
+   * owner, and this account's own come back, or a fresh start. If the stash cannot be written,
+   * nothing changes: sync stays blocked, so nothing is merged into the wrong account.
+   */
+  const takeOwner = async (userId: string) => {
+    const theirs = await switchOwner(docRef.current, userId)
+    if (!theirs) return
+    setSession(null)
+    void saveSession(null)
+    void mirrorFile.forget()
+    setMirror(null)
+    setMirrorState(mirrorFile.supported() ? 'off' : 'unsupported')
+    setAccountSavedAt(0)
+    setSavedAt(0)
+    setKeptApart(true)
+    hydratedSnapshot.current = null
+    skipSave.current = false
+    setDoc(stampOpened(theirs))
+  }
+
+  const onAccount = (next: AccountSession | null) => {
+    setAccount(next)
+    if (!next) return
+    setSessionEnded(false)
+    const owner = docRef.current.owner
+    if (owner && owner !== next.userId) void takeOwner(next.userId)
+  }
+
+  /** After a first finished sitting, ask the browser not to clear this site's storage on its own. */
+  const askToKeep = () => {
+    try {
+      const storage = navigator.storage
+      void storage?.persisted?.().then((kept) => (kept ? undefined : storage.persist?.())).catch(() => undefined)
+    } catch {
+      /* unsupported */
+    }
+  }
+
   const onSession = (s: LiveSession) => {
     if (isFinished(s) && s.answered > 0) {
       setDoc((d) =>
@@ -257,6 +373,7 @@ export function App() {
         }),
       )
       setSession(null)
+      askToKeep()
       go({ name: 'journey' })
       return
     }
@@ -267,6 +384,12 @@ export function App() {
     signOutAccount()
     setAccount(null)
     setRecovery(false)
+    void clearStash()
+    setAccountSavedAt(0)
+    setSavedAt(0)
+    setKeptApart(false)
+    setSessionEnded(false)
+    setSyncState('idle')
     void mirrorFile.forget()
     setMirror(null)
     setMirrorState(mirrorFile.supported() ? 'off' : 'unsupported')
@@ -338,7 +461,7 @@ export function App() {
         {loadState === 'pending' && <main className="page" />}
         {loadState === 'failed' && (
           <main className="page">
-            <p className="lede">Progress did not load.</p>
+            <p className="lede">{newer ? chrome.loadNewer : chrome.loadFailed}</p>
           </main>
         )}
         {loadState === 'ready' && route.name === 'journey' && (
@@ -415,7 +538,14 @@ export function App() {
             onDoc={commitDoc}
             onReset={eraseDevice}
             account={account}
-            onAccount={setAccount}
+            onAccount={onAccount}
+            sync={{
+              state: syncState,
+              savedAt,
+              unsaved: !savedAt || doc.updatedAt > savedAt,
+              sessionEnded,
+              keptApart,
+            }}
             recovery={recovery}
             onRecoveryDone={() => setRecovery(false)}
           />

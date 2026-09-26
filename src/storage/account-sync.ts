@@ -7,7 +7,7 @@ import { currentId } from '@content/aliases'
 import { mergeItem } from './import'
 import { DEFAULT_SETTINGS, sanitizeDoc, type ProgressDoc, type SessionLog } from './progress-schema'
 import { sameDocPayload } from './db'
-import { accountConfig, currentAccess, type AccountSession } from './auth'
+import { accountConfig, currentAccess, readAccount, type AccountSession } from './auth'
 
 function unionSessions(a: SessionLog[], b: SessionLog[]): SessionLog[] {
   const map = new Map<number, SessionLog>()
@@ -48,6 +48,7 @@ export function mergeAccount(local: ProgressDoc, remote: ProgressDoc): ProgressD
     },
     // Both sides were read through sanitizeDoc, so both are already in the new order.
     voiceOrder: 2,
+    ...(local.owner ? { owner: local.owner } : {}),
   })
 }
 
@@ -108,19 +109,37 @@ async function upsertRemote(session: AccountSession, doc: ProgressDoc): Promise<
 }
 
 /**
- * Pull, merge, and upload. Returns a document only when this device should adopt it.
- * A failed request leaves the local document alone.
+ * saved: the account holds everything this browser has. failed: it may not, try again later.
+ * signed-out: the session was refused and is gone. foreign: these cards belong to another account.
  */
-export async function syncAccount(local: ProgressDoc): Promise<ProgressDoc | null> {
+export type SyncState = 'saved' | 'failed' | 'signed-out' | 'foreign'
+
+export interface SyncResult {
+  state: SyncState
+  /** A document this browser should adopt, when the merge brought something new. */
+  doc: ProgressDoc | null
+  /** The account now signed in, for a foreign result. */
+  userId?: string
+}
+
+/**
+ * Pull, merge, and upload. A failed request leaves the local document alone.
+ * Cards owned by another account are never merged into this one: the app sets them aside first.
+ * Cards with no owner join the first account that syncs them, once, and are its from then on.
+ */
+export async function syncAccount(local: ProgressDoc): Promise<SyncResult> {
   const session = await currentAccess()
-  if (!session) return null
+  // No usable session: refused (and so removed), or the refresh did not get through.
+  if (!session) return { state: readAccount() ? 'failed' : 'signed-out', doc: null }
+  if (local.owner && local.owner !== session.userId) return { state: 'foreign', doc: null, userId: session.userId }
   const remote = await fetchRemote(session)
-  if (remote.status === 'error') return null
+  if (remote.status === 'error') return { state: 'failed', doc: null }
   let merged = withDisplayName(remote.status === 'doc' ? mergeAccount(local, remote.doc) : local, session.displayName)
+  merged = { ...merged, owner: session.userId }
   const sameLocal = sameDocPayload(merged, local)
   const sameRemote = remote.status === 'doc' && sameDocPayload(merged, remote.doc)
-  if (sameLocal && sameRemote) return null
+  if (sameLocal && sameRemote) return { state: 'saved', doc: null }
   merged = { ...merged, updatedAt: Date.now() }
-  await upsertRemote(session, merged)
-  return sameLocal ? null : merged
+  const uploaded = await upsertRemote(session, merged)
+  return { state: uploaded ? 'saved' : 'failed', doc: sameLocal ? null : merged }
 }

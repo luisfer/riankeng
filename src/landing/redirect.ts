@@ -5,6 +5,8 @@
  * from the gate (?signin) stays, or a home-screen launch without the cookie loops.
  */
 export function landingRedirect(hash: string, search: string, standalone: boolean): string | null {
+  // A link from an email (a reset or an invite) is finished here, on the landing.
+  if (/(^#|&)(access_token|error)=/.test(hash)) return null
   if (hash.startsWith('#/')) return `/learn/${hash}`
   if (standalone && !new URLSearchParams(search).has('signin')) return '/learn/'
   return null

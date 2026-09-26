@@ -132,7 +132,79 @@ describe('syncAccount', () => {
     })
     vi.stubGlobal('fetch', fetchMock)
     const result = await syncAccount(answer(emptyDoc(t0), 'w:maa', t0))
-    expect(result).toBeNull()
+    expect(result).toEqual({ state: 'failed', doc: null })
     expect(fetchMock.mock.calls.some((call) => (call[1]?.method ?? 'GET') === 'POST')).toBe(false)
+  })
+})
+
+describe('syncAccount and who owns the cards', () => {
+  const signIn = (over: Record<string, unknown> = {}) => {
+    vi.stubEnv('VITE_SUPABASE_URL', 'https://example.supabase.co')
+    vi.stubEnv('VITE_SUPABASE_ANON_KEY', 'anon-key')
+    localStorage.setItem(
+      'riankeng:account',
+      JSON.stringify({
+        accessToken: 'a.b.c',
+        refreshToken: 'refresh',
+        expiresAt: Date.now() + 60 * 60 * 1000,
+        email: 'b@example.com',
+        displayName: '',
+        userId: 'user-1',
+        ...over,
+      }),
+    )
+  }
+
+  afterEach(() => {
+    vi.unstubAllEnvs()
+    vi.unstubAllGlobals()
+    localStorage.clear()
+  })
+
+  it('never reads or writes the account with cards another account owns', async () => {
+    signIn()
+    const fetchMock = vi.fn()
+    vi.stubGlobal('fetch', fetchMock)
+    const theirs = { ...answer(emptyDoc(t0), 'w:maa', t0), owner: 'user-2' }
+    expect(await syncAccount(theirs)).toEqual({ state: 'foreign', doc: null, userId: 'user-1' })
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  it('lets this browser own cards join the first account once, and marks them its', async () => {
+    signIn()
+    const posted: unknown[] = []
+    vi.stubGlobal('fetch', vi.fn(async (_input: RequestInfo, init?: RequestInit) => {
+      if ((init?.method ?? 'GET') === 'GET') return new Response('[]', { status: 200 })
+      posted.push(JSON.parse(String(init?.body)))
+      return new Response(null, { status: 201 })
+    }))
+    const result = await syncAccount(answer(emptyDoc(t0), 'w:maa', t0))
+    expect(result.state).toBe('saved')
+    expect(result.doc?.owner).toBe('user-1')
+    expect(result.doc?.items['w:maa']?.reps).toBe(1)
+    expect((posted[0] as { doc: { owner?: string } }).doc.owner).toBe('user-1')
+  })
+
+  it('reports a failed upload, so the app tries again', async () => {
+    signIn()
+    vi.stubGlobal('fetch', vi.fn(async (_input: RequestInfo, init?: RequestInit) =>
+      (init?.method ?? 'GET') === 'GET' ? new Response('[]', { status: 200 }) : new Response('no', { status: 500 }),
+    ))
+    const result = await syncAccount({ ...answer(emptyDoc(t0), 'w:maa', t0), owner: 'user-1' })
+    expect(result.state).toBe('failed')
+  })
+
+  it('tells a refused session from one that could not reach the server', async () => {
+    signIn({ expiresAt: Date.now() - 1000 })
+    vi.stubGlobal('fetch', vi.fn(async () => new Response('{"error":"invalid_grant"}', { status: 400 })))
+    expect((await syncAccount(emptyDoc(t0))).state).toBe('signed-out')
+    expect(localStorage.getItem('riankeng:account')).toBeNull()
+
+    signIn({ expiresAt: Date.now() - 1000 })
+    vi.stubGlobal('fetch', vi.fn(async () => {
+      throw new TypeError('offline')
+    }))
+    expect((await syncAccount(emptyDoc(t0))).state).toBe('failed')
+    expect(localStorage.getItem('riankeng:account')).not.toBeNull()
   })
 })

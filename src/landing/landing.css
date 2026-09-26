@@ -471,6 +471,9 @@ html[data-gate="open"] .signin,
   clip-path: inset(50%);
 }
 [data-waitlist-note]:focus { outline: none; }
+/* Send a reset link: type, quiet, under the form. Signed in, there is nothing to reset here. */
+.signin-reset { justify-self: start; font-size: 14px; }
+html[data-session="in"] .signin-reset { display: none; }
 html[data-session="in"] .signin .signin-label,
 html[data-session="in"] .signin .signin-field { display: none; }
 html[data-session="in"] .signin-row { grid-template-columns: auto; justify-content: start; }

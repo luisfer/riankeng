@@ -85,14 +85,17 @@ describe('her day', () => {
   })
 
   it('reads with no storage at all', () => {
-    vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+    // On the instance: happy-dom's storage does not always go through Storage.prototype.
+    const getItem = vi.spyOn(localStorage, 'getItem').mockImplementation(() => {
       throw new Error('blocked')
     })
-    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+    const setItem = vi.spyOn(localStorage, 'setItem').mockImplementation(() => {
       throw new Error('blocked')
     })
     const host = render(met(2))
     expect(host.querySelectorAll('.day-cell .balloon')).toHaveLength(2)
     expect(host.querySelector('.day-count')?.textContent).toBe(`2 of ${DEMO.length} lines.`)
+    expect(getItem).toHaveBeenCalled()
+    expect(setItem).toHaveBeenCalled()
   })
 })

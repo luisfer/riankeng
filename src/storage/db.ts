@@ -1,6 +1,6 @@
 import { get, set } from 'idb-keyval'
 import type { LiveSession } from '@/engine/session'
-import { DEFAULT_SETTINGS, emptyDoc, sanitizeDoc, type ProgressDoc } from './progress-schema'
+import { DEFAULT_SETTINGS, emptyDoc, PROGRESS_VERSION, sanitizeDoc, type ProgressDoc } from './progress-schema'
 import { aliasItems } from './import'
 
 const PROGRESS_KEY = 'riankeng:progress:v1'
@@ -46,6 +46,22 @@ export function fromMirror(): ProgressDoc | null {
   return null
 }
 
+/** Our document, written by a newer build of the course than this one. Never read, never written over. */
+export function isNewerDoc(value: unknown): boolean {
+  if (!value || typeof value !== 'object') return false
+  const v = value as { app?: unknown; version?: unknown }
+  return v.app === 'riankeng' && typeof v.version === 'number' && v.version > PROGRESS_VERSION
+}
+
+function rawMirror(): unknown {
+  try {
+    const raw = localStorage.getItem(MIRROR_KEY)
+    return raw ? (JSON.parse(raw) as unknown) : null
+  } catch {
+    return null
+  }
+}
+
 export function isDoc(value: unknown): value is ProgressDoc {
   if (!value || typeof value !== 'object') return false
   const v = value as ProgressDoc
@@ -61,10 +77,18 @@ export type LoadDocResult =
   | { status: 'ready'; doc: ProgressDoc }
   | { status: 'empty'; doc: ProgressDoc }
   | { status: 'timeout'; doc: ProgressDoc | null }
-  | { status: 'failed'; doc: ProgressDoc | null }
+  | { status: 'failed'; doc: ProgressDoc | null; newer?: true }
 
-/** Timeout is never treated as an empty document. */
-export function resolveLoad(idb: Timed<ProgressDoc | undefined>, mirror: ProgressDoc | null): LoadDocResult {
+/**
+ * Timeout is never treated as an empty document, and neither is a document a newer build wrote:
+ * reading it as empty would let the next answer write over it.
+ */
+export function resolveLoad(
+  idb: Timed<ProgressDoc | undefined>,
+  mirror: ProgressDoc | null,
+  mirrorRaw: unknown = null,
+): LoadDocResult {
+  if ((idb.ok && isNewerDoc(idb.value)) || isNewerDoc(mirrorRaw)) return { status: 'failed', doc: null, newer: true }
   if (!idb.ok) return { status: 'timeout', doc: mirror }
   if (isDoc(idb.value) && mirror) {
     const stored = normalizeDoc(idb.value)
@@ -77,7 +101,7 @@ export function resolveLoad(idb: Timed<ProgressDoc | undefined>, mirror: Progres
 
 export async function loadDoc(): Promise<LoadDocResult> {
   const idb = await withTimeout(get<ProgressDoc>(PROGRESS_KEY), IDB_MS)
-  return resolveLoad(idb, fromMirror())
+  return resolveLoad(idb, fromMirror(), rawMirror())
 }
 
 type WriteTask = { kind: 'doc'; doc: ProgressDoc } | { kind: 'session'; session: LiveSession | null }
@@ -112,11 +136,17 @@ async function writeDoc(doc: ProgressDoc): Promise<void> {
   try {
     localStorage.setItem(MIRROR_KEY, JSON.stringify(next))
   } catch {
-    /* quota */
+    // Full. A mirror left behind would be older than IndexedDB, and could win a later load or be
+    // served when IndexedDB is slow. No mirror is safer than a stale one.
+    try {
+      localStorage.removeItem(MIRROR_KEY)
+    } catch {
+      /* storage refused altogether */
+    }
   }
+  await withTimeout(set(PROGRESS_KEY, next), IDB_MS)
+  // After IndexedDB, so a tab that has to read it there finds this write.
   announceDoc(next)
-  const idb = await withTimeout(set(PROGRESS_KEY, next), IDB_MS)
-  if (!idb.ok) return
 }
 
 async function writeSession(session: LiveSession | null): Promise<void> {

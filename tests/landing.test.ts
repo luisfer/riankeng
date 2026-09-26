@@ -102,6 +102,13 @@ describe('the landing page', () => {
     expect(doc.querySelectorAll('#try .lede br:not(.narrow)')).toHaveLength(1)
   })
 
+  it('offers a reset link under Log in, and names the password field so a link can make it New password', () => {
+    const gate = doc.querySelector('form#gate')
+    expect(text(gate?.querySelector('[data-reset]') ?? null)).toBe('Send a reset link')
+    expect(gate?.querySelector('[data-reset]')?.getAttribute('type')).toBe('button')
+    expect(gate?.querySelector('label[for="password"]')?.hasAttribute('data-password-label')).toBe(true)
+  })
+
   it('keeps Log in in the nav, and the waitlist alone in the title cell', () => {
     expect(doc.querySelector('.cell.title form[data-signin]')).toBeNull()
     expect(doc.querySelector('.nav form[data-signin]')?.id).toBe('gate')

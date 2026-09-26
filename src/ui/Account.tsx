@@ -8,12 +8,14 @@ import {
   accountConfig,
   changePassword,
   sendPasswordReset,
-  signInAccount,
+  signInResult,
   signOutAccount,
   updatePassword,
   type AccountSession,
 } from '@/storage/auth'
+import type { SyncState } from '@/storage/account-sync'
 import { Commit, Meter, TextBtn } from './bits'
+import { chrome } from './copy'
 import { cleanGloss } from '@/engine/grader-en'
 
 const MONTH_WORD = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] as const
@@ -95,6 +97,30 @@ function HeatDay(props: { doc: ProgressDoc; day: string }) {
 }
 
 export const ERASE_CONFIRM = 'Erase cards on this browser and sign out? The account keeps its copy.'
+
+/** What erasing loses: nothing while the account holds every card, else say so plainly. */
+export function eraseConfirm(signedIn: boolean, saved: boolean): string {
+  if (signedIn && saved) return ERASE_CONFIRM
+  return signedIn ? chrome.eraseUnsaved : chrome.eraseSignedOut
+}
+
+/** Where the account stands with this browser's cards. */
+export interface AccountSync {
+  state: SyncState | 'idle'
+  /** When the account last held everything this browser had. 0: not yet. */
+  savedAt: number
+  /** Cards changed since then, or never saved at all. */
+  unsaved: boolean
+  /** The session was refused and removed, so saving stopped. */
+  sessionEnded: boolean
+  /** Another account's cards were set aside on this browser. */
+  keptApart: boolean
+}
+
+export function syncLine(sync: AccountSync, now = Date.now()): string {
+  if (sync.unsaved || sync.state === 'failed' || !sync.savedAt) return chrome.notSaved
+  return `${chrome.savedTo} ${agoWords(sync.savedAt, now)}.`
+}
 
 export function localDayKey(now = Date.now()): string {
   const day = new Date(now)
@@ -181,6 +207,7 @@ export function Account(props: {
   onReset: () => void
   account: AccountSession | null
   onAccount: (session: AccountSession | null) => void
+  sync: AccountSync
   recovery: boolean
   onRecoveryDone: () => void
 }) {
@@ -213,14 +240,20 @@ export function Account(props: {
     }
     setSigningIn(true)
     setSignInNote('')
-    void signInAccount(email, password).then((session) => {
+    void signInResult(email, password).then((result) => {
       setSigningIn(false)
-      if (!session) {
-        setSignInNote('Could not sign in.')
+      if (!('session' in result)) {
+        setSignInNote(
+          'refused' in result
+            ? 'Wrong email or password.'
+            : navigator.onLine === false
+              ? 'No connection.'
+              : 'Could not sign in.',
+        )
         return
       }
       setPassword('')
-      props.onAccount(session)
+      props.onAccount(result.session)
     })
   }
   const submitPassword = () => {
@@ -286,6 +319,10 @@ export function Account(props: {
       {signedIn ? (
         <>
           <p className="lede">{props.account?.displayName || props.account?.email}</p>
+          <p className="account-quiet" role="status">
+            {syncLine(props.sync)}
+          </p>
+          {props.sync.keptApart && <p className="account-quiet">{chrome.keptApart}</p>}
           <form
             onSubmit={(e) => {
               e.preventDefault()
@@ -340,6 +377,7 @@ export function Account(props: {
             submitSignIn()
           }}
         >
+          {props.sync.sessionEnded && <p className="lede">{chrome.sessionEnded}</p>}
           <label className="field">
             <span>Email</span>
             <input
@@ -518,7 +556,7 @@ export function Account(props: {
       >
         <div className="confirm-sheet">
           <h2 id="erase-title">Erase this device</h2>
-          <p>{ERASE_CONFIRM}</p>
+          <p>{eraseConfirm(signedIn, signedIn && !props.sync.unsaved && props.sync.savedAt > 0)}</p>
           <div className="confirm-acts">
             <button type="button" className="btn secondary" autoFocus onClick={() => eraseRef.current?.close()}>
               Keep the cards

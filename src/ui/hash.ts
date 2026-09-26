@@ -57,6 +57,13 @@ export function go(route: Route): void {
   else window.dispatchEvent(new HashChangeEvent('hashchange'))
 }
 
+/** The address bar catches up with a screen already turning: a Back stop as `go` makes, and no second turn. */
+export function follow(route: Route): void {
+  const next = hashFor(route)
+  if (window.location.hash === next) return
+  window.history.pushState(null, '', `${window.location.pathname}${window.location.search}${next}`)
+}
+
 /** Leave a dead `#/session` without stacking another Back stop. */
 export function replace(route: Route): void {
   const next = hashFor(route)

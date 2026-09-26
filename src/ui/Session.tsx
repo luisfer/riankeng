@@ -8,6 +8,7 @@ import {
   afterMeet,
   alreadyScored,
   currentItem,
+  isFinished,
   markCorrect,
   markMissMove,
   markMissStay,
@@ -210,12 +211,14 @@ export function SessionView(props: {
       return
     }
     const verdict = ack ?? props.session.pending
-    setAck(null)
-    setAnswer('')
-    setSlipLine(null)
-    if (hold) props.onSession(afterHold(props.session))
-    else if (verdict?.ok) props.onSession(markCorrect(props.session))
-    else props.onSession(requeueCurrent(props.session))
+    const next = hold ? afterHold(props.session) : verdict?.ok ? markCorrect(props.session) : requeueCurrent(props.session)
+    // The last card stays as it was, answer and all, while the page turns to the end of the sitting.
+    if (!isFinished(next)) {
+      setAck(null)
+      setAnswer('')
+      setSlipLine(null)
+    }
+    props.onSession(next)
   }
   goNextRef.current = goNext
 

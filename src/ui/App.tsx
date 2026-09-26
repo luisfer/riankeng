@@ -36,7 +36,7 @@ import { clearStash, switchOwner } from '@/storage/owner'
 import * as mirrorFile from '@/storage/mirror-file'
 import type { MirrorState } from '@/storage/mirror-file'
 import { onVoices } from '@/audio/tts'
-import { go, parseHash, replace, type Route } from './hash'
+import { follow, go, parseHash, replace, type Route } from './hash'
 import { Account, khunName } from './Account'
 import { Alphabet } from './Alphabet'
 import { Journey } from './Journey'
@@ -388,13 +388,13 @@ export function App() {
       )
       askToKeep()
       // One render ends the sitting and opens its page, so the guard that leaves a dead #/session
-      // never sees one; the hash follows.
+      // never sees one; the hash follows, quietly, or its change would start a second turn.
       turnPage(routeRef.current, { name: 'done' }, () => {
         setSession(null)
         setLastSitting(s)
         setRoute({ name: 'done' })
       })
-      go({ name: 'done' })
+      follow({ name: 'done' })
       return
     }
     setSession(s)

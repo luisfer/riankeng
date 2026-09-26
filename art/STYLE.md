@@ -166,25 +166,57 @@ Rules that follow from it:
 1. Describe the scene, not the style. The style is the reference. Every
    sentence about style is a chance to contradict the drawing.
 2. References are fixed: `art/refs/page-strip.png`, `art/scenes/tea.png`,
-   `art/scenes/coffee.png`, plus one shipped panel of the same kind of place.
-   Never a candidate as a reference.
+   `art/scenes/coffee.png`, plus one shipped panel of the same kind of place,
+   and the crops in `art/refs/cast/` of the people in the scene (they are cut
+   from shipped panels). Four at most. Never a candidate as a reference.
 3. A handful at a time, every one from the same fixed references. Look at each
    beside tea before drawing the next batch.
 4. Nothing goes into `art/scenes` without passing the gate and Luis.
 
+## Staging: draw what the model can build
+
+The model paints what looks right patch by patch; it does not build a room. It
+fails where space has to add up. The toilet panel is the lesson: a corridor in
+deep perspective beside a door that stands behind the man, and no floor under
+either of them. The panels that work are staged like a stage: one flat wall,
+one floor, two people on it, a few things resting on things. So every scene is
+staged that way, on purpose.
+
+- Straight on, at eye level. The back wall is flat and faces us. The floor is
+  a band across the bottom, and every figure stands on it, feet on it.
+- Two people, three at most, side by side in the left and right thirds, facing
+  each other or us. They never overlap. The speaker's third takes the balloon.
+- Hands at their sides, or one gesture (a wai, pointing, a wave, handing
+  something over), or one thing held in both hands. No counting on fingers,
+  no chopsticks mid-bite, no writing.
+- A door or a window is drawn whole on the back wall; a door reaches the floor.
+  Behind a head there is only wall. Nothing stands in a doorway behind anyone.
+- Three to five props, each resting on a named surface or held.
+- Seated only on a low stool, a step or a floor mat, seen from the side.
+- Vehicles side-on, parked or riding across the panel. Thailand keeps left.
+- Never: a corridor or a street in perspective, a crowd, a mirror, a screen
+  with anything on it, a sign with letters, a calendar, a clock with numbers.
+- Each person from `art/UNIVERSE.md` plays their own role in their own place.
+
+A shot card in `art/shots.md` holds all of it: place, who stands in which
+third and faces whom, what each hand does, the props and what they rest on,
+the wall and what hangs on it where, who speaks, and the time of day.
+
 ## Drawing a new panel
 
 1. Pick a real Voice entry with a shipped clip: `getEntry(id)` and
-   `hasShippedClip(id)` must both hold. Tests enforce this.
+   `hasShippedClip(id)` must both hold. Tests enforce this. The cards waiting
+   to be drawn are in `art/shots.md`; the batches of prompts made from them are
+   in `art/batches/`.
 2. Prompt, in this order, and nothing else:
    the prefix above, verbatim.
-   One sentence of scene: who she is with, where, what they hold, what the
-   floor and the background are. End it with "all seen straight on" ("seen
-   from the side" for a ride). A street in deep perspective comes back busy and
-   over-detailed; a flat wall with a door, a plant or a lamp reads like the
-   shipped panels.
+   One sentence of scene, from the shot card: who she is with, where each
+   stands, what they hold, what the floor and the back wall are. End it with
+   "all seen straight on" ("seen from the side" for a ride). A street in deep
+   perspective comes back busy and over-detailed; a flat wall with a door, a
+   plant or a lamp reads like the shipped panels.
    "One white oval speech balloon in the upper part of the panel, tail toward
-   her, empty inside. No letters, no numbers, no logos anywhere."
+   <the speaker>, empty inside. No letters, no numbers, no logos anywhere."
    Aspect 1:1. References as listed.
 3. Save the PNG as `art/candidates/<stem>.png`. Short stem, one word. The image
    tool moves its output to `~/Downloads/cursor-generated-assets` within
@@ -195,6 +227,15 @@ Rules that follow from it:
    `art/candidates/sheet.png`: each candidate between tea and coffee at the
    same size, with its numbers and PASS or FAIL. Read the sheet. A pass is a
    floor, not approval.
+   Then every candidate is looked at, full size, and gets a verdict in
+   `art/candidates/review-NN.md`: anatomy (two arms, two legs, hands, feet on
+   the floor), posture and balance, space (one floor, doors and windows whole,
+   props resting on something, sizes that agree), the cast as `UNIVERSE.md`
+   draws them, Thai life drawn right (the wai, a monk's robe, traffic on the
+   left, no letters anywhere), the house line, and one empty balloon with its
+   tail to the speaker. PASS; FIX, with one local edit for the image tool (the
+   candidate as reference, "keep everything, only ..."); or REDRAW, with the
+   card changed. Luis sees only what passed.
 5. Luis says yes or no per panel.
 6. `python3 scripts/gen-scenes.py --approve <stem>` moves it into
    `art/scenes` and prints its `SEEDS` line. Add the line, run

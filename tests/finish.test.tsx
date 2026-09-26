@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { act } from 'react'
 import { createRoot } from 'react-dom/client'
 import { entriesForLevel } from '../content/index'
-import type { LiveSession } from '../src/engine/session'
+import { afterMeet, isFinished, markCorrect, markMissMove, requeueCurrent, type LiveSession } from '../src/engine/session'
 import { countWord, Finish, sittingTally, tallyLine } from '../src/ui/Finish'
 
 ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
@@ -21,6 +21,29 @@ describe('the page that closes a sitting', () => {
     const tally = sittingTally(finished(ids, ids.slice(0, 3)))
     expect(tally.cards).toHaveLength(16)
     expect(tally.firstTime).toBe(13)
+  })
+
+  it('keeps the cards the queue turned past, after a Look and after a miss', () => {
+    const [a, b, c, d] = ids
+    let s: LiveSession = {
+      startedAt: 1, level: 1, track: 'voice', cursor: 0, answered: 0, correct: 0, hold: null,
+      queue: [
+        { id: a!, modality: 'th-en', salt: 'a' },
+        { id: b!, modality: 'en-th', salt: 'b' },
+        { id: c!, modality: 'th-en', salt: 'c', meet: true },
+        { id: d!, modality: 'th-en', salt: 'd' },
+      ],
+    }
+    s = markCorrect(s) // a, right
+    s = requeueCurrent(markMissMove(s)) // b, missed: it goes to the back and a turns past
+    s = afterMeet(s) // c, looked at: its test goes to the back
+    s = markCorrect(s) // d
+    s = markCorrect(s) // b, right the second time
+    s = markCorrect(s) // c, right
+    expect(isFinished(s)).toBe(true)
+    const tally = sittingTally(s)
+    expect(tally.cards.map((e) => e.id)).toEqual([a, b, c, d])
+    expect(tally.firstTime).toBe(3)
   })
 
   it('writes the tally as a primer does, in words', () => {

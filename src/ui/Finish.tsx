@@ -1,7 +1,8 @@
+import { useEffect, useRef } from 'react'
 import { LEVELS, SCRIPT_LEVELS, getEntry } from '@content/index'
 import type { Entry } from '@content/types'
 import { unlockCount, type LevelStatus } from '@/engine/scheduler'
-import type { LiveSession } from '@/engine/session'
+import { sittingCards, type LiveSession } from '@/engine/session'
 import { ReviewRows } from './AlreadyYours'
 import { Commit, Meter, TextBtn } from './bits'
 import { chrome } from './copy'
@@ -21,7 +22,7 @@ export function sittingTally(session: LiveSession): { cards: Entry[]; firstTime:
   const seen = new Set<string>()
   const missed = new Set<string>()
   const cards: Entry[] = []
-  for (const q of session.queue) {
+  for (const q of sittingCards(session)) {
     if (q.penalized) missed.add(q.id)
     if (seen.has(q.id)) continue
     seen.add(q.id)
@@ -50,6 +51,12 @@ export function Finish(props: {
   onBack: () => void
 }) {
   const { cards, firstTime } = sittingTally(props.sitting)
+  // Sit again holds the focus, one Enter from the next sitting, but the page stays at its top: on a
+  // phone the sixteen words below would otherwise scroll the tally out of sight.
+  const actions = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    actions.current?.querySelector<HTMLButtonElement>('.commit')?.focus({ preventScroll: true })
+  }, [])
   const track = props.sitting.track ?? 'voice'
   const review = Boolean(props.sitting.review)
   const level = (track === 'script' ? SCRIPT_LEVELS : LEVELS)[props.sitting.level]
@@ -70,8 +77,8 @@ export function Finish(props: {
         </div>
       )}
       <ReviewRows entries={cards} audioRate={props.audioRate} />
-      <div className="finish-actions">
-        <Commit onClick={props.onAgain} autoFocus>
+      <div className="finish-actions" ref={actions}>
+        <Commit onClick={props.onAgain}>
           {review ? chrome.reviewAgain : chrome.sitAgain}
         </Commit>
         <TextBtn onClick={props.onBack}>{review ? chrome.yoursTitle : track === 'script' ? 'Script' : 'Voice'}</TextBtn>

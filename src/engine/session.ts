@@ -45,6 +45,12 @@ export interface LiveSession {
    * so the number in the margin is this plus one. Older sittings count from their answers.
    */
   step?: number
+  /**
+   * Cards met before the queue last turned, in order. A turn drops the cards ahead of the cursor and
+   * sends the current one to the back, so they wait here for the page at the end of the sitting.
+   * Missing on older sittings.
+   */
+  past?: QueueItem[]
 }
 
 function stepped(session: LiveSession): number {
@@ -223,8 +229,17 @@ export function afterMeet(session: LiveSession): LiveSession {
   if (!item?.meet) return session
   const tested = { ...item, meet: false }
   const rest = session.queue.slice(session.cursor + 1)
-  if (rest.length === 0) return { ...session, queue: [tested], cursor: 0, step: stepped(session) }
-  return { ...session, queue: [...rest, tested], cursor: 0, step: stepped(session) }
+  return { ...session, queue: [...rest, tested], past: turnedPast(session), cursor: 0, step: stepped(session) }
+}
+
+/** The cards met before a turn of the queue: those from earlier turns, then this one's, the current card last. */
+function turnedPast(session: LiveSession): QueueItem[] {
+  return [...(session.past ?? []), ...session.queue.slice(0, session.cursor + 1)]
+}
+
+/** Every card this sitting has held, in the order it met them, a card met twice once for each time. */
+export function sittingCards(session: LiveSession): QueueItem[] {
+  return [...(session.past ?? []), ...session.queue]
 }
 
 export function markCorrect(session: LiveSession): LiveSession {
@@ -292,6 +307,7 @@ export function requeueCurrent(session: LiveSession): LiveSession {
   return {
     ...session,
     queue: [...rest, { ...item, scored: false }],
+    past: turnedPast(session),
     cursor: 0,
     hold: null,
     pending: undefined,

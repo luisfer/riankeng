@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { allLevelStatus, reviewEntries, stampOpened, unlockCount, withOpened } from '@/engine/scheduler'
+import { allLevelStatus, reviewDue, reviewEntries, stampOpened, unlockCount, withOpened } from '@/engine/scheduler'
 import {
   canContinue,
   canResumeReview,
@@ -296,6 +296,7 @@ export function App() {
   const voiceStatuses = allLevelStatus(doc, Date.now(), 'voice')
   const scriptStatuses = allLevelStatus(doc, Date.now(), 'script')
   const yours = reviewEntries(doc)
+  const yoursDue = reviewDue(doc)
   const accountLabel = khunName(doc.settings.name) || 'Account'
 
   const beginLevel = (n: number, track: TrackId) => {
@@ -471,6 +472,7 @@ export function App() {
             onTrack={(track) => go({ name: 'track', track })}
             onReview={() => go({ name: 'review' })}
             yoursCount={yours.length}
+            yoursDue={yoursDue}
             dayCount={saidStems(doc).size}
             onDay={() => go({ name: 'day' })}
             onAlphabet={() => go({ name: 'alphabet' })}
@@ -491,6 +493,7 @@ export function App() {
         {loadState === 'ready' && route.name === 'review' && (
           <ReviewPage
             pool={yours}
+            due={yoursDue}
             audioRate={doc.settings.audioRate}
             onSit={sitThese}
             canResume={canResumeReview(session)}

@@ -16,7 +16,8 @@
   --word-rom: var(--lacquer);
   --ink: #1c1710;
   --ink-2: #5a5146;
-  --ink-3: #8a8074;
+  /* Small meta text: 5:1 on paper, as small text needs. #8a8074 was 3.2:1. */
+  --ink-3: #6b6155;
   --hair: rgba(28, 23, 16, 0.14);
   color-scheme: light;
   /* Noto Serif Thai's face is range-limited to Thai, so it sits in every stack and only ever draws Thai. */

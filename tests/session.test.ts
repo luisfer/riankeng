@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { entriesForLevel, getEntry } from '../content/index'
+
+const ENTRIES_SCRIPT = entriesForLevel(1, 'script')
 import {
   afterHold,
   afterMeet,
@@ -23,7 +25,7 @@ import {
 import { chooseModality } from '../src/engine/scheduler'
 import { emptyDoc } from '../src/storage/progress-schema'
 import { newItemProgress, type ItemProgress } from '../src/engine/srs'
-import { pickPrompt } from '../src/ui/Session'
+import { pairMiss, pickPrompt } from '../src/ui/Session'
 
 describe('session transitions', () => {
   it('markCorrect advances and scores', () => {
@@ -281,6 +283,22 @@ describe('startSession leftover', () => {
     expect(s.queue.slice(0, 4).every((q) => due.some((e) => e.id === q.id))).toBe(true)
   })
 
+  it('keeps seats for earlier levels even when the level itself has more than a sitting due', () => {
+    const now = 1_700_000_000_000
+    const doc = emptyDoc(now)
+    // Voice 4, every card met and due, far more than one sitting holds.
+    const level4 = entriesForLevel(4, 'voice')
+    expect(level4.length).toBeGreaterThan(SESSION_SIZE)
+    for (const e of level4) doc.items[e.id] = dueItem(e.id, now - 1000)
+    // And six cards from Voice 0, due for longer.
+    const early = entriesForLevel(0, 'voice').slice(0, 6)
+    for (const e of early) doc.items[e.id] = dueItem(e.id, now - 10 * 86_400_000)
+    const s = startSession(doc, now, 4, 'voice')
+    const earlyIds = new Set(early.map((e) => e.id))
+    expect(s.queue).toHaveLength(SESSION_SIZE)
+    expect(s.queue.filter((q) => earlyIds.has(q.id))).toHaveLength(REVIEW_TAIL)
+  })
+
   it('reserves earlier dues instead of stuffing leftovers', () => {
     const now = 1_700_000_000_000
     const doc = emptyDoc(now)
@@ -293,6 +311,13 @@ describe('startSession leftover', () => {
 })
 
 describe('sittingModality', () => {
+  it('turns a saved Script English-to-romanization card into a pick', () => {
+    const script = ENTRIES_SCRIPT[0]!
+    expect(sittingModality({ id: script.id, modality: 'en-th', salt: 'x' }, true)).toBe('pick')
+    const voice = entriesForLevel(1, 'voice')[0]!
+    expect(sittingModality({ id: voice.id, modality: 'en-th', salt: 'x' }, true)).toBe('en-th')
+  })
+
   it('renders listen and tone as writing when the card cannot be heard', () => {
     const s = startSession(emptyDoc(), 1, 0, 'voice')
     expect(sittingModality({ ...currentItem(s)!, modality: 'listen' }, false)).toBe('th-en')
@@ -329,5 +354,15 @@ describe('the number in the margin', () => {
   it('reads an older sitting by its answers', async () => {
     const { cardNumber } = await import('../src/ui/Session')
     expect(cardNumber({ startedAt: 1, level: 0, cursor: 0, answered: 5, correct: 4, hold: null, queue: [] })).toBe(6)
+  })
+})
+
+describe('a wrong pick between two sounds', () => {
+  it('is a slip when only the tone or the length differs, and wrong when the sound does', () => {
+    const tone = pairMiss('maa', 'mǎa')
+    expect(tone.v).toBe('tone')
+    expect([...tone.slips.values()]).toEqual(['rising'])
+    expect(pairMiss('kâo', 'kâao').v).toBe('length')
+    expect(pairMiss('gai', 'kai').v).toBe('wrong')
   })
 })

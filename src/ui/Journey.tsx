@@ -102,6 +102,8 @@ export function Journey(props: {
   onDay: () => void
   /** Words already met. The hub offers them as a review. */
   yoursCount?: number
+  /** Of those, the ones due now. */
+  yoursDue?: number
   /** Panels of her day already lettered. */
   dayCount?: number
 }) {
@@ -132,7 +134,7 @@ export function Journey(props: {
           title="Already yours"
           sub={props.yoursCount ? `${props.yoursCount} words` : chrome.yoursSub}
           rom
-          meta={props.yoursCount ? 'Review' : ''}
+          meta={props.yoursDue ? `${props.yoursDue} due` : props.yoursCount ? 'Review' : ''}
           onOpen={props.onReview}
         />
         <Row

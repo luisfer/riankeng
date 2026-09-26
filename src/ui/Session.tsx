@@ -36,6 +36,16 @@ import { LetterInk, preloadLetters } from './LetterInk'
 const TONE_ORDER: Tone[] = TONES
 
 /** Pick shows the English gloss only. Rom would give the answer away. */
+/**
+ * A wrong pick between two sounds, graded as typing it would be. Hearing máa as mǎa is a near miss:
+ * a slip, one stage, the tone named on the line. Hearing g as k is not, and costs what a wrong answer costs.
+ */
+export function pairMiss(target: string, picked: string): { v: 'tone' | 'length' | 'wrong'; target: string; slips: Map<number, Tone> } {
+  const g = gradeThai(target, picked)
+  const v = g.verdict === 'tone' || g.verdict === 'length' ? g.verdict : 'wrong'
+  return { v, target: g.matchedTarget ?? target, slips: new Map(g.toneSlips.map((s) => [s.syllable, s.got])) }
+}
+
 export function pickPrompt(entry: { en: string[] }): string {
   return cleanGloss(entry.en[0] ?? '')
 }
@@ -87,22 +97,42 @@ export function SessionView(props: {
   const [, setVoiceTick] = useState(0)
   const goNextRef = useRef(() => {})
   const attemptedRef = useRef(false)
+  /** The choices on the desk now, by number key: the same numbers the buttons show. */
+  const choicesRef = useRef<Map<string, () => void>>(new Map())
   const track = props.session.track ?? 'voice'
   const script = item ? entryTrack(entryOrThrow(item.id)) === 'script' : track === 'script'
   const meeting = Boolean(item?.meet && !props.session.hold)
   const waitingNext = Boolean(props.session.pending && (props.session.pending.ok || !props.session.hold))
   const canAdvance = meeting || waitingNext
 
+  // A new card starts clean. Check does not: what was written stays on the line beside Next.
   useEffect(() => {
-    attemptedRef.current = Boolean(item?.scored || props.session.pending)
     setAnswer('')
-    setAck(props.session.pending ?? null)
-    setHint(null)
     setHeard(false)
     setToneStep(0)
+  }, [item?.id, item?.modality, item?.meet, props.session.cursor, props.session.step])
+
+  useEffect(() => {
+    attemptedRef.current = Boolean(item?.scored || props.session.pending)
+    setAck(props.session.pending ?? null)
+    setHint(null)
   }, [item?.id, item?.modality, item?.meet, item?.scored, props.session.pending])
 
   useEffect(() => onVoices(() => setVoiceTick((n) => n + 1)), [])
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.altKey || e.metaKey || e.ctrlKey || e.repeat) return
+      const target = e.target as HTMLElement | null
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) return
+      const pick = choicesRef.current.get(e.key)
+      if (!pick) return
+      e.preventDefault()
+      pick()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
 
   // A Script sitting fetches the letter outlines early, so the first letter inks in at once.
   useEffect(() => {
@@ -126,8 +156,9 @@ export function SessionView(props: {
     if (!item || props.doc.settings.silent) return
     const onKey = (e: KeyboardEvent) => {
       if (!e.altKey || e.metaKey || e.ctrlKey || e.repeat) return
-      const key = e.key.toLowerCase()
-      if (key !== 'h' && key !== 's') return
+      // By the key, not the character: Option+H on a Mac types ˙, which would land in the answer.
+      const key = e.code === 'KeyH' ? 'h' : e.code === 'KeyS' ? 's' : ''
+      if (!key) return
       e.preventDefault()
       const card = entryOrThrow(item.id)
       setHeard(true)
@@ -276,8 +307,14 @@ export function SessionView(props: {
 
   const submitPair = (rom: string) => {
     if (ack || alreadyScored(props.session)) return
-    const ok = rom === entry.rom
-    noteAttempt(ok, ok ? 'exact' : 'wrong', ok ? 'Right.' : `That was ${entry.rom}.`, ok ? undefined : 'move')
+    if (rom === entry.rom) {
+      noteAttempt(true, 'exact', 'Right.')
+      return
+    }
+    const miss = pairMiss(entry.rom, rom)
+    if (noteAttempt(false, miss.v, `That was ${entry.rom}.`, 'move') && miss.slips.size > 0) {
+      setSlipLine({ target: miss.target, slips: miss.slips })
+    }
   }
 
   const submitPick = (thai: string) => {
@@ -407,42 +444,59 @@ export function SessionView(props: {
     submitEn()
   }
 
+  // A card answered by choosing: two sounds, a letter, or a tone. Each choice has a number key,
+  // and a tone's number is the one the key strip writes it with: 1 low, 2 falling, 3 high, 4 rising, 0 mid.
+  const choiceKind: 'pair' | 'glyph' | 'tone' | null =
+    meeting || waitingNext
+      ? null
+      : pairing && hearable && heard && !hold
+        ? 'pair'
+        : modality === 'pick' && !hold
+          ? 'glyph'
+          : modality === 'tone' && !hold
+            ? 'tone'
+            : null
+  const choices: { key: string; label: string; pick: () => void }[] =
+    choiceKind === 'pair'
+      ? pairRoms(entry).map((rom, i) => ({ key: String(i + 1), label: rom, pick: () => submitPair(rom) }))
+      : choiceKind === 'glyph'
+        ? pickChoices(entry).map((thai, i) => ({ key: String(i + 1), label: showThai(thai), pick: () => submitPick(thai) }))
+        : choiceKind === 'tone'
+          ? TONE_ORDER.map((t, i) => ({ key: String(i), label: TONE_LABEL[t], pick: () => submitTone(t) }))
+          : []
+  choicesRef.current = new Map(ack ? [] : choices.map((c) => [c.key, c.pick]))
+
   const desk = meeting ? (
     <div className="answer-form bare">
       <div />
-      <Commit onClick={goNext}>Continue</Commit>
+      <Commit onClick={goNext} autoFocus>
+        Continue
+      </Commit>
     </div>
   ) : waitingNext ? (
-    /* What was written stays on its line, and Next stands where Check stood. */
+    /* What was written stays on its line, and Next stands where Check stood, with the focus. */
     <div className={answer ? 'answer-form said' : 'answer-form bare'}>
       <p className={`answer-said${voiceEn ? ' en' : ' rom'}`}>{answer}</p>
-      <Commit onClick={goNext}>Next</Commit>
+      <Commit onClick={goNext} autoFocus>
+        Next
+      </Commit>
     </div>
   ) : pairing && hearable && !heard ? (
     <div className="answer-form bare">
       <div />
     </div>
-  ) : pairing && hearable && heard && !hold ? (
-    <div className="tone-picks">
-      {pairRoms(entry).map((rom) => (
-        <button key={rom} type="button" className="tone-word rom" onClick={() => submitPair(rom)}>
-          {rom}
-        </button>
-      ))}
-    </div>
-  ) : modality === 'pick' && !hold ? (
-    <div className="glyph-picks">
-      {pickChoices(entry).map((thai, i) => (
-        <button key={`${thai}-${i}`} type="button" className="glyph-pick thai" onClick={() => submitPick(thai)}>
-          {showThai(thai)}
-        </button>
-      ))}
-    </div>
-  ) : modality === 'tone' && !hold ? (
-    <div className="tone-picks">
-      {TONE_ORDER.map((t) => (
-        <button key={t} type="button" className="tone-word" onClick={() => submitTone(t)}>
-          {TONE_LABEL[t]}
+  ) : choices.length > 0 ? (
+    <div className={choiceKind === 'glyph' ? 'glyph-picks' : 'tone-picks'}>
+      {choices.map((c) => (
+        <button
+          key={c.key}
+          type="button"
+          className={choiceKind === 'glyph' ? 'glyph-pick thai' : choiceKind === 'pair' ? 'tone-word rom' : 'tone-word'}
+          aria-keyshortcuts={c.key}
+          onClick={c.pick}
+        >
+          <span className="pop-k">{c.key}</span>
+          {c.label}
         </button>
       ))}
     </div>

@@ -70,14 +70,17 @@ export function Commit({
   onClick,
   disabled,
   type = 'button',
+  autoFocus,
 }: {
   children: ReactNode
   onClick?: () => void
   disabled?: boolean
   type?: 'button' | 'submit'
+  /** Take focus when it appears, as Next does once Check has landed and the field is gone. */
+  autoFocus?: boolean
 }) {
   return (
-    <button type={type} className="btn primary commit" onClick={onClick} disabled={disabled}>
+    <button type={type} className="btn primary commit" onClick={onClick} disabled={disabled} autoFocus={autoFocus}>
       {children}
     </button>
   )

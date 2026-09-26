@@ -1,4 +1,4 @@
-import { entriesForLevel, getEntry } from '@content/index'
+import { entriesForLevel, entryTrack, getEntry } from '@content/index'
 import type { TrackId } from '@content/types'
 import { hasShippedClip } from '@/audio/clips'
 import { detectVoice } from '@/audio/tts'
@@ -52,7 +52,10 @@ function stepped(session: LiveSession): number {
 }
 
 export const SESSION_SIZE = 16
-/** Earlier-level dues that may trail a sitting, after the opened level is filled. */
+/**
+ * Seats kept in every sitting for cards from earlier levels that are due. Without them a big level
+ * (Voice 4 has 110 cards) fills every sitting for weeks, and the words learned before it go stale.
+ */
 export const REVIEW_TAIL = 4
 
 export function startSession(doc: ProgressDoc, now = Date.now(), level?: number, track: TrackId = 'voice'): LiveSession {
@@ -94,20 +97,16 @@ export function startSession(doc: ProgressDoc, now = Date.now(), level?: number,
     .sort((a, b) => progressFor(doc, a.id).lastSeen - progressFor(doc, b.id).lastSeen)
   const onLevelIds = new Set(onLevel.map((e) => e.id))
 
-  for (const e of dueSorted) push(e.id)
-  for (const e of introducing) push(e.id)
+  // The level fills the sitting up to the seats kept for earlier levels' due cards.
+  const levelCap = SESSION_SIZE - Math.min(REVIEW_TAIL, tailIds.length)
+  for (const e of dueSorted) push(e.id, levelCap)
+  for (const e of introducing) push(e.id, levelCap)
   const hasLevel = queue.some((q) => onLevelIds.has(q.id))
   if (fresh.length <= newCap || !hasLevel) {
-    for (const e of leftoverSorted) push(e.id)
+    for (const e of leftoverSorted) push(e.id, levelCap)
   }
-  const tailRoom = Math.max(0, SESSION_SIZE - queue.length)
-  let tailAdded = 0
-  for (const id of tailIds) {
-    if (tailAdded >= tailRoom) break
-    const before = queue.length
-    push(id)
-    if (queue.length > before) tailAdded++
-  }
+  // Then those due cards, most overdue first, in the kept seats and any the level left empty.
+  for (const id of tailIds) push(id)
 
   return {
     startedAt: now,
@@ -177,6 +176,11 @@ export function sittingModality(item: QueueItem, canHear: boolean): QueueItem['m
   if ((item.modality === 'listen' || item.modality === 'tone') && !canHear) return 'th-en'
   // A sitting saved before tone drills skipped kráp/kâ cards still holds one.
   if (item.modality === 'tone' && getEntry(item.id)?.rom.includes('/')) return 'th-en'
+  // A Script sitting saved before English to romanization became a pick still holds one.
+  if (item.modality === 'en-th') {
+    const entry = getEntry(item.id)
+    if (entry && entryTrack(entry) === 'script') return 'pick'
+  }
   return item.modality
 }
 

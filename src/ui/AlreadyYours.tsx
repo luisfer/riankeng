@@ -48,6 +48,8 @@ function ReviewRows(props: { entries: Entry[]; audioRate: number }) {
 export function AlreadyYours(props: {
   pool: Entry[]
   take: number
+  /** How many cards at the head of the pool are due now. They come first, and are not shuffled away. */
+  due?: number
   audioRate: number
   onMore?: () => void
   onSit?: (ids: string[]) => void
@@ -65,7 +67,12 @@ export function AlreadyYours(props: {
     return Number(na) - Number(nb)
   })
   const filtered = filter === 'all' ? props.pool : props.pool.filter((e) => levelKey(e) === filter)
-  const rows = shuffleSeen(filtered, salt, props.take)
+  // Due cards first, most overdue first; the rest of the sitting is a shuffle of what is not due.
+  const dueIds = new Set(props.pool.slice(0, props.due ?? 0).map((e) => e.id))
+  const dueRows = filtered.filter((e) => dueIds.has(e.id)).slice(0, props.take)
+  const rest = filtered.filter((e) => !dueIds.has(e.id))
+  const rows = [...dueRows, ...shuffleSeen(rest, salt, props.take - dueRows.length)]
+  const dueHere = filtered.filter((e) => dueIds.has(e.id)).length
 
   useEffect(() => {
     for (const e of rows) prefetchClip(e.id)
@@ -80,6 +87,7 @@ export function AlreadyYours(props: {
         <>
           <p className="account-quiet">
             {filter === 'all' ? `${props.pool.length} words` : `${levelLabel(filter)}, ${filtered.length} words`}
+            {dueHere > 0 ? `, ${dueHere} due` : ''}
           </p>
           <div className="yours-filters">
             <TextBtn current={filter === 'all'} onClick={() => setFilter('all')}>
@@ -113,6 +121,7 @@ export function AlreadyYours(props: {
 
 export function ReviewPage(props: {
   pool: Entry[]
+  due?: number
   audioRate: number
   onSit: (ids: string[]) => void
   canResume?: boolean
@@ -123,6 +132,7 @@ export function ReviewPage(props: {
       <AlreadyYours
         pool={props.pool}
         take={SESSION_SIZE}
+        due={props.due}
         audioRate={props.audioRate}
         onSit={props.onSit}
         canResume={props.canResume}

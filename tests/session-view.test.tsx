@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { act } from 'react'
 import { createRoot } from 'react-dom/client'
 import { emptyDoc, type ProgressDoc } from '../src/storage/progress-schema'
@@ -7,6 +7,19 @@ import { SessionView } from '../src/ui/Session'
 import { chrome } from '../src/ui/copy'
 
 ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
+
+const heard = vi.hoisted(() => ({ thai: 0, slower: 0 }))
+vi.mock('../src/audio/tts', async (original) => ({
+  ...(await original<typeof import('../src/audio/tts')>()),
+  speakThai: vi.fn(() => {
+    heard.thai++
+    return { ready: true }
+  }),
+  speakSlower: vi.fn(() => {
+    heard.slower++
+    return { ready: true }
+  }),
+}))
 
 function sitting(modality: LiveSession['queue'][number]['modality'] = 'th-en'): LiveSession {
   return {
@@ -125,3 +138,35 @@ describe('SessionView', () => {
   })
 })
 
+
+describe('SessionView, finishing a card', () => {
+  it('keeps what was written on the line after Check, and puts the focus on Next', () => {
+    const { host } = render(sitting('th-en'))
+    typeEn(host, 'come')
+    check(host)
+    expect(host.querySelector('.answer-said')?.textContent).toBe('come')
+    expect(document.activeElement?.textContent).toBe('Next')
+  })
+
+  it('hears the card on Option+H, by the key, even though a Mac types ˙ for it', () => {
+    render(sitting('th-en'))
+    const before = heard.thai
+    const press = new KeyboardEvent('keydown', { altKey: true, code: 'KeyH', key: '˙', cancelable: true, bubbles: true })
+    act(() => {
+      window.dispatchEvent(press)
+    })
+    expect(press.defaultPrevented).toBe(true)
+    // Sittings from earlier tests stay mounted and hear the key too; this one is among them.
+    expect(heard.thai).toBeGreaterThan(before)
+  })
+
+  it('answers a tone card by its number: 0 mid, then the key strip numbers', () => {
+    const { host, state } = render(sitting('tone'))
+    const keys = [...host.querySelectorAll('.tone-word .pop-k')].map((k) => k.textContent)
+    expect(keys).toEqual(['0', '1', '2', '3', '4'])
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: '0', cancelable: true, bubbles: true }))
+    })
+    expect(state.session.pending?.ok).toBe(true)
+  })
+})

@@ -775,6 +775,9 @@ li.quiet-row { cursor: default; }
 }
 
 .tone-picks { display: flex; gap: 20px; flex-wrap: wrap; margin: 0; align-items: end; }
+/* A choice's number key, small and ink-2 as on the key strip. */
+.tone-word .pop-k,
+.glyph-pick .pop-k { font-family: var(--ui); margin-right: 6px; }
 .tone-word { color: var(--ink-2); text-underline-offset: 4px; }
 .tone-word:hover { color: var(--ink); text-decoration: underline; }
 

@@ -239,6 +239,31 @@ describe('hereLevel', () => {
     doc.items[one.id] = { ...doc.items[one.id]!, stage: 1, days: ['2026-01-01'] }
     const voice = allLevelStatus(doc, now, 'voice')
     expect(voice[1]!.unlocked).toBe(true)
+    // And Continue stays on the level the learner reached. The slipped card returns as a review.
+    expect(hereLevel(voice, 'voice')).toBe(1)
+  })
+
+  it('still sends Continue to an open level below the frontier that was never studied', () => {
+    expect(
+      hereLevel([
+        status({ n: 0, total: 2, seen: 2, mastered: 2, complete: true, progress: 1, unlocked: true }),
+        status({ n: 1, total: 3, seen: 0, mastered: 0, complete: false, progress: 0, unlocked: true }),
+        status({ n: 2, total: 2, seen: 2, mastered: 1, complete: false, progress: 0.5, unlocked: true }),
+      ]),
+    ).toBe(1)
+  })
+
+  it('tests Script by its letters, never English to romanization', () => {
+    const cards = [...entriesForLevel(1, 'script'), ...entriesForLevel(5, 'script'), ...entriesForLevel(20, 'script')]
+    expect(cards.length).toBeGreaterThan(10)
+    for (const e of cards) {
+      for (const stage of [0, 1, 3, 5]) {
+        for (let k = 0; k < 12; k++) {
+          const m = chooseModality(e, { ...newItemProgress(e.id), stage, reps: stage }, `s${k}`)
+          expect(m, `${e.id} stage ${stage}`).not.toBe('en-th')
+        }
+      }
+    }
   })
 
   it('is null when every authored level is complete', () => {

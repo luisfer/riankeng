@@ -106,12 +106,20 @@ export function currentLevel(doc: ProgressDoc, now = Date.now(), track: TrackId 
   return levelsFor(track).length - 1
 }
 
-/** First unlocked level that is not yet finished. Script finishes on passed, Voice on mastery. */
+/**
+ * First unlocked level that is not yet finished. Script finishes on passed, Voice on mastery.
+ * Below the furthest open Voice level, a level whose every card has been met counts as finished:
+ * one slip on an old card brings that card back as a review, not Continue back to its level.
+ * A level never studied there, as the reorder of 26 Sep 2026 left some, is still where Continue goes.
+ */
 export function hereLevel(statuses: LevelStatus[], track: TrackId = 'voice'): number | null {
+  let frontier = -1
+  for (const s of statuses) if (s.unlocked && s.total > 0) frontier = s.n
   for (const s of statuses) {
     if (s.total === 0) continue
     if (!s.unlocked) continue
-    const done = track === 'script' ? s.passed >= s.total : s.complete
+    const done =
+      track === 'script' ? s.passed >= s.total : s.complete || (s.n < frontier && s.seen >= s.total)
     if (!done) return s.n
   }
   return null
@@ -154,6 +162,16 @@ export function seenEntries(doc: ProgressDoc, track: TrackId = 'voice'): Entry[]
 
 export function shuffleSeen<T extends { id: string }>(items: T[], salt: string, take: number): T[] {
   return [...items].sort((a, b) => hash(`${salt}:${a.id}`) - hash(`${salt}:${b.id}`)).slice(0, take)
+}
+
+/** How many seen cards are due now, on every track: the head of reviewEntries. */
+export function reviewDue(doc: ProgressDoc, now = Date.now()): number {
+  let n = 0
+  for (const e of ENTRIES) {
+    const p = doc.items[e.id]
+    if (p && p.reps > 0 && isDue(p, now)) n++
+  }
+  return n
 }
 
 /** Seen cards on every track, overdue first. */
@@ -266,10 +284,10 @@ export function chooseModality(entry: Entry, p: ItemProgress, salt: string, canH
   const r = hash(entry.id + salt)
   if (entryTrack(entry) === 'script') {
     if (entry.thai === 'ไหม' && /silk/i.test(entry.en[0] ?? '')) return 'pick'
+    // Script tests the script: the letter from its sound or meaning (pick), or the sound from the
+    // letter (th-en). English to romanization would show no Thai, and on vowel cards print the answer.
     if (p.stage <= 0) return r < 0.55 ? 'pick' : 'th-en'
-    if (r < 0.35) return 'pick'
-    if (r < 0.7) return 'th-en'
-    return 'en-th'
+    return r < 0.5 ? 'pick' : 'th-en'
   }
   let next: Modality
   if (entry.level === 0) {

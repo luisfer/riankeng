@@ -567,6 +567,7 @@ html[data-session="in"] .signin-row { grid-template-columns: auto; justify-conte
 .try .answer-form { margin-top: 0; }
 .try .roman-field { font-size: 34px; }
 .try .feedback { margin-top: 4px; }
+.try .slip-line { margin: 0; font-size: 28px; line-height: 1.2; }
 /* Right's lacquer square hangs in the margin, so the word lines up with everything above it. */
 .try .session-feedback.ok::before { margin-left: -20px; }
 .try-pair { display: grid; gap: 4px; padding: 8px 0 4px; }

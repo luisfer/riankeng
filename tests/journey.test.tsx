@@ -3,8 +3,9 @@ import { act } from 'react'
 import { createRoot } from 'react-dom/client'
 import { LEVELS, SCRIPT_LEVELS } from '../content/index'
 import { allLevelStatus, type LevelStatus } from '../src/engine/scheduler'
-import { QUIET, sceneSrc } from '../src/landing/demo'
+import { DEMO, QUIET, sceneSrc } from '../src/landing/demo'
 import { emptyDoc } from '../src/storage/progress-schema'
+import { chrome } from '../src/ui/copy'
 import { Journey, trackPlace, trackTally } from '../src/ui/Journey'
 import { TrackPage } from '../src/ui/TrackPage'
 
@@ -56,7 +57,7 @@ describe('trackTally', () => {
 })
 
 describe('the landing page', () => {
-  function render() {
+  function render(dayCount?: number) {
     const doc = emptyDoc()
     const host = document.createElement('div')
     document.body.appendChild(host)
@@ -68,6 +69,8 @@ describe('the landing page', () => {
           onTrack={() => undefined}
           onReview={() => undefined}
           onAlphabet={() => undefined}
+          onDay={() => undefined}
+          dayCount={dayCount}
         />,
       )
     })
@@ -89,16 +92,23 @@ describe('the landing page', () => {
     expect(host.querySelector('.splash-pair')?.textContent?.trim()).toBe('')
   })
 
-  it('is four rows, not a list of every level', () => {
+  it('is five rows, not a list of every level', () => {
     const host = render()
     const rows = [...host.querySelectorAll('.contents-row')]
-    expect(rows).toHaveLength(4)
+    expect(rows).toHaveLength(5)
     expect(rows.map((r) => r.querySelector('.contents-title')?.textContent)).toEqual([
       'Voice',
       'Script',
       'Already yours',
+      'Her day',
       'The whole script',
     ])
+  })
+
+  it('counts the lines of her day once any is lettered', () => {
+    const day = (host: HTMLElement) => [...host.querySelectorAll('.contents-row')][3]!.querySelector('.contents-rom')?.textContent
+    expect(day(render())).toBe(chrome.daySub)
+    expect(day(render(7))).toBe(`7 of ${DEMO.length} lines`)
   })
 
   it('names the level you are on, and counts that lesson', () => {

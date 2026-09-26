@@ -5,6 +5,7 @@ import { gradeThai, type ThaiGrade } from '@/engine/grader-thai'
 import { RomanInput } from '@/input/RomanInput'
 import { Commit, HearBtn } from '@/ui/bits'
 import { chrome } from '@/ui/copy'
+import { ToneRom } from '@/ui/ToneRom'
 import { landing } from './copy'
 import { sceneSrc, sceneSrcSet, type DemoCard } from './demo'
 
@@ -22,6 +23,8 @@ export function TryCard(props: { deck: DemoCard[] }) {
   const [grade, setGrade] = useState<ThaiGrade | null>(null)
   const [pasted, setPasted] = useState(false)
   const [focusField, setFocusField] = useState(false)
+  /** Bumped by Hear and Slower, so the pitch lines draw again with the voice. */
+  const [drawn, setDrawn] = useState(0)
   const audio = useRef<HTMLAudioElement | null>(null)
   const card = props.deck[at] ?? props.deck[0]!
 
@@ -47,6 +50,7 @@ export function TryCard(props: { deck: DemoCard[] }) {
   }, [props.deck])
 
   const play = (rate: number) => {
+    setDrawn((d) => d + 1)
     audio.current?.pause()
     const a = new Audio(clipUrl(card.id))
     stickPlaybackRate(a, rate)
@@ -118,14 +122,16 @@ export function TryCard(props: { deck: DemoCard[] }) {
           <div className="try-copy">
             {look && (
               <p className="try-rom rom" lang="th-Latn">
-                {card.rom}
+                <ToneRom rom={card.rom} draw={drawn} />
               </p>
             )}
             <p className="try-en">{card.en}</p>
             {right && (
               <div className="try-pair">
                 <p className="pair-line rom">
-                  <span lang="th-Latn">{card.rom}</span>
+                  <span lang="th-Latn">
+                    <ToneRom rom={card.rom} draw={drawn} />
+                  </span>
                   <span className="prompt-tools">
                     <HearBtn onClick={() => play(1)}>{landing.hear}</HearBtn>
                     <HearBtn onClick={() => play(0.6)}>{landing.slower}</HearBtn>
@@ -157,6 +163,11 @@ export function TryCard(props: { deck: DemoCard[] }) {
                 />
                 <Commit type="submit">{landing.check}</Commit>
               </form>
+            )}
+            {grade?.verdict === 'tone' && grade.toneSlips.length > 0 && (
+              <p className="slip-line rom" lang="th-Latn">
+                <ToneRom rom={grade.matchedTarget} slips={new Map(grade.toneSlips.map((s) => [s.syllable, s.got]))} />
+              </p>
             )}
           </div>
           <div className="try-act">

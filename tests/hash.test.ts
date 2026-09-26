@@ -17,6 +17,11 @@ describe('hash', () => {
     }
   })
 
+  it('routes her day both ways', () => {
+    expect(parseHash('#/day')).toEqual({ name: 'day' })
+    expect(hashFor({ name: 'day' })).toBe('#/day')
+  })
+
   it('replaces a dead session without adding history', () => {
     window.history.pushState(null, '', '/#/session')
     const before = window.history.length

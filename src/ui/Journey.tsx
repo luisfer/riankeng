@@ -2,7 +2,7 @@ import { useState, type ReactNode } from 'react'
 import { LEVELS, SCRIPT_LEVELS } from '@content/index'
 import type { LevelMeta, TrackId } from '@content/types'
 import { hereLevel, unlockCount, type LevelStatus } from '@/engine/scheduler'
-import { QUIET, sceneSrc, sceneSrcSet } from '@/landing/demo'
+import { DEMO, QUIET, sceneSrc, sceneSrcSet } from '@/landing/demo'
 import { Meter } from './bits'
 import { chrome } from './copy'
 
@@ -98,8 +98,12 @@ export function Journey(props: {
   onTrack: (track: TrackId) => void
   onReview: () => void
   onAlphabet: () => void
+  /** Open her day, the comic lettered as far as the learner has come. */
+  onDay: () => void
   /** Words already met. The hub offers them as a review. */
   yoursCount?: number
+  /** Panels of her day already lettered. */
+  dayCount?: number
 }) {
   const [scenes] = useState(() => {
     const first = Math.floor(Math.random() * QUIET.length)
@@ -130,6 +134,13 @@ export function Journey(props: {
           rom
           meta={props.yoursCount ? 'Review' : ''}
           onOpen={props.onReview}
+        />
+        <Row
+          title={chrome.dayTitle}
+          sub={props.dayCount ? `${props.dayCount} of ${DEMO.length} lines` : chrome.daySub}
+          rom
+          meta="open"
+          onOpen={props.onDay}
         />
         <Row title="The whole script" sub={chrome.alphabetSub} rom meta="open" onOpen={props.onAlphabet} />
       </ol>

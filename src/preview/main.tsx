@@ -6,6 +6,7 @@ import { cleanGloss } from '@/engine/grader-en'
 import { gradeThai } from '@/engine/grader-thai'
 import { RomanInput } from '@/input/RomanInput'
 import { Commit, HearBtn, TextBtn, Trail } from '@/ui/bits'
+import { ToneRom } from '@/ui/ToneRom'
 import { PREVIEW_IDS, PREVIEW_VOICE } from './catalog'
 import { clearProgress, loadProgress, saveProgress } from './progress'
 import { rememberRef } from '@/landing/ref'
@@ -66,6 +67,8 @@ function Preview() {
   const [misses, setMisses] = useState(0)
   const [finished, setFinished] = useState(saved.done.length === TOTAL)
   const heard = useRef<PlaySlot>({ audio: null })
+  /** Bumped by Hear and Slower, so the pitch lines draw again with the voice. */
+  const [drawn, setDrawn] = useState(0)
   const card = PREVIEW_VOICE[i]!
 
   useEffect(() => {
@@ -154,14 +157,28 @@ function Preview() {
                       {card.thai}
                     </p>
                     <p className="prompt-rom rom" lang="th-Latn">
-                      {card.rom}
+                      <ToneRom rom={card.rom} draw={drawn} />
                     </p>
                   </>
                 ) : null}
                 <p className="prompt-en">{cleanGloss(card.en[0] ?? '')}</p>
                 <p className="prompt-tools">
-                  <HearBtn onClick={() => play(card.id, 1, heard.current)}>Hear</HearBtn>
-                  <HearBtn onClick={() => play(card.id, 0.7, heard.current)}>Slower</HearBtn>
+                  <HearBtn
+                    onClick={() => {
+                      setDrawn((d) => d + 1)
+                      play(card.id, 1, heard.current)
+                    }}
+                  >
+                    Hear
+                  </HearBtn>
+                  <HearBtn
+                    onClick={() => {
+                      setDrawn((d) => d + 1)
+                      play(card.id, 0.7, heard.current)
+                    }}
+                  >
+                    Slower
+                  </HearBtn>
                 </p>
               </div>
               <div className="preview-desk">

@@ -40,6 +40,8 @@ import { Alphabet } from './Alphabet'
 import { Journey } from './Journey'
 import { TrackPage } from './TrackPage'
 import { ReviewPage } from './AlreadyYours'
+import { HerDay, saidStems } from './HerDay'
+import { chrome } from './copy'
 import { LevelIntro } from './LevelIntro'
 import { SessionView } from './Session'
 import { Trail } from './bits'
@@ -292,6 +294,8 @@ export function App() {
       ? 'Already yours'
       : route.name === 'alphabet'
         ? 'The whole script'
+        : route.name === 'day'
+          ? chrome.dayTitle
         : route.name === 'track'
           ? route.track === 'script'
             ? 'Script'
@@ -344,9 +348,12 @@ export function App() {
             onTrack={(track) => go({ name: 'track', track })}
             onReview={() => go({ name: 'review' })}
             yoursCount={yours.length}
+            dayCount={saidStems(doc).size}
+            onDay={() => go({ name: 'day' })}
             onAlphabet={() => go({ name: 'alphabet' })}
           />
         )}
+        {loadState === 'ready' && route.name === 'day' && <HerDay doc={doc} audioRate={doc.settings.audioRate} />}
         {loadState === 'ready' && route.name === 'track' && (
           <TrackPage
             track={route.track}

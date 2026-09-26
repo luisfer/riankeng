@@ -1,13 +1,5 @@
 import { TONE_LABEL, TONE_MARKS, TONES, type Tone } from '@content/system'
-
-/** Textbook Bangkok contours: mid level, low falling-to-low, falling from high, high tense, rising from low. */
-const CONTOUR: Record<Tone, string> = {
-  mid: 'M 14 25 L 66 25',
-  low: 'M 14 29 C 28 36 42 39 66 39',
-  falling: 'M 14 12 C 26 10 40 24 66 39',
-  high: 'M 14 18 C 32 14 48 12 66 12',
-  rising: 'M 14 39 C 28 40 44 20 66 13',
-}
+import { CONTOUR } from './tone-contour'
 
 /** Cards the learner actually sits on Voice 0. Extra contours are labelled. */
 function exampleFor(tone: Tone): { rom: string; sits: boolean } {

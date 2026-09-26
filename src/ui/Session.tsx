@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { TONES, TONE_LABEL, type Tone } from '@content/system'
 import { cleanGloss, gradeEnglish } from '@/engine/grader-en'
 import { gradeThai } from '@/engine/grader-thai'
@@ -30,33 +30,14 @@ import { RomanInput } from '@/input/RomanInput'
 import { Commit, HearBtn } from './bits'
 import { chrome } from './copy'
 import { showThai } from './thai'
+import { ToneRom } from './ToneRom'
+import { LetterInk, preloadLetters } from './LetterInk'
 
 const TONE_ORDER: Tone[] = TONES
 
 /** Pick shows the English gloss only. Rom would give the answer away. */
 export function pickPrompt(entry: { en: string[] }): string {
   return cleanGloss(entry.en[0] ?? '')
-}
-
-/**
- * The target as it is written, with the syllables the grader named set in lacquer:
- * the way the tone marks are the only lacquer in the mark. Anything it cannot place stays plain.
- */
-export function slipSpans(target: string, slips: number[]): ReactNode {
-  if (!slips.length) return target
-  const out: ReactNode[] = []
-  let at = 0
-  for (const [i, chunk] of analyseRom(target).syllables.entries()) {
-    // A glottal break is written as a hyphen in the target, not as the apostrophe the skeleton keeps.
-    const syllable = chunk.replaceAll("'", '')
-    const from = target.indexOf(syllable, at)
-    if (from < 0) return target
-    if (from > at) out.push(target.slice(at, from))
-    out.push(slips.includes(i) ? <span key={i} className="slip">{syllable}</span> : syllable)
-    at = from + syllable.length
-  }
-  if (at < target.length) out.push(target.slice(at))
-  return out
 }
 
 /** A card's usage note and word-for-word reading, shown when the card is met. Thai in a note sets in the Thai face. */
@@ -100,7 +81,9 @@ export function SessionView(props: {
   const [hint, setHint] = useState<string | null>(null)
   const [heard, setHeard] = useState(false)
   const [toneStep, setToneStep] = useState(0)
-  const [slipLine, setSlipLine] = useState<{ target: string; slips: number[] } | null>(null)
+  const [slipLine, setSlipLine] = useState<{ target: string; slips: Map<number, Tone> } | null>(null)
+  /** Bumped by Hear and Slower, so the pitch lines draw again with the voice. */
+  const [drawn, setDrawn] = useState(0)
   const [, setVoiceTick] = useState(0)
   const goNextRef = useRef(() => {})
   const attemptedRef = useRef(false)
@@ -120,6 +103,11 @@ export function SessionView(props: {
   }, [item?.id, item?.modality, item?.meet, item?.scored, props.session.pending])
 
   useEffect(() => onVoices(() => setVoiceTick((n) => n + 1)), [])
+
+  // A Script sitting fetches the letter outlines early, so the first letter inks in at once.
+  useEffect(() => {
+    if (track === 'script') void preloadLetters()
+  }, [track])
 
   useEffect(() => {
     for (const q of props.session.queue) prefetchClip(q.id)
@@ -143,6 +131,7 @@ export function SessionView(props: {
       e.preventDefault()
       const card = entryOrThrow(item.id)
       setHeard(true)
+      setDrawn((d) => d + 1)
       setHint(null)
       if (key === 'h') void speakThai(card.thai, card.id, props.doc.settings.audioRate, { gesture: true })
       else void speakSlower(card.thai, card.id, props.doc.settings.audioRate, { gesture: true })
@@ -244,7 +233,7 @@ export function SessionView(props: {
       noteAttempt(true, 'exact', `${chrome.alsoRight} ${entry.rom}.`)
     } else if (g.verdict === 'tone' || g.verdict === 'length') {
       if (noteAttempt(false, g.verdict, g.message, 'move')) {
-        setSlipLine({ target: g.matchedTarget ?? entry.rom, slips: g.toneSlips.map((s) => s.syllable) })
+        setSlipLine({ target: g.matchedTarget ?? entry.rom, slips: new Map(g.toneSlips.map((s) => [s.syllable, s.got])) })
       }
     } else {
       if (noteAttempt(false, 'wrong', g.message, 'stay', { kind: 'retype-th', id: entry.id, target: g.matchedTarget })) {
@@ -344,8 +333,14 @@ export function SessionView(props: {
       if (script) {
         return (
           <>
-            <p className="prompt-thai thai">{showThai(entry.thai)}</p>
-            <p className="prompt-rom rom">{entry.rom}</p>
+            {entry.tags.includes('letter') ? (
+              <LetterInk thai={entry.thai} />
+            ) : (
+              <p className="prompt-thai thai">{showThai(entry.thai)}</p>
+            )}
+            <p className="prompt-rom rom">
+              <ToneRom rom={entry.rom} draw={drawn} />
+            </p>
             <p className="prompt-en">{cleanGloss(entry.en[0] ?? '')}</p>
             <MeetNotes entry={entry} />
           </>
@@ -353,7 +348,9 @@ export function SessionView(props: {
       }
       return (
         <>
-          <p className="prompt-rom rom">{entry.rom}</p>
+          <p className="prompt-rom rom">
+            <ToneRom rom={entry.rom} draw={drawn} />
+          </p>
           <p className="prompt-en">{cleanGloss(entry.en[0] ?? '')}</p>
           <MeetNotes entry={entry} />
         </>
@@ -362,7 +359,7 @@ export function SessionView(props: {
     if (hold) {
       return (
         <p className="reveal rom">
-          {hold.target}
+          <ToneRom rom={hold.target} draw={drawn} />
           {props.doc.settings.thaiScript && <span className="thai"> {entry.thai}</span>}
         </p>
       )
@@ -380,7 +377,7 @@ export function SessionView(props: {
     if (modality === 'th-en') {
       return (
         <p className="prompt-rom rom">
-          {entry.rom}
+          <ToneRom rom={entry.rom} draw={drawn} />
           {props.doc.settings.thaiScript && <span className="thai"> {entry.thai}</span>}
         </p>
       )
@@ -510,10 +507,14 @@ export function SessionView(props: {
           {stimulus}
           {pairLine && (
             <p className={`pair-line${modality === 'pick' ? ' thai' : modality === 'th-en' ? '' : ' rom'}`}>
-              {pairLine}
+              {pairLine === entry.rom ? <ToneRom rom={entry.rom} draw={drawn} /> : pairLine}
             </p>
           )}
-          {slipLine && ack && !ack.ok && <p className="slip-line rom">{slipSpans(slipLine.target, slipLine.slips)}</p>}
+          {slipLine && ack && !ack.ok && (
+            <p className="slip-line rom">
+              <ToneRom rom={slipLine.target} slips={slipLine.slips} />
+            </p>
+          )}
           {sense && !right && <p className="sense-line">{sense}</p>}
         </div>
         {(!props.doc.settings.silent || fromVoice) && (
@@ -525,6 +526,7 @@ export function SessionView(props: {
                   ariaKeyshortcuts="Alt+H"
                   onClick={() => {
                     setHeard(true)
+                    setDrawn((d) => d + 1)
                     if (hint === chrome.hearFirst) setHint(null)
                     void speakThai(entry.thai, entry.id, props.doc.settings.audioRate, { gesture: true })
                   }}
@@ -535,6 +537,7 @@ export function SessionView(props: {
                   ariaKeyshortcuts="Alt+S"
                   onClick={() => {
                     setHeard(true)
+                    setDrawn((d) => d + 1)
                     setHint(null)
                     void speakSlower(entry.thai, entry.id, props.doc.settings.audioRate, { gesture: true })
                   }}

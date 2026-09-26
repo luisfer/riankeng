@@ -8,6 +8,7 @@ export type Route =
   | { name: 'account' }
   | { name: 'review' }
   | { name: 'alphabet' }
+  | { name: 'day' }
 
 export function parseHash(raw = window.location.hash): Route {
   const h = raw.replace(/^#/, '') || '/'
@@ -21,6 +22,7 @@ export function parseHash(raw = window.location.hash): Route {
   if (h === '/account') return { name: 'account' }
   if (h === '/review') return { name: 'review' }
   if (h === '/alphabet') return { name: 'alphabet' }
+  if (h === '/day') return { name: 'day' }
   return { name: 'journey' }
 }
 
@@ -40,6 +42,8 @@ export function hashFor(route: Route): string {
       return '#/review'
     case 'alphabet':
       return '#/alphabet'
+    case 'day':
+      return '#/day'
   }
 }
 

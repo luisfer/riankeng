@@ -7,6 +7,7 @@ import { gradeThai } from '@/engine/grader-thai'
 import { RomanInput } from '@/input/RomanInput'
 import { Commit, HearBtn, TextBtn, Trail } from '@/ui/bits'
 import { ToneRom } from '@/ui/ToneRom'
+import { announceClip } from '@/audio/voice-clock'
 import { PREVIEW_IDS, PREVIEW_VOICE } from './catalog'
 import { clearProgress, loadProgress, saveProgress } from './progress'
 import { rememberRef } from '@/landing/ref'
@@ -19,6 +20,7 @@ function play(id: string, rate: number, slot: PlaySlot) {
   const audio = new Audio(clipUrl(id))
   stickPlaybackRate(audio, rate)
   slot.audio = audio
+  announceClip(id, audio)
   void audio.play()
 }
 
@@ -157,7 +159,7 @@ function Preview() {
                       {card.thai}
                     </p>
                     <p className="prompt-rom rom" lang="th-Latn">
-                      <ToneRom rom={card.rom} draw={drawn} />
+                      <ToneRom rom={card.rom} draw={drawn} voice={card.id} />
                     </p>
                   </>
                 ) : null}

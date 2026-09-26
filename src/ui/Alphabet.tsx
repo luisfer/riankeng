@@ -4,6 +4,9 @@ import { CONSONANTS, DIGITS, OTHER_SIGNS, VOWELS, type Consonant, type Consonant
 import type { Entry } from '@content/types'
 import { progressFor } from '@/engine/scheduler'
 import type { ProgressDoc } from '@/storage/progress-schema'
+import { hasShippedClip } from '@/audio/clips'
+import { speakThai } from '@/audio/tts'
+import { WrittenGlyph } from './LetterInk'
 import { showThai } from './thai'
 
 /** The Script card that teaches a given letter or sign, if any. */
@@ -40,25 +43,47 @@ function consonantLine(c: Consonant): string {
   return ends ? `${line}, ends\u00a0${c.final}` : line
 }
 
-function Grid(props: { cells: Cell[]; onOpen: (n: number) => void; unlocked?: (n: number) => boolean }) {
+/** Each letter written again when it is pressed, and said, where its card has a clip. */
+type Ink = { takes: Record<string, number>; write: (char: string) => void }
+
+/**
+ * Every letter, as the page it is taught on counts it. Pressing a letter writes it, head first, and
+ * says it. The level that teaches it is the small number in the corner, a way to that level.
+ */
+function Grid(props: { cells: Cell[]; onOpen: (n: number) => void; unlocked?: (n: number) => boolean; ink: Ink }) {
   return (
-      <ul className="alpha-grid">
-        {props.cells.map((c) => (
-          <li key={c.char}>
+    <ul className="alpha-grid">
+      {props.cells.map((c) => {
+        const level = c.level
+        const locked = level !== undefined && props.unlocked ? !props.unlocked(level) : false
+        return (
+          <li key={c.char} className="alpha-item">
             <button
               type="button"
               className={`alpha-cell${c.seen ? ' seen' : ''}${c.retired ? ' retired' : ''}`}
-              disabled={c.level === undefined || (props.unlocked ? !props.unlocked(c.level) : false)}
-              onClick={() => c.level !== undefined && props.onOpen(c.level)}
-              title={c.level === undefined ? undefined : `Script level ${c.level}`}
+              onClick={() => props.ink.write(c.char)}
             >
-              <span className="thai alpha-char">{showThai(c.char)}</span>
+              <span className="thai alpha-char" lang="th">
+                <WrittenGlyph thai={c.char} take={props.ink.takes[c.char] ?? 0} />
+              </span>
               <span className="rom alpha-sub">{c.sub}</span>
-              {c.level !== undefined && <span className="alpha-level">{c.level}</span>}
             </button>
+            {level !== undefined && (
+              <button
+                type="button"
+                className="alpha-level"
+                disabled={locked}
+                onClick={() => props.onOpen(level)}
+                aria-label={`Script level ${level}`}
+                title={`Script level ${level}`}
+              >
+                {level}
+              </button>
+            )}
           </li>
-        ))}
-      </ul>
+        )
+      })}
+    </ul>
   )
 }
 
@@ -85,6 +110,17 @@ function classNote(cls: ConsonantClass): ReactNode {
 export function Alphabet(props: { doc: ProgressDoc; onOpen: (n: number) => void; unlocked?: (n: number) => boolean }) {
   const [open, setOpen] = useState<string>('mid')
   const toggle = (id: string) => setOpen((cur) => (cur === id ? '' : id))
+  const [takes, setTakes] = useState<Record<string, number>>({})
+  const ink: Ink = {
+    takes,
+    write: (char) => {
+      setTakes((t) => ({ ...t, [char]: (t[char] ?? 0) + 1 }))
+      const card = cardFor(char)
+      if (card && !props.doc.settings.silent && hasShippedClip(card.id)) {
+        void speakThai(card.thai, card.id, props.doc.settings.audioRate, { gesture: true })
+      }
+    },
+  }
 
   const sections: Array<{ id: string; title: string; count: number; note: ReactNode; body: ReactNode }> = [
     ...(['mid', 'high', 'low'] as ConsonantClass[]).map((cls) => {
@@ -99,6 +135,7 @@ export function Alphabet(props: { doc: ProgressDoc; onOpen: (n: number) => void;
             cells={letters.map((c) => cell(props.doc, c.char, consonantLine(c), c.retired))}
             onOpen={props.onOpen}
             unlocked={props.unlocked}
+            ink={ink}
           />
         ),
       }
@@ -108,7 +145,7 @@ export function Alphabet(props: { doc: ProgressDoc; onOpen: (n: number) => void;
       title: 'Vowels',
       count: VOWELS.length,
       note: 'The sign, and the sound it writes on a consonant.',
-      body: <Grid cells={VOWELS.map((v) => cell(props.doc, v.char, v.reads))} onOpen={props.onOpen} unlocked={props.unlocked} />,
+      body: <Grid cells={VOWELS.map((v) => cell(props.doc, v.char, v.reads))} onOpen={props.onOpen} unlocked={props.unlocked} ink={ink} />,
     },
     {
       id: 'tones',
@@ -155,14 +192,14 @@ export function Alphabet(props: { doc: ProgressDoc; onOpen: (n: number) => void;
       title: 'Other marks',
       count: OTHER_SIGNS.length,
       note: 'A mark on a word you can already say.',
-      body: <Grid cells={OTHER_SIGNS.map((s) => cell(props.doc, s.char, s.reads))} onOpen={props.onOpen} unlocked={props.unlocked} />,
+      body: <Grid cells={OTHER_SIGNS.map((s) => cell(props.doc, s.char, s.reads))} onOpen={props.onOpen} unlocked={props.unlocked} ink={ink} />,
     },
     {
       id: 'digits',
       title: 'Digits',
       count: DIGITS.length,
       note: '๐ is zero. The rest count up from there.',
-      body: <Grid cells={DIGITS.map((d, i) => cell(props.doc, d, String(i)))} onOpen={props.onOpen} unlocked={props.unlocked} />,
+      body: <Grid cells={DIGITS.map((d, i) => cell(props.doc, d, String(i)))} onOpen={props.onOpen} unlocked={props.unlocked} ink={ink} />,
     },
   ]
 

@@ -59,7 +59,7 @@ Name the words. Do not coach. No “you will”, no “ears first”, no Hear-sa
 
 ## Motion
 None required. Reduced-motion is the default. Selection is lacquer on paper.
-Three authored moments in the course, each drawn once and simply there under reduced motion: a pitch stroke over a syllable, a Script letter writing itself, a balloon lettering in. Nothing loops.
+Authored moments in the course, each quiet and simply there under reduced motion: a pitch stroke drawn over a syllable, which then inks in lacquer with a dot at its tip as her clip plays, in time with the audio element's own clock; a Script letter writing itself, on its card and on the whole-script page when pressed; a balloon lettering in; and the page turning between screens, a few pixels along the line of reading and back the other way, the trail and the paper still. Nothing loops.
 
 ## Refused
 Pills, chips, kickers, middots, em dashes, gradient text, glass, photo heroes, featured “start here” cards, faded locked walls, progress rings and pies, Bricolage, Gentium, Pridi, navy-and-gold.

@@ -38,3 +38,16 @@ describe('a Script letter writing itself', () => {
     expect(html(<LetterInk thai="ั" />)).toBe('<p class="prompt-thai thai">◌ั</p>')
   })
 })
+
+describe('a letter on the whole-script page', () => {
+  it('stands still until it is pressed, then writes itself, again with each press', async () => {
+    const { WrittenGlyph } = await import('../src/ui/LetterInk')
+    await preloadLetters()
+    const still = html(<WrittenGlyph thai="ม" take={0} />)
+    expect(still).toContain('class="written still"')
+    const writing = html(<WrittenGlyph thai="ม" take={2} />)
+    expect(writing).toContain('class="written"')
+    expect(writing).toContain('<span class="ink-under">ม</span>')
+    expect(html(<WrittenGlyph thai="ั" take={1} />)).toBe('◌ั')
+  })
+})

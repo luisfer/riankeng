@@ -44,6 +44,7 @@ import { TrackPage } from './TrackPage'
 import { ReviewPage } from './AlreadyYours'
 import { HerDay, saidStems } from './HerDay'
 import { Finish } from './Finish'
+import { turnPage } from './page-turn'
 import { chrome } from './copy'
 import { LevelIntro } from './LevelIntro'
 import { SessionView } from './Session'
@@ -78,9 +79,14 @@ export function App() {
   const hydratedSnapshot = useRef<ProgressDoc | null>(null)
   const docRef = useRef(doc)
   docRef.current = doc
+  const routeRef = useRef(route)
+  routeRef.current = route
 
   useEffect(() => {
-    const onHash = () => setRoute(parseHash())
+    const onHash = () => {
+      const next = parseHash()
+      turnPage(routeRef.current, next, () => setRoute(next))
+    }
     window.addEventListener('hashchange', onHash)
     if (!window.location.hash) window.location.hash = '#/'
     return () => window.removeEventListener('hashchange', onHash)
@@ -380,11 +386,14 @@ export function App() {
           ],
         }),
       )
-      setSession(null)
-      setLastSitting(s)
       askToKeep()
-      // In the same render as the sitting ending, so the guard that leaves a dead #/session never sees one.
-      setRoute({ name: 'done' })
+      // One render ends the sitting and opens its page, so the guard that leaves a dead #/session
+      // never sees one; the hash follows.
+      turnPage(routeRef.current, { name: 'done' }, () => {
+        setSession(null)
+        setLastSitting(s)
+        setRoute({ name: 'done' })
+      })
       go({ name: 'done' })
       return
     }

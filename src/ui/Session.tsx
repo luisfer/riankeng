@@ -377,7 +377,7 @@ export function SessionView(props: {
               <p className="prompt-thai thai">{showThai(entry.thai)}</p>
             )}
             <p className="prompt-rom rom">
-              <ToneRom rom={entry.rom} draw={drawn} />
+              <ToneRom rom={entry.rom} draw={drawn} voice={entry.id} />
             </p>
             <p className="prompt-en">{cleanGloss(entry.en[0] ?? '')}</p>
             <MeetNotes entry={entry} />
@@ -387,7 +387,7 @@ export function SessionView(props: {
       return (
         <>
           <p className="prompt-rom rom">
-            <ToneRom rom={entry.rom} draw={drawn} />
+            <ToneRom rom={entry.rom} draw={drawn} voice={entry.id} />
           </p>
           <p className="prompt-en">{cleanGloss(entry.en[0] ?? '')}</p>
           <MeetNotes entry={entry} />
@@ -397,7 +397,7 @@ export function SessionView(props: {
     if (hold) {
       return (
         <p className="reveal rom">
-          <ToneRom rom={hold.target} draw={drawn} />
+          <ToneRom rom={hold.target} draw={drawn} voice={entry.id} />
           {props.doc.settings.thaiScript && <span className="thai"> {entry.thai}</span>}
         </p>
       )
@@ -415,7 +415,7 @@ export function SessionView(props: {
     if (modality === 'th-en') {
       return (
         <p className="prompt-rom rom">
-          <ToneRom rom={entry.rom} draw={drawn} />
+          <ToneRom rom={entry.rom} draw={drawn} voice={entry.id} />
           {props.doc.settings.thaiScript && <span className="thai"> {entry.thai}</span>}
         </p>
       )
@@ -562,12 +562,12 @@ export function SessionView(props: {
           {stimulus}
           {pairLine && (
             <p className={`pair-line${modality === 'pick' ? ' thai' : modality === 'th-en' ? '' : ' rom'}`}>
-              {pairLine === entry.rom ? <ToneRom rom={entry.rom} draw={drawn} /> : pairLine}
+              {pairLine === entry.rom ? <ToneRom rom={entry.rom} draw={drawn} voice={entry.id} /> : pairLine}
             </p>
           )}
           {slipLine && ack && !ack.ok && (
             <p className="slip-line rom">
-              <ToneRom rom={slipLine.target} slips={slipLine.slips} />
+              <ToneRom rom={slipLine.target} slips={slipLine.slips} voice={entry.id} />
             </p>
           )}
           {sense && !right && <p className="sense-line">{sense}</p>}

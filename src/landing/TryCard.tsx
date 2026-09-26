@@ -6,6 +6,7 @@ import { RomanInput } from '@/input/RomanInput'
 import { Commit, HearBtn } from '@/ui/bits'
 import { chrome } from '@/ui/copy'
 import { ToneRom } from '@/ui/ToneRom'
+import { announceClip } from '@/audio/voice-clock'
 import { landing } from './copy'
 import { sceneSrc, sceneSrcSet, type DemoCard } from './demo'
 
@@ -55,6 +56,7 @@ export function TryCard(props: { deck: DemoCard[] }) {
     const a = new Audio(clipUrl(card.id))
     stickPlaybackRate(a, rate)
     audio.current = a
+    announceClip(card.id, a)
     void a.play().catch(() => undefined)
   }
 
@@ -122,7 +124,7 @@ export function TryCard(props: { deck: DemoCard[] }) {
           <div className="try-copy">
             {look && (
               <p className="try-rom rom" lang="th-Latn">
-                <ToneRom rom={card.rom} draw={drawn} />
+                <ToneRom rom={card.rom} draw={drawn} voice={card.id} />
               </p>
             )}
             <p className="try-en">{card.en}</p>
@@ -130,7 +132,7 @@ export function TryCard(props: { deck: DemoCard[] }) {
               <div className="try-pair">
                 <p className="pair-line rom">
                   <span lang="th-Latn">
-                    <ToneRom rom={card.rom} draw={drawn} />
+                    <ToneRom rom={card.rom} draw={drawn} voice={card.id} />
                   </span>
                   <span className="prompt-tools">
                     <HearBtn onClick={() => play(1)}>{landing.hear}</HearBtn>
@@ -166,7 +168,7 @@ export function TryCard(props: { deck: DemoCard[] }) {
             )}
             {grade?.verdict === 'tone' && grade.toneSlips.length > 0 && (
               <p className="slip-line rom" lang="th-Latn">
-                <ToneRom rom={grade.matchedTarget} slips={new Map(grade.toneSlips.map((s) => [s.syllable, s.got]))} />
+                <ToneRom rom={grade.matchedTarget} slips={new Map(grade.toneSlips.map((s) => [s.syllable, s.got]))} voice={card.id} />
               </p>
             )}
           </div>

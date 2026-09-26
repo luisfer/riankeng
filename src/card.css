@@ -346,6 +346,15 @@ p:has(.tone-rom) { padding-top: 0.4em; }
 .tone-line .tone-is { opacity: 0.5; }
 .slip .tone-line .tone-is { opacity: 1; }
 .tone-line .tone-was { stroke: var(--ink-3); stroke-dasharray: 3 5; }
+/* With her voice: each syllable's stroke inks in lacquer as she says it, a dot at the tip, then settles. */
+.tone-line .tone-lit {
+  stroke: var(--lacquer);
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: opacity 700ms ease;
+}
+.voice-rest .tone-line .tone-lit { opacity: 0; }
+.tone-line .tone-dot { fill: var(--lacquer); stroke: none; opacity: 0; transition: opacity 140ms ease; }
 @media (prefers-reduced-motion: no-preference) {
   .tone-line .tone-is {
     stroke-dasharray: 1;

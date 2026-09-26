@@ -1,3 +1,4 @@
+import { announceClip } from './voice-clock'
 import { clipCached, clipUrl, hasShippedClip, prefetchClip, setClipCached, shouldTryClip } from './clips'
 import { stickPlaybackRate } from './rate'
 
@@ -111,6 +112,7 @@ function playClip(thai: string, id: string, rate: number, gesture: boolean): Voi
   const audio = new Audio(clipUrl(id))
   stickPlaybackRate(audio, Math.min(1.2, Math.max(0.6, rate / 0.85)))
   lastAudio = audio
+  announceClip(id, audio)
   void audio.play().then(
     () => {
       unlocked = true

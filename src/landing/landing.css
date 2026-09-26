@@ -462,7 +462,15 @@ html[data-gate="open"] .signin,
 .signin-field:focus { border-bottom-color: var(--lacquer); }
 .signin-field:focus-visible { outline: 2px solid var(--lacquer); outline-offset: 4px; }
 .signin-miss { min-height: 0; color: var(--lacquer); font-size: 15px; }
-.signin-miss:empty { display: none; }
+/* Empty, the note leaves the layout but stays a live region, so the thanks or a miss is read out when it lands. */
+.signin-miss:empty {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+[data-waitlist-note]:focus { outline: none; }
 html[data-session="in"] .signin .signin-label,
 html[data-session="in"] .signin .signin-field { display: none; }
 html[data-session="in"] .signin-row { grid-template-columns: auto; justify-content: start; }

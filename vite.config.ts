@@ -56,12 +56,15 @@ function gateDev(secret: string, waitlist: WaitlistEnv, account: { url: string; 
       }
       if (url.pathname === '/api/waitlist' && req.method === 'POST') {
         const raw = await readBody(req)
+        // The browser's own headers, so the check that refuses other sites runs here as on Vercel.
+        const passed: Record<string, string> = {}
+        for (const name of ['content-type', 'origin', 'sec-fetch-site']) {
+          const value = req.headers[name]
+          if (typeof value === 'string') passed[name] = value
+        }
+        if (req.headers.host) passed['x-forwarded-host'] = req.headers.host
         const response = await handleWaitlist(
-          new Request('http://local/api/waitlist', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: raw,
-          }),
+          new Request('http://local/api/waitlist', { method: 'POST', headers: passed, body: raw }),
           waitlist,
         )
         res.statusCode = response.status

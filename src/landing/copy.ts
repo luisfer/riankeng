@@ -6,6 +6,8 @@ export const landing = {
   waitlistJoined: 'Joined.',
   waitlistThanks: 'Thanks. One email goes to this address when the course opens.',
   waitlistNeed: 'Type an email.',
+  waitlistCheck: 'Check the address, like name@gmail.com.',
+  waitlistBusy: 'Too many sign-ups from this network. Try again in a minute.',
   waitlistFail: 'Could not save this.',
   open: 'Open the course',
   typeEmail: 'Type an email.',

@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { signInAccount } from '../storage/auth'
 import { COMIC_SLOTS, fillClose, fillScene, mountComic, pickComic, pickLayout, pickPhone, placeComic, swapComicStem } from './comic'
 import { landing } from './copy'
-import { bindWaitlist } from './waitlist'
+import { bindWaitlist, openWaitlistAt } from './waitlist'
 import { DEMO, QUIET, TRY_ORDER } from './demo'
 import { TRY_EVENT, TryCard } from './TryCard'
 import { landingRedirect } from './redirect'
@@ -124,6 +124,16 @@ for (const form of document.querySelectorAll<HTMLFormElement>('form[data-waitlis
     navSign?.setAttribute('aria-expanded', 'false')
   })
 }
+if (openWaitlistAt(location.hash)) {
+  // Landing on /#close, the browser's own jump to the fragment moves focus to the page once it
+  // arrives. The caret goes back into the field after that.
+  addEventListener(
+    'load',
+    () => requestAnimationFrame(() => document.querySelector<HTMLInputElement>('#close input[name="email"]')?.focus({ preventScroll: true })),
+    { once: true },
+  )
+}
+addEventListener('hashchange', () => openWaitlistAt(location.hash))
 
 const layout = pickLayout()
 const shown = document.querySelector<HTMLElement>('.try')?.dataset.stem

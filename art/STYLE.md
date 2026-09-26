@@ -202,6 +202,18 @@ A shot card in `art/shots.md` holds all of it: place, who stands in which
 third and faces whom, what each hand does, the props and what they rest on,
 the wall and what hangs on it where, who speaks, and the time of day.
 
+What batch 01 (26 Sep) taught: all six cards came back with a clean take, and
+three things need saying outright in every prompt.
+
+- The balloon's tail drifts to her. When someone else speaks, place the
+  balloon itself: "One white oval speech balloon above the cashier, in the
+  upper left of the panel, its tail pointing down to him".
+- Her clothes follow the reference. A reference with her collared blouse gives
+  her the blouse. Write "she, in her cream round-neck T-shirt with no collar",
+  and keep tea among the references.
+- Say which way a gesture goes. "Points" alone came back pointed at her twice;
+  "points toward the door, away from her, his arm stretched to the right" does not.
+
 ## Drawing a new panel
 
 1. Pick a real Voice entry with a shipped clip: `getEntry(id)` and

@@ -28,7 +28,7 @@ Each card:
 - Place: the soi (soi, cat). A flat terracotta wall; a closed blue shutter in the middle of the wall; a potted plant at the far right; a grey pavement.
 - Blocking: Ton in the left third, facing right, one arm pointing down at the dog. She in the right third, facing left, smiling down, tote bag on her shoulder.
 - Props: a tan soi dog asleep on the pavement in front of the shutter; the plant.
-- Speaker: Ton.
+- Speaker: she, naming the dog as he points. All three batch-01 takes put the tail on her.
 
 **08 coming** · `p:dǐao maa` เดี๋ยวมา, coming in a moment · Voice 7 · morning
 - Place: Lung Chai's counter (coffee). A flat cream wall; a wooden counter across the right two thirds; a low shelf behind the counter at waist height with three glass jars.
@@ -80,7 +80,7 @@ Each card:
 - Props: a glass of iced coffee on the counter, a small plant.
 - Speaker: she.
 
-**06 change?** · `p:mii ngən tɔɔn mái` มีเงินทอนไหม, do you have change · Voice 5 · morning
+**06 banknote** · `p:mii ngən tɔɔn mái` มีเงินทอนไหม, do you have change · Voice 5 · morning
 - Place: the morning market (market, thanks).
 - Blocking: she in the left third, holding out a plain pink banknote. Pa Noi in the right third behind her crates, looking into a small wooden cash box.
 - Props: crates of fruit, a hanging scale, a striped awning.
@@ -131,7 +131,7 @@ Each card:
 - Blocking: Yai Bua in the right third, holding a plastic basket of washing in both hands. She in the left third, facing her.
 - Speaker: Yai Bua.
 
-**17 heat ★** · `p:ùn mái` อุ่นไหม, heat it up? · Voice 11 · night
+**17 reheat ★** · `p:ùn mái` อุ่นไหม, heat it up? · Voice 11 · night
 - Place: the corner shop (scan, cash). The sage green wall; snack shelves at the far left edge; the counter.
 - Blocking: Bank behind the counter, left of middle, holding up a plain boxed ready meal in both hands. She in the right third, facing him.
 - Props: a small closed microwave on the counter, plain, no display; the steamer of buns.
@@ -173,7 +173,7 @@ Each card:
 - Blocking: Fon in the right third in a straw hat, a beach bag on her shoulder, a rolled mat under her arm. She in the left third, laughing.
 - Speaker: Fon.
 
-**25 rain** · `p:prɔ́ wâa fǒn dtòk` เพราะว่าฝนตก, because it is raining · Voice 17 · afternoon
+**25 drenched** · `p:prɔ́ wâa fǒn dtòk` เพราะว่าฝนตก, because it is raining · Voice 17 · afternoon
 - Place: her door; rain seen in the small window.
 - Blocking: Fon in the right third, wet, holding a closed dripping umbrella. She in the left third, holding out a towel in both hands.
 - Speaker: Fon.
@@ -256,7 +256,7 @@ Each card:
 - Blocking: she on a low stool at a small table in the left half, seen from the side, pointing at an open notebook of plain ruled lines. Fon on a stool on the right, leaning in to look.
 - Speaker: she.
 
-**42 krathong** · `p:rao bpai lɔɔi grà-tong gan` เราไปลอยกระทงกัน, let us go to Loy Krathong · Voice 24 · night
+**42 floats** · `p:rao bpai lɔɔi grà-tong gan` เราไปลอยกระทงกัน, let us go to Loy Krathong · Voice 24 · night
 - Place: her door at night (tea for the navy).
 - Blocking: Fon in the right third, holding a krathong in each hand: banana leaf, a candle, marigolds. She in the left third, delighted.
 - Speaker: Fon.
@@ -277,7 +277,7 @@ Each card:
 - Props: crates of fruit, the hanging scale, the striped awning.
 - Speaker: she.
 
-**47 football** · `p:duu fút-bɔn gan` ดูฟุตบอลกัน, let us watch the football · Voice 26 · night
+**47 match** · `p:duu fút-bɔn gan` ดูฟุตบอลกัน, let us watch the football · Voice 26 · night
 - Place: Lung Chai's restaurant at night. A small television on a wall bracket in the middle, showing only a plain green field.
 - Blocking: Lung Chai in the right third, holding two glasses of iced tea. She on a low stool in the left third, seen from the side.
 - Speaker: Lung Chai.
@@ -287,7 +287,7 @@ Each card:
 - Blocking: the older man in a blue shirt from train, seated on the bench in the right third, turned to her. She in the left third, standing, tote bag.
 - Speaker: the man.
 
-**49 slowly** · `i:cháa cháa dâi práa lêm ngaam` ช้าๆได้พร้าเล่มงาม, slowly does it · Voice 27 · evening
+**49 steady** · `i:cháa cháa dâi práa lêm ngaam` ช้าๆได้พร้าเล่มงาม, slowly does it · Voice 27 · evening
 - Place: home, inside (elder). A floor mat and a low table.
 - Blocking: she kneeling at the low table on the left, an open notebook in front of her, a pencil lying on it, her chin in her hand. Yai Bua kneeling on the right, smiling, a cup of tea in both hands.
 - Speaker: Yai Bua.

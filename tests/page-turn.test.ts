@@ -4,6 +4,7 @@ import { turnPage } from '../src/ui/page-turn'
 afterEach(() => {
   delete (document as { startViewTransition?: unknown }).startViewTransition
   delete document.documentElement.dataset.turn
+  delete document.documentElement.dataset.turning
   vi.restoreAllMocks()
 })
 
@@ -29,5 +30,19 @@ describe('turnPage', () => {
     expect(update).toHaveBeenCalledTimes(3)
     await Promise.resolve()
     expect(document.documentElement.dataset.turn).toBeUndefined()
+  })
+
+  it('captures the page leaving and the page arriving apart, so neither stretches to the other', async () => {
+    const marks: (string | undefined)[] = []
+    ;(document as { startViewTransition?: unknown }).startViewTransition = (cb: () => void) => {
+      marks.push(document.documentElement.dataset.turning)
+      cb()
+      marks.push(document.documentElement.dataset.turning)
+      return { finished: Promise.resolve() }
+    }
+    turnPage({ name: 'session' }, { name: 'done' }, () => marks.push('update'))
+    expect(marks).toEqual(['out', 'update', 'in'])
+    await Promise.resolve()
+    expect(document.documentElement.dataset.turning).toBeUndefined()
   })
 })

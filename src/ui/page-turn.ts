@@ -14,6 +14,9 @@ const DEPTH: Record<Route['name'], number> = {
   done: 4,
 }
 
+/** Turns begun, so a turn cut short by the next one leaves the next one's marks alone. */
+let turns = 0
+
 type ViewTransitionDocument = Document & {
   startViewTransition?: (update: () => void) => { finished: Promise<void> }
 }
@@ -31,9 +34,18 @@ export function turnPage(from: Route, to: Route, update: () => void): void {
     return
   }
   const root = document.documentElement
+  const mine = ++turns
   root.dataset.turn = DEPTH[to.name] < DEPTH[from.name] ? 'back' : 'forward'
-  const turn = doc.startViewTransition(() => flushSync(update))
+  // The page leaving is captured as one thing and the page arriving as another, so neither is
+  // stretched to the other's size: most screens are a column, a sitting is the full width.
+  root.dataset.turning = 'out'
+  const turn = doc.startViewTransition(() => {
+    flushSync(update)
+    if (mine === turns) root.dataset.turning = 'in'
+  })
   void turn.finished.finally(() => {
+    if (mine !== turns) return
     delete root.dataset.turn
+    delete root.dataset.turning
   })
 }

@@ -570,8 +570,8 @@ html[data-session="in"] .signin-row { grid-template-columns: auto; justify-conte
 .try .roman-field { font-size: 34px; }
 .try .feedback { margin-top: 4px; }
 .try .slip-line { margin: 0; font-size: 28px; line-height: 1.2; }
-/* Right's lacquer square hangs in the margin, so the word lines up with everything above it. */
-.try .session-feedback.ok::before { margin-left: -20px; }
+/* Right: the square on the column's edge, as in the course, and Next card on the same line. */
+.try-act:has(.try-next) { grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; }
 .try-pair { display: grid; gap: 4px; padding: 8px 0 4px; }
 .try-pair .pair-line { font-size: 30px; }
 .try-pair .pair-line.rom {

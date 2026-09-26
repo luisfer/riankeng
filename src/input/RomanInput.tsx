@@ -3,6 +3,11 @@ import { DOT_BELOW, POPOVER_TONES, SEPARATORS, TONE_MARKS, VOWEL_BASES, VOWEL_KE
 
 const TYPED_VOWELS = new Set(['a', 'e', 'i', 'o', 'u'])
 
+/** A vowel letter, in either case: caps lock or a phone's capital still writes pǒm as PǑM. */
+function isVowel(ch: string | undefined): boolean {
+  return ch !== undefined && (VOWEL_BASES.has(ch) || VOWEL_BASES.has(ch.toLowerCase()))
+}
+
 const TONE_MARK_SET = new Set<string>(Object.values(TONE_MARKS))
 
 function withTone(letter: string, mark: string): string {
@@ -49,7 +54,7 @@ function clusterEnd(nfd: string, start: number): number {
 function clusters(nfd: string): Cluster[] {
   const out: Cluster[] = []
   for (let i = 0; i < nfd.length; i++) {
-    if (!VOWEL_BASES.has(nfd[i]!)) continue
+    if (!isVowel(nfd[i])) continue
     const end = clusterEnd(nfd, i)
     out.push({ start: i, end })
     i = end - 1
@@ -94,25 +99,33 @@ function nuclei(nfd: string): Cluster[] {
   const out: Cluster[] = []
   let i = 0
   while (i < nfd.length) {
-    if (!VOWEL_BASES.has(nfd[i]!)) {
+    if (!isVowel(nfd[i])) {
       i++
       continue
     }
     const start = i
     let end = clusterEnd(nfd, i)
-    while (end < nfd.length && VOWEL_BASES.has(nfd[end]!)) end = clusterEnd(nfd, end)
+    while (end < nfd.length && isVowel(nfd[end])) end = clusterEnd(nfd, end)
     out.push({ start, end })
     i = end
   }
   return out
 }
 
-/** The syllable the caret is in or just after, else the next one, inside the caret's run of letters. */
+/**
+ * The syllable the caret is in or just after, else the next one, inside the caret's run of letters.
+ * Right after a space or hyphen, with nothing written yet on the new side, it is the syllable just
+ * written: pom then a space (a phone's suggestion adds one) still tones as pǒm.
+ */
 function nucleusAt(nfd: string, pos: number): Cluster | null {
   const run = runAt(nfd, pos)
-  const own = nuclei(nfd).filter((c) => c.start >= run.start && c.end <= run.end)
+  const all = nuclei(nfd)
+  const own = all.filter((c) => c.start >= run.start && c.end <= run.end)
   const before = [...own].reverse().find((c) => c.start < pos)
-  return before ?? own.find((c) => c.start >= pos) ?? null
+  const found = before ?? own.find((c) => c.start >= pos)
+  if (found) return found
+  if (run.start === run.end) return [...all].reverse().find((c) => c.end <= run.start) ?? null
+  return null
 }
 
 /** Where a caret inside the old vowel sits in the new one: after the same letters, and after any mark on the last. */
@@ -129,7 +142,9 @@ function caretInside(old: string, offset: number, next: string): number {
  * Put `mark` on the syllable at the caret, on its first vowel letter: máa,
  * kɔ̀ɔp, gǔai. Any tone already on that syllable goes. The caret keeps its
  * place in the text. A space, hyphen or period closes a syllable, so the mark
- * stays on the caret's side of it. With no vowel there yet, write à/â/á/ǎ.
+ * stays on the caret's side of it, and right after one, with nothing written
+ * past it yet, the mark goes on the syllable before it. With no vowel there
+ * yet, as after ch, write à/â/á/ǎ.
  */
 export function toneAt(value: string, caret: number, mark: string): { value: string; caret: number } {
   const { nfd, pos } = nfdCaret(value, caret)

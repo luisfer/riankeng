@@ -72,7 +72,21 @@ describe('toneAt in a phrase', () => {
     expect(toneAt('mâi ch', 6, TONE_MARKS.falling)).toEqual({ value: 'mâi châ', caret: 7 })
     expect(toneAt('mâi ch', 6, TONE_MARKS.high)).toEqual({ value: 'mâi chá', caret: 7 })
     expect(toneAt('sa-w', 4, TONE_MARKS.low)).toEqual({ value: 'sa-wà', caret: 5 })
-    expect(toneAt('bprà-têet ', 10, TONE_MARKS.low)).toEqual({ value: 'bprà-têet à', caret: 11 })
+  })
+
+  it('tones the syllable just written from right after a space or hyphen, with nothing past it yet', () => {
+    expect(toneAt('pom ', 4, TONE_MARKS.rising)).toEqual({ value: 'pǒm ', caret: 4 })
+    expect(toneAt('pom  ', 5, TONE_MARKS.rising)).toEqual({ value: 'pǒm  ', caret: 5 })
+    expect(toneAt('sa-', 3, TONE_MARKS.low)).toEqual({ value: 'sà-', caret: 3 })
+    expect(toneAt('bprà-têet ', 10, TONE_MARKS.low)).toEqual({ value: 'bprà-tèet ', caret: 10 })
+    // A new syllable that opens on a toned vowel is its letter, then its number.
+    expect(toneAt('bprà-têet a', 11, TONE_MARKS.low)).toEqual({ value: 'bprà-têet à', caret: 11 })
+  })
+
+  it('tones a capital vowel, as caps lock or a phone writes it', () => {
+    expect(toneAt('POM', 3, TONE_MARKS.rising)).toEqual({ value: 'PǑM', caret: 3 })
+    expect(toneAt('Pom', 3, TONE_MARKS.rising)).toEqual({ value: 'Pǒm', caret: 3 })
+    expect(toneAt('Aa-hǎan', 2, TONE_MARKS.low)).toEqual({ value: 'Àa-hǎan', caret: 2 })
   })
 })
 
@@ -84,6 +98,9 @@ describe('tonedVowel', () => {
     expect(tonedVowel('sà-wàt-dii', 10, TONE_MARKS.falling)).toBe('îi')
     expect(tonedVowel('kɔɔ', 3, TONE_MARKS.rising)).toBe(`\u0254${TONE_MARKS.rising}\u0254`)
     expect(tonedVowel('mâi ch', 6, TONE_MARKS.high)).toBe('á')
+    expect(tonedVowel('pom', 3, TONE_MARKS.rising)).toBe('ǒ')
+    expect(tonedVowel('pom ', 4, TONE_MARKS.rising)).toBe('ǒ')
+    expect(tonedVowel('POM', 3, TONE_MARKS.falling)).toBe('Ô')
   })
 })
 

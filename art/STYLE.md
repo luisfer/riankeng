@@ -214,6 +214,16 @@ three things need saying outright in every prompt.
 - Say which way a gesture goes. "Points" alone came back pointed at her twice;
   "points toward the door, away from her, his arm stretched to the right" does not.
 
+Batch 02 (27 Sep): with those three written into every prompt, all 24 takes had
+the tail on the named speaker, her T-shirt, and the gesture going where it was
+sent. Two more lessons:
+
+- Manners are checked like anatomy. A wai goes from the younger to the older:
+  she never wais Ton, she takes what he gives in both hands. Shoes come off
+  indoors and on a home's step. A monk's robe covers both shoulders.
+- Ask only for gestures the model can draw. It does not know the Thai
+  palm-down beckon; "an open hand held out toward her, inviting" it can do.
+
 ## Drawing a new panel
 
 1. Pick a real Voice entry with a shipped clip: `getEntry(id)` and

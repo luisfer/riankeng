@@ -16,6 +16,18 @@ Each card:
 
 ★ marks a card for the landing's hero rotation. B1 marks the calibration batch, which is drawn first.
 
+## Progress
+
+| batch | cards | picks (in `art/candidates/`) | state |
+| --- | --- | --- | --- |
+| 01 | toilet, dog, coming, change, age, story | toilet-b, dog-a, coming-a, change-a, age-b, story-b | waiting for Luis |
+| 02 | cute, reheat, kitty, flower, shy, come, time, hundred | cute-b, reheat-a, kitty-a, shy-a, come-b, time-b, hundred-a | waiting for Luis; flower redrawn in 03 |
+| 03 | flower, wait, go, shoes, laundry, internet, exam, drenched, fine, cheaper, same, better | | in Cursor |
+
+The verdict on every take is in `art/candidates/review-NN.md`, and each batch's picks sit on
+`art/candidates/batch-NN-picks-sheet.png`. That folder is not in git: a take becomes permanent
+when `gen-scenes.py --approve` moves it into `art/scenes`.
+
 ## B1, calibration
 
 **00 toilet (redraw)** · `p:hɔ̂ng náam yùu tîi-nǎi` ห้องน้ำอยู่ที่ไหน, where is the toilet · Voice 3 · midday
@@ -58,7 +70,7 @@ Each card:
 
 **02 come** · `w:maa` มา, come · Voice 0 · afternoon
 - Place: Yai Bua's step (tired).
-- Blocking: Yai Bua in the right third on her top step, facing left, beckoning with one hand, palm down, the Thai way. She in the left third on the pavement, facing right.
+- Blocking: Yai Bua in the right third on her top step, facing left, one open hand held out toward her, inviting. She in the left third on the pavement, facing right. (The model cannot draw the Thai palm-down beckon; batch 02 came back palm up.)
 - Props: a plate of cut mango on a low stool beside Yai Bua, plant pots.
 - Speaker: Yai Bua.
 
@@ -212,7 +224,7 @@ Each card:
 
 **32 flower ★** · `p:kɔ̀ɔp kun ná` ขอบคุณนะ, thank you, you know · Voice 19 · afternoon
 - Place: the soi.
-- Blocking: Ton in the right third, holding out one white frangipani flower in both hands. She in the left third, making a small wai.
+- Blocking: Ton in the right third, holding out one white frangipani flower. She in the left third, bending toward him and taking the flower in both hands, smiling. (Not a wai: a wai goes from the younger to the older, and batch 02's three takes all had her wai the boy.)
 - Speaker: she.
 
 **33 photo** · `p:tàai rûup dâi mái` ถ่ายรูปได้ไหม, can I take a photo · Voice 20 · night

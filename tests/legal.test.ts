@@ -33,7 +33,7 @@ describe('privacy and terms', () => {
       expect(slopHits([body])).toEqual([])
     }
     expect(text(privacy.querySelector('h1'))).toBe('Privacy')
-    expect(privacy.body.innerHTML).toContain('mailto:pristinemekong@mail.com')
+    expect(privacy.body.innerHTML).toContain('mailto:pristinemekong@gmail.com')
     expect(text(terms.querySelector('h1'))).toBe('Terms')
   })
 })

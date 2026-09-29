@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { Analytics } from '@vercel/analytics/react'
 import { allLevelStatus, reviewDue, reviewEntries, stampOpened, unlockCount, withOpened } from '@/engine/scheduler'
 import {
   canContinue,
@@ -475,6 +476,7 @@ export function App() {
 
   return (
     <div className={`app${inSession ? ' in-session' : ''}${loadState === 'ready' && route.name === 'journey' ? ' home' : ''}`}>
+      <Analytics />
       <div className="shell">
         <Trail
           onHome={inSession ? leaveSitting : () => go({ name: 'journey' })}

@@ -24,6 +24,7 @@
     "fonts": "python3 scripts/fetch-fonts.py"
   },
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
     "@vercel/functions": "^3.9.8",
     "idb-keyval": "^6.3.0",
     "react": "^19.3.0",

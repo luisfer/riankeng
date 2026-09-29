@@ -40,6 +40,10 @@ describe('link previews', () => {
       expect(meta(doc, 'og:image:height')).toBe('630')
       expect(meta(doc, 'og:image:alt')).not.toBe('')
       expect(meta(doc, 'twitter:card')).toBe('summary_large_image')
+      expect(meta(doc, 'twitter:title')).toBe(meta(doc, 'og:title'))
+      expect(meta(doc, 'twitter:description')).toBe(meta(doc, 'og:description'))
+      expect(meta(doc, 'twitter:image')).toBe(meta(doc, 'og:image'))
+      expect(meta(doc, 'twitter:image:alt')).toBe(meta(doc, 'og:image:alt'))
       const copy = [meta(doc, 'og:title'), meta(doc, 'og:description'), meta(doc, 'description'), doc.title]
       expect(slopHits(copy)).toEqual([])
       // The clips are a neural voice. Nothing public calls them recorded.

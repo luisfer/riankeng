@@ -795,17 +795,12 @@ html[data-session="in"] .signin-row { grid-template-columns: auto; justify-conte
   }
   .try[data-phase="write"] .try-copy { gap: 8px; }
   .try[data-phase="write"] .try-act { gap: 10px; }
-  /* Check beside the line again: under the strip it fell below the first screen. */
-  .try .answer-form {
-    grid-template-columns: minmax(0, 1fr) auto;
-    column-gap: 12px;
-  }
+  /* Keep Check on the ruled line (row 1). auto-placement drops it under the strip. */
+  .try .answer-form { column-gap: 12px; }
   .try .answer-form > .btn.commit {
-    grid-column: auto;
-    grid-row: auto;
-    justify-self: end;
-    margin: 0 0 12px;
-    border-radius: 2px;
+    grid-column: 2;
+    grid-row: 1;
+    margin-bottom: 2px;
   }
   .close { margin-top: 64px; padding-top: 56px; }
 }

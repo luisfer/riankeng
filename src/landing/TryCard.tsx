@@ -66,9 +66,11 @@ export function TryCard(props: { deck: DemoCard[] }) {
     // The panel shrinks on a phone in the write phase; bring that frame to the top so the
     // picture and the field share the first screen.
     requestAnimationFrame(() => {
-      document.querySelector<HTMLElement>('.try[data-phase="write"]')?.scrollIntoView({
-        block: 'start',
-        behavior: 'smooth',
+      requestAnimationFrame(() => {
+        document.querySelector<HTMLElement>('.try[data-phase="write"]')?.scrollIntoView({
+          block: 'start',
+          behavior: 'smooth',
+        })
       })
     })
   }

@@ -1,5 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { Analytics } from '@vercel/analytics/react'
 import { parseAuthLink, saveAccount, sendPasswordReset, signInResult, updatePassword, type AccountSession } from '../storage/auth'
 import { COMIC_SLOTS, fillClose, fillScene, mountComic, pickComic, pickLayout, pickPhone, placeComic, swapComicStem } from './comic'
 import { landing } from './copy'
@@ -251,6 +252,7 @@ const host = document.getElementById('try-card')
 if (host) {
   createRoot(host).render(
     <StrictMode>
+      <Analytics />
       <TryCard deck={deck} />
     </StrictMode>,
   )

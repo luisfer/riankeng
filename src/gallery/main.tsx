@@ -1,4 +1,5 @@
 import { createRoot } from 'react-dom/client'
+import { Analytics } from '@vercel/analytics/react'
 import { DEMO, QUIET, sceneSrc } from '@/landing/demo'
 
 /* The contact sheets are left out at the import, not after it, so they never enter the build. */
@@ -59,4 +60,9 @@ function Gallery() {
   )
 }
 
-createRoot(document.getElementById('root')!).render(<Gallery />)
+createRoot(document.getElementById('root')!).render(
+  <>
+    <Analytics />
+    <Gallery />
+  </>,
+)

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
+import { Analytics } from '@vercel/analytics/react'
 import { clipUrl } from '@/audio/clip-url'
 import { stickPlaybackRate } from '@/audio/rate'
 import { cleanGloss } from '@/engine/grader-en'
@@ -245,4 +246,9 @@ function Preview() {
 
 // A link straight to the preview keeps its tag for the waitlist it leads to.
 rememberRef()
-createRoot(document.getElementById('root')!).render(<Preview />)
+createRoot(document.getElementById('root')!).render(
+  <>
+    <Analytics />
+    <Preview />
+  </>,
+)

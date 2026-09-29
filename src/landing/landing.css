@@ -777,21 +777,35 @@ html[data-session="in"] .signin-row { grid-template-columns: auto; justify-conte
   .try-panel, .night-art { max-width: none; }
   /* Writing: keep a small panel above the line so the picture and the field share the phone. */
   .try[data-phase="write"] {
-    gap: 20px;
+    gap: 16px;
     align-items: start;
   }
   .try[data-phase="write"] .try-panel {
-    width: min(42vw, 168px);
-    max-width: min(42vw, 168px);
+    width: min(36vw, 140px);
+    max-width: min(36vw, 140px);
   }
   .try[data-phase="write"] .try-stage {
     padding-left: 0;
     border-left: none;
-    gap: 16px;
+    gap: 12px;
     min-height: 0;
   }
   .try[data-phase="write"] .try-en {
     font-size: clamp(22px, 5.2vw, 28px);
+  }
+  .try[data-phase="write"] .try-copy { gap: 8px; }
+  .try[data-phase="write"] .try-act { gap: 10px; }
+  /* Check beside the line again: under the strip it fell below the first screen. */
+  .try .answer-form {
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 12px;
+  }
+  .try .answer-form > .btn.commit {
+    grid-column: auto;
+    grid-row: auto;
+    justify-self: end;
+    margin: 0 0 12px;
+    border-radius: 2px;
   }
   .close { margin-top: 64px; padding-top: 56px; }
 }
@@ -801,19 +815,9 @@ html[data-session="in"] .signin-row { grid-template-columns: auto; justify-conte
   .signin-row .btn.commit { justify-self: start; }
   /* The bar has room for the mark and two keys, not the name. */
   html[data-stuck] .nav .wordmark-name { display: none; }
-  /* A phrase needs the card's width to be read while it is typed. The keys stay under the line,
-     and Check stands under them, where Continue and Next stand. */
-  .try .answer-form { grid-template-columns: minmax(0, 1fr); }
   .try .roman-field { font-size: 28px; }
-  .try .answer-form > .btn.commit {
-    grid-column: 1;
-    grid-row: 3;
-    justify-self: end;
-    margin: 20px 0 0;
-    border-radius: 2px;
-  }
   /* Four tone keys do not fit one phone row. Two by two, not three and one. */
-  .try .strip-group:has(.strip-k.tone) { display: grid; grid-template-columns: repeat(2, max-content); gap: 8px 28px; }
+  .try .strip-group:has(.strip-k.tone) { display: grid; grid-template-columns: repeat(2, max-content); gap: 8px 16px; }
   /* The bar's form opens under the bar at the page's gutters, not under its key. */
   html[data-stuck] .nav .nav-wait[data-open] .waitlist-row {
     position: fixed;

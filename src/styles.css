@@ -12,6 +12,8 @@ body {
   line-height: 1.45;
   background-color: var(--paper);
   caret-color: var(--lacquer);
+  /* Buttons and links: no iPhone double-tap zoom delay. */
+  touch-action: manipulation;
 }
 body::before {
   content: "";
@@ -1075,6 +1077,14 @@ li.quiet-row { cursor: default; }
 @media (max-width: 760px) {
   .session-stage .session-no { grid-row: 1; transform: none; font-size: 20px; }
   .session-stage .session-prompt { padding-left: 2.1rem; }
+  /* Preview hangs the same number; keep it on-screen beside the word. */
+  .preview-stage .session-no {
+    transform: none;
+    font-size: 20px;
+    align-self: start;
+    line-height: 1.1;
+  }
+  .preview-stage .preview-word { padding-left: 2.1rem; }
 }
 @media (max-width: 860px) {
   .journey:has(.splash) { grid-template-columns: minmax(0, 1fr); }
@@ -1095,6 +1105,11 @@ li.quiet-row { cursor: default; }
   .session-stage .roman-field.en,
   .session-stage .answer-said.en { font-size: 22px; }
   .prompt-rom, .prompt-thai, .prompt-listen, .reveal { font-size: 28px; }
+  /* Preview's look type was desktop-sized on a phone and pushed the desk down. */
+  .preview-stage .prompt-thai { font-size: 48px; }
+  .preview-stage .prompt-rom { font-size: 32px; }
+  .preview-stage .prompt-en { font-size: 32px; margin-top: 10px; }
+  .preview-desk { margin-top: 20px; padding-top: 16px; gap: 12px; }
   .app.in-session .page.session { padding-top: 20px; }
   .session-stage .session-prompt { font-size: 18px; }
   .session-stage .session-desk { margin-top: 36px; }

@@ -8,7 +8,10 @@ import { DEMO, QUIET, TRY_ORDER } from './demo'
 import { TRY_EVENT, TryCard } from './TryCard'
 import { landingRedirect } from './redirect'
 import { rememberRef } from './ref'
+import { bindKeyboardInset } from '../ui/keyboard-inset'
 import './bar'
+
+bindKeyboardInset()
 
 const away = landingRedirect(location.hash, location.search, matchMedia('(display-mode: standalone)').matches)
 if (away) location.replace(away)

@@ -11,7 +11,10 @@ import { announceClip } from '@/audio/voice-clock'
 import { PREVIEW_IDS, PREVIEW_VOICE } from './catalog'
 import { clearProgress, loadProgress, saveProgress } from './progress'
 import { rememberRef } from '@/landing/ref'
+import { bindKeyboardInset } from '@/ui/keyboard-inset'
 import '@/styles.css'
+
+bindKeyboardInset()
 
 type PlaySlot = { audio: HTMLAudioElement | null }
 

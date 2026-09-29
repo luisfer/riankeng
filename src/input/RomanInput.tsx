@@ -364,6 +364,7 @@ export function RomanInput(props: {
           autoCorrect="off"
           autoComplete="off"
           spellCheck={false}
+          enterKeyHint="done"
           onChange={(e) => props.onChange(e.target.value)}
           onKeyDown={onKeyDown}
           onSelect={remember}

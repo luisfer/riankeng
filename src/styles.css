@@ -1086,6 +1086,34 @@ li.quiet-row { cursor: default; }
   }
   .preview-stage .preview-word { padding-left: 2.1rem; }
 }
+
+/*
+ * Soft keyboard open. Preview keeps only the English gloss, Hear, and the writing
+ * desk in the visual viewport; the trail and word nav wait until the keyboard closes.
+ */
+@media (max-width: 760px) {
+  html[data-keyboard="open"] .app.in-session .trail { display: none; }
+  html[data-keyboard="open"] .preview-stage .session-no { display: none; }
+  html[data-keyboard="open"] .preview-stage .prompt-thai,
+  html[data-keyboard="open"] .preview-stage .prompt-rom { display: none; }
+  html[data-keyboard="open"] .preview-stage .preview-word { padding-left: 0; gap: 0; }
+  html[data-keyboard="open"] .preview-stage .prompt-en {
+    font-size: 22px;
+    margin: 0;
+  }
+  html[data-keyboard="open"] .preview-word .prompt-tools { margin-top: 8px; }
+  html[data-keyboard="open"] .preview-desk {
+    margin-top: 12px;
+    padding-top: 12px;
+    gap: 10px;
+  }
+  html[data-keyboard="open"] .preview-nav,
+  html[data-keyboard="open"] .preview-learned { display: none; }
+  html[data-keyboard="open"] .app.in-session .page.session { padding-top: 12px; }
+  html[data-keyboard="open"] .app.in-session {
+    padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  }
+}
 @media (max-width: 860px) {
   .journey:has(.splash) { grid-template-columns: minmax(0, 1fr); }
 }

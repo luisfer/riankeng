@@ -826,3 +826,26 @@ html[data-session="in"] .signin-row { grid-template-columns: auto; justify-conte
   /* The narrowest phones keep one key in the bar. Log in waits at the top of the page. */
   html[data-stuck] .nav .nav-login { display: none; }
 }
+
+/*
+ * Soft keyboard open (html[data-keyboard="open"] from keyboard-inset.ts). Drop the
+ * picture and the lede so the ruled line, strip, and Check fit the visual viewport.
+ */
+@media (max-width: 720px) {
+  html[data-keyboard="open"] #try .section-head { display: none; }
+  html[data-keyboard="open"] .try[data-phase="write"] .try-panel { display: none; }
+  html[data-keyboard="open"] .try[data-phase="write"] .try-en { display: none; }
+  html[data-keyboard="open"] .try[data-phase="write"] {
+    gap: 0;
+  }
+  html[data-keyboard="open"] .try[data-phase="write"] .try-stage {
+    gap: 8px;
+    padding-top: 0;
+  }
+  html[data-keyboard="open"] .try[data-phase="write"] .prompt {
+    font-size: 15px;
+    gap: 6px 14px;
+  }
+  html[data-keyboard="open"] .try-sheet { padding-top: 16px; padding-bottom: 16px; }
+  html[data-keyboard="open"] #try.section { padding-top: 16px; }
+}

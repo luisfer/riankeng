@@ -1077,14 +1077,23 @@ li.quiet-row { cursor: default; }
 @media (max-width: 760px) {
   .session-stage .session-no { grid-row: 1; transform: none; font-size: 20px; }
   .session-stage .session-prompt { padding-left: 2.1rem; }
-  /* Preview hangs the same number; keep it on-screen beside the word. */
+  /*
+   * Preview: the hung margin doesn't fit. Put the number on its own line above the
+   * word so Continue, the word, and the nav share one left edge.
+   */
   .preview-stage .session-no {
+    grid-row: 1;
     transform: none;
-    font-size: 20px;
+    font-size: 28px;
+    line-height: 1;
     align-self: start;
-    line-height: 1.1;
+    margin: 0 0 8px;
   }
-  .preview-stage .preview-word { padding-left: 2.1rem; }
+  .preview-stage .preview-word {
+    grid-row: 2;
+    padding-left: 0;
+  }
+  .preview-stage .preview-desk { grid-row: 3; }
 }
 
 /*
@@ -1096,7 +1105,7 @@ li.quiet-row { cursor: default; }
   html[data-keyboard="open"] .preview-stage .session-no { display: none; }
   html[data-keyboard="open"] .preview-stage .prompt-thai,
   html[data-keyboard="open"] .preview-stage .prompt-rom { display: none; }
-  html[data-keyboard="open"] .preview-stage .preview-word { padding-left: 0; gap: 0; }
+  html[data-keyboard="open"] .preview-stage .preview-word { gap: 0; }
   html[data-keyboard="open"] .preview-stage .prompt-en {
     font-size: 22px;
     margin: 0;

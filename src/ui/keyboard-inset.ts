@@ -67,6 +67,16 @@ export function bindKeyboardInset(): () => void {
   }
 }
 
+function topPad(): number {
+  // The landing bar uses scroll-padding-top; preview hides its trail while the keyboard is open.
+  if (document.documentElement.dataset.keyboard === 'open' && document.querySelector('.app.in-session')) {
+    return 10
+  }
+  const raw = getComputedStyle(document.documentElement).scrollPaddingTop
+  const fromCss = Number.parseFloat(raw)
+  return Number.isFinite(fromCss) && fromCss > 0 ? fromCss : 10
+}
+
 /**
  * Scroll so the answer form (field, strip, Check) sits inside the visual
  * viewport, just under its top. Call after focus and when the keyboard resizes.
@@ -84,7 +94,7 @@ export function keepWritingVisible(within: ParentNode = document): void {
   const rect = form.getBoundingClientRect()
   const top = rect.top - vv.offsetTop
   const bottom = rect.bottom - vv.offsetTop
-  const pad = 10
+  const pad = topPad()
   if (top >= pad && bottom <= vv.height - pad) return
   // Prefer the top of the form under the sticky bar / trail, not centered —
   // centering leaves the strip under the keyboard on a short vv.

@@ -846,6 +846,9 @@ html[data-session="in"] .signin-row { grid-template-columns: auto; justify-conte
     font-size: 15px;
     gap: 6px 14px;
   }
+  /* Hide the sticky site bar while typing so the strip clears the keyboard. */
+  html[data-keyboard="open"] .site-bar { display: none; }
+  html[data-keyboard="open"] { scroll-padding-top: 12px; }
   html[data-keyboard="open"] .try-sheet { padding-top: 16px; padding-bottom: 16px; }
   html[data-keyboard="open"] #try.section { padding-top: 16px; }
 }

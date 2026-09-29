@@ -49,7 +49,8 @@ describe('keyboard inset', () => {
   })
 
   it('scrolls the answer form up when it sits under the keyboard', () => {
-    document.body.innerHTML = `<div class="preview-stage"><form class="answer-form" style="height: 200px"></form></div>`
+    document.documentElement.dataset.keyboard = 'open'
+    document.body.innerHTML = `<div class="app in-session"><div class="preview-stage"><form class="answer-form"></form></div></div>`
     const form = document.querySelector<HTMLElement>('.answer-form')!
     form.getBoundingClientRect = () =>
       ({
@@ -71,7 +72,7 @@ describe('keyboard inset', () => {
     keepWritingVisible(document)
     expect(scrollBy).toHaveBeenCalled()
     const arg = scrollBy.mock.calls[0]?.[0] as { top: number }
-    // 500 - 10 pad = 490 px up into the visual viewport.
+    // Preview + keyboard: 10px pad → 500 - 10 = 490.
     expect(arg.top).toBe(490)
   })
 })

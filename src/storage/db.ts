@@ -2,6 +2,7 @@ import { get, set } from 'idb-keyval'
 import type { LiveSession } from '@/engine/session'
 import { DEFAULT_SETTINGS, emptyDoc, PROGRESS_VERSION, sanitizeDoc, type ProgressDoc } from './progress-schema'
 import { aliasItems } from './import'
+import { docPayload } from './fingerprint'
 
 const PROGRESS_KEY = 'riankeng:progress:v1'
 const SESSION_KEY = 'riankeng:session:v1'
@@ -198,10 +199,7 @@ export function announceDoc(doc: ProgressDoc): void {
   }
 }
 
+/** The same cards, sittings and settings, whatever the clock says and whatever order the keys came in. */
 export function sameDocPayload(a: ProgressDoc, b: ProgressDoc): boolean {
-  const strip = (d: ProgressDoc) => {
-    const { updatedAt: _u, ...rest } = d
-    return JSON.stringify(rest)
-  }
-  return strip(a) === strip(b)
+  return a === b || docPayload(a) === docPayload(b)
 }

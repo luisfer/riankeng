@@ -31,7 +31,7 @@ import { resetDoc } from '@/storage/import'
 import { exportJson } from '@/storage/export'
 import { mergeWork } from '@/storage/sync'
 import { ACCOUNT_KEY, readAccount, signOutAccount, takeRecoverySession, type AccountSession } from '@/storage/auth'
-import { syncAccount, type SyncState } from '@/storage/account-sync'
+import { useAccountSync } from './useAccountSync'
 import { accountSavedAt, setAccountSavedAt, setMirrorWrittenAt } from '@/storage/device'
 import { clearStash, switchOwner } from '@/storage/owner'
 import * as mirrorFile from '@/storage/mirror-file'
@@ -66,8 +66,6 @@ export function App() {
   })
   const [account, setAccount] = useState<AccountSession | null>(boot.session)
   const [recovery, setRecovery] = useState(boot.recovery)
-  const [syncState, setSyncState] = useState<SyncState | 'idle'>('idle')
-  const [syncTick, setSyncTick] = useState(0)
   const [savedAt, setSavedAt] = useState(() => accountSavedAt())
   const [sessionEnded, setSessionEnded] = useState(false)
   const [keptApart, setKeptApart] = useState(false)
@@ -200,66 +198,34 @@ export function App() {
     void saveSession(session)
   }, [session, loadState])
 
-  useEffect(() => {
-    if (loadState !== 'ready' || !account) return
-    let cancelled = false
-    let retry: ReturnType<typeof setTimeout> | undefined
-    const timer = setTimeout(() => {
-      // Offline there is no one to sync with. The network coming back tries again.
-      if (typeof navigator !== 'undefined' && navigator.onLine === false) {
-        setSyncState('failed')
-        return
-      }
-      void syncAccount(docRef.current).then((result) => {
-        if (cancelled) return
-        setSyncState(result.state)
-        if (result.state === 'signed-out') {
-          setAccount(null)
-          setSessionEnded(true)
-          return
-        }
-        if (result.state === 'foreign') {
-          if (result.userId) void takeOwner(result.userId)
-          return
-        }
-        if (result.state === 'saved') {
-          const t = Date.now()
-          setAccountSavedAt(t)
-          setSavedAt(t)
-        } else {
-          retry = setTimeout(() => setSyncTick((n) => n + 1), 60_000)
-        }
-        const next = result.doc
-        if (!next || sameDocPayload(next, docRef.current)) return
-        skipSave.current = false
-        setDoc(next)
-      })
-    }, 400)
-    return () => {
-      cancelled = true
-      clearTimeout(timer)
-      clearTimeout(retry)
-    }
-  }, [doc, loadState, account, syncTick])
+  // The cards and the account stay together without the whole document moving on every answer: see useAccountSync.
+  const sync = useAccountSync({
+    ready: loadState === 'ready',
+    account,
+    doc,
+    inSitting: () => routeRef.current.name === 'session',
+    onSignedOut: () => {
+      setAccount(null)
+      setSessionEnded(true)
+    },
+    onForeign: (userId) => void takeOwner(userId),
+    onSaved: (t) => {
+      setAccountSavedAt(t)
+      setSavedAt(t)
+    },
+    onAdopt: (next) => {
+      skipSave.current = false
+      setDoc(next)
+    },
+  })
 
-  // A sync that did not get through tries again when the network returns or the tab comes back.
-  // Another tab signing in or out is followed here too.
+  // Another tab signing in or out is followed here.
   useEffect(() => {
-    const again = () => setSyncTick((n) => n + 1)
-    const onVisible = () => {
-      if (document.visibilityState === 'visible') again()
-    }
     const onAccountKey = (ev: StorageEvent) => {
       if (ev.key === ACCOUNT_KEY) setAccount(readAccount())
     }
-    window.addEventListener('online', again)
-    document.addEventListener('visibilitychange', onVisible)
     window.addEventListener('storage', onAccountKey)
-    return () => {
-      window.removeEventListener('online', again)
-      document.removeEventListener('visibilitychange', onVisible)
-      window.removeEventListener('storage', onAccountKey)
-    }
+    return () => window.removeEventListener('storage', onAccountKey)
   }, [])
 
   useEffect(() => {
@@ -388,6 +354,9 @@ export function App() {
         }),
       )
       askToKeep()
+      // A sitting is the natural unit to send: the account gets all of it now, not card by card. A moment,
+      // so the sitting's line in the log, set just above, is in the document that goes.
+      sync.flush(100)
       // One render ends the sitting and opens its page, so the guard that leaves a dead #/session
       // never sees one; the hash follows, quietly, or its change would start a second turn.
       turnPage(routeRef.current, { name: 'done' }, () => {
@@ -410,7 +379,7 @@ export function App() {
     setSavedAt(0)
     setKeptApart(false)
     setSessionEnded(false)
-    setSyncState('idle')
+    sync.setState('idle')
     void mirrorFile.forget()
     setMirror(null)
     setMirrorState(mirrorFile.supported() ? 'off' : 'unsupported')
@@ -589,7 +558,7 @@ export function App() {
             account={account}
             onAccount={onAccount}
             sync={{
-              state: syncState,
+              state: sync.state,
               savedAt,
               unsaved: !savedAt || doc.updatedAt > savedAt,
               sessionEnded,

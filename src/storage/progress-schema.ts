@@ -87,6 +87,32 @@ function isIsoDay(value: unknown): value is string {
   return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value)
 }
 
+/**
+ * An attempt with its keys in one fixed order. Postgres hands a stored object back with its keys
+ * sorted another way, so without this the same attempt is different text depending on where it has been.
+ */
+function canonAttempt(h: Attempt): Attempt {
+  return {
+    t: h.t,
+    ok: h.ok,
+    v: h.v,
+    m: h.m,
+    ...(typeof h.d === 'string' ? { d: h.d } : {}),
+    ...(h.p === 1 ? { p: 1 as const } : {}),
+  }
+}
+
+function canonSession(s: SessionLog): SessionLog {
+  return {
+    startedAt: s.startedAt,
+    endedAt: s.endedAt,
+    level: s.level,
+    ...(s.track ? { track: s.track } : {}),
+    answered: s.answered,
+    correct: s.correct,
+  }
+}
+
 export function sanitizeItem(raw: unknown, fallbackId: string): ItemProgress | null {
   if (!raw || typeof raw !== 'object') return null
   const r = raw as Partial<ItemProgress>
@@ -98,28 +124,39 @@ export function sanitizeItem(raw: unknown, fallbackId: string): ItemProgress | n
   const lastSeen = Number.isFinite(r.lastSeen) ? Number(r.lastSeen) : 0
   const days = Array.isArray(r.days) ? r.days.filter(isIsoDay) : []
   const history = Array.isArray(r.history)
-    ? r.history.filter((h): h is Attempt => {
-        if (!h || typeof h !== 'object') return false
-        return typeof h.t === 'number' && typeof h.ok === 'boolean' && typeof h.v === 'string' && typeof h.m === 'string'
-      })
+    ? r.history
+        .filter((h): h is Attempt => {
+          if (!h || typeof h !== 'object') return false
+          return typeof h.t === 'number' && typeof h.ok === 'boolean' && typeof h.v === 'string' && typeof h.m === 'string'
+        })
+        .map(canonAttempt)
     : []
   return { id, stage, due, reps, lapses, lastSeen, days, history }
 }
 
 export function sanitizeDoc(doc: ProgressDoc): ProgressDoc {
-  const items: Record<string, ItemProgress> = {}
+  const found: Record<string, ItemProgress> = {}
   for (const [id, raw] of Object.entries(doc.items ?? {})) {
     const item = sanitizeItem(raw, id)
-    if (item) items[item.id] = item
+    if (item) found[item.id] = item
   }
+  // The cards in one order, whatever order they were met in or a database returned them in.
+  const items: Record<string, ItemProgress> = {}
+  for (const id of Object.keys(found).sort()) items[id] = found[id]!
   const opened = doc.opened
   const voice = Number.isFinite(opened?.voice) ? Math.max(0, Math.trunc(opened!.voice)) : 0
-  const sessions = Array.isArray(doc.sessions) ? doc.sessions : []
+  const sessions = (Array.isArray(doc.sessions) ? doc.sessions : []).filter((s) => s && typeof s === 'object').map(canonSession)
   // A document from before the reorder is renumbered once, and marked so it never is again.
   const reordered = doc.voiceOrder === 2
+  // Known fields in a fixed order, then anything else a newer build added, sorted. The same
+  // learner work is the same text, which is what lets two copies be compared without reading both.
+  const { version, app, createdAt, updatedAt, settings, items: _items, sessions: _sessions, opened: _opened, voiceOrder: _order, owner, ...extra } = doc
   return {
-    ...doc,
-    settings: { ...DEFAULT_SETTINGS, ...doc.settings },
+    version,
+    app,
+    createdAt,
+    updatedAt,
+    settings: { ...DEFAULT_SETTINGS, ...settings },
     items,
     sessions: reordered ? sessions : sessions.map(reorderedSession),
     opened: {
@@ -127,6 +164,8 @@ export function sanitizeDoc(doc: ProgressDoc): ProgressDoc {
       script: Number.isFinite(opened?.script) ? Math.max(0, Math.trunc(opened!.script)) : 0,
     },
     voiceOrder: 2,
+    ...(typeof owner === 'string' && owner ? { owner } : {}),
+    ...Object.fromEntries(Object.entries(extra).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))),
   }
 }
 

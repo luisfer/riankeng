@@ -63,6 +63,43 @@ export function setSyncedAt(t: number): void {
   }
 }
 
+const SYNC_MARK_KEY = 'riankeng:sync-mark:v1'
+
+/**
+ * What this browser knew when its last sync with the account finished: when the account's row was
+ * last written, and a digest of the cards this browser held. If neither has moved, a sync has
+ * nothing to send and nothing to fetch. Wrong in the safe direction: a mark that does not match
+ * only means the work is done the long way.
+ */
+export interface SyncMark {
+  userId: string
+  /** The account row's updated_at, epoch ms. */
+  stamp: number
+  /** fingerprint() of this browser's document as it was sent. */
+  hash: string
+}
+
+export function syncMark(userId: string): SyncMark | null {
+  try {
+    const raw = localStorage.getItem(SYNC_MARK_KEY)
+    if (!raw) return null
+    const v = JSON.parse(raw) as Partial<SyncMark>
+    if (v.userId !== userId || typeof v.stamp !== 'number' || !Number.isFinite(v.stamp) || typeof v.hash !== 'string') return null
+    return { userId: v.userId, stamp: v.stamp, hash: v.hash }
+  } catch {
+    return null
+  }
+}
+
+export function setSyncMark(mark: SyncMark | null): void {
+  try {
+    if (mark) localStorage.setItem(SYNC_MARK_KEY, JSON.stringify(mark))
+    else localStorage.removeItem(SYNC_MARK_KEY)
+  } catch {
+    /* an optimisation: without it every sync is a full one */
+  }
+}
+
 const ACCOUNT_SAVED_KEY = 'riankeng:account-saved:v1'
 
 /** When this browser last saw the account hold everything it had. 0: never, or not since a switch. */

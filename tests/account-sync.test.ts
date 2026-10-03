@@ -59,6 +59,33 @@ describe('mergeAccount', () => {
     expect(merged.opened).toEqual({ voice: 1, script: 0 })
   })
 
+  it('takes the account\'s settings when this browser has done nothing and changed nothing', () => {
+    // A new phone: its empty document is stamped later than anything the account holds.
+    const local = { ...emptyDoc(t0), updatedAt: t0 + 5 * DAY }
+    let remote = answer(emptyDoc(t0), 'w:maa', t0 + DAY)
+    remote = {
+      ...remote,
+      updatedAt: t0 + DAY,
+      settings: { ...remote.settings, name: 'Luis', silent: true, thaiScript: true, newPerSession: 12, audioRate: 0.9 },
+    }
+    const merged = mergeAccount(local, remote)
+    expect(merged.settings).toEqual(remote.settings)
+    expect(merged.items['w:maa']!.reps).toBe(1)
+  })
+
+  it('keeps what this browser set before its first card, when that is newer', () => {
+    const local = { ...emptyDoc(t0), updatedAt: t0 + 5 * DAY }
+    local.settings = { ...local.settings, silent: true }
+    const remote = {
+      ...answer(emptyDoc(t0), 'w:maa', t0 + DAY),
+      updatedAt: t0 + DAY,
+      settings: { ...emptyDoc(t0).settings, name: 'Luis', newPerSession: 12 },
+    }
+    const merged = mergeAccount(local, remote)
+    expect(merged.settings.silent).toBe(true)
+    expect(merged.settings.name).toBe('')
+  })
+
   it('keeps one sitting when both copies started together', () => {
     const sitting = (endedAt: number, answered: number) => ({
       startedAt: t0,
@@ -183,6 +210,28 @@ describe('syncAccount and who owns the cards', () => {
     expect(result.doc?.owner).toBe('user-1')
     expect(result.doc?.items['w:maa']?.reps).toBe(1)
     expect((posted[0] as { doc: { owner?: string } }).doc.owner).toBe('user-1')
+  })
+
+  it('does not put the defaults in the account\'s place when a new browser signs in', async () => {
+    signIn()
+    const account = {
+      ...answer(emptyDoc(t0), 'w:maa', t0),
+      owner: 'user-1',
+      updatedAt: t0 + DAY,
+      settings: { ...emptyDoc(t0).settings, name: 'Luis', silent: true, newPerSession: 12 },
+    }
+    const posted: { doc: { settings: unknown } }[] = []
+    vi.stubGlobal('fetch', vi.fn(async (_input: RequestInfo, init?: RequestInit) => {
+      if ((init?.method ?? 'GET') === 'GET') return new Response(JSON.stringify([{ doc: account }]), { status: 200 })
+      posted.push(JSON.parse(String(init?.body)))
+      return new Response(null, { status: 201 })
+    }))
+    const result = await syncAccount(emptyDoc(t0 + 5 * DAY))
+    expect(result.state).toBe('saved')
+    expect(result.doc?.settings).toEqual(account.settings)
+    expect(result.doc?.items['w:maa']?.reps).toBe(1)
+    // Whatever goes back up carries the learner's settings, not the new browser's.
+    for (const row of posted) expect(row.doc.settings).toEqual(account.settings)
   })
 
   it('reports a failed upload, so the app tries again', async () => {

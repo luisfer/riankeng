@@ -5,7 +5,7 @@
 import { getEntry } from '@content/index'
 import { currentId } from '@content/aliases'
 import { mergeItem } from './import'
-import { DEFAULT_SETTINGS, sanitizeDoc, type ProgressDoc, type SessionLog } from './progress-schema'
+import { DEFAULT_SETTINGS, sanitizeDoc, type ProgressDoc, type SessionLog, type Settings } from './progress-schema'
 import { sameDocPayload } from './db'
 import { accountConfig, currentAccess, readAccount, type AccountSession } from './auth'
 
@@ -24,6 +24,17 @@ function openedLevel(doc: ProgressDoc, track: 'voice' | 'script'): number {
   return Number.isFinite(n) ? Math.max(0, Math.trunc(n as number)) : 0
 }
 
+/**
+ * A browser that has answered nothing, sat nothing and changed no setting has nothing to say about
+ * settings. A fresh document is stamped with the moment it was made, which is later than anything the
+ * account holds, so without this it would win the merge and put the defaults in the account's place.
+ */
+function untouched(doc: ProgressDoc): boolean {
+  if (Object.keys(doc.items ?? {}).length > 0 || (doc.sessions ?? []).length > 0) return false
+  const kept = doc.settings as unknown as Record<string, unknown>
+  return (Object.keys(DEFAULT_SETTINGS) as (keyof Settings)[]).every((key) => kept[key] === DEFAULT_SETTINGS[key])
+}
+
 /** Remote answers survive a newer local setting, and the reverse. */
 export function mergeAccount(local: ProgressDoc, remote: ProgressDoc): ProgressDoc {
   const items = { ...local.items }
@@ -33,7 +44,7 @@ export function mergeAccount(local: ProgressDoc, remote: ProgressDoc): ProgressD
     const incoming = raw.id === current ? raw : { ...raw, id: current }
     items[current] = mergeItem(items[current], incoming)
   }
-  const settings = remote.updatedAt > local.updatedAt ? remote.settings : local.settings
+  const settings = remote.updatedAt > local.updatedAt || untouched(local) ? remote.settings : local.settings
   return sanitizeDoc({
     version: 1,
     app: 'riankeng',

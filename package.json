@@ -18,6 +18,8 @@
     "validate": "tsx scripts/validate-content.ts",
     "copy": "tsx scripts/dump-learner-copy.ts && slopless content/.learner-copy.md",
     "numbers": "tsx scripts/numbers.ts",
+    "simulate": "E2E=1 vitest run tests/learner-full-course.test.ts",
+    "simulate:live": "E2E=live vitest run tests/learner-full-course.test.ts",
     "ground": "python3 scripts/gen-ground.py",
     "audio": "python3 scripts/gen-audio.py",
     "scenes": "python3 scripts/gen-scenes.py",

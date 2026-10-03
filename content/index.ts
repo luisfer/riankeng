@@ -118,8 +118,20 @@ export function getEntry(id: string): Entry | undefined {
   return BY_ID.get(id)
 }
 
+const BY_LEVEL = new Map<string, Entry[]>()
+
+/**
+ * The cards of one level, in catalog order. The content does not change while the page is open and this
+ * is asked on every answer, for every level, so each list is made once. Frozen: copy before sorting.
+ */
 export function entriesForLevel(n: number, track: TrackId = 'voice'): Entry[] {
-  return ENTRIES.filter((e) => e.level === n && entryTrack(e) === track)
+  const key = `${track}:${n}`
+  let list = BY_LEVEL.get(key)
+  if (!list) {
+    list = Object.freeze(ENTRIES.filter((e) => e.level === n && entryTrack(e) === track)) as Entry[]
+    BY_LEVEL.set(key, list)
+  }
+  return list
 }
 
 export function levelIds(n: number, track: TrackId = 'voice'): string[] {

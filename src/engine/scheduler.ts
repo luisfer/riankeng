@@ -30,7 +30,12 @@ export function progressFor(doc: ProgressDoc, id: string): ItemProgress {
   return doc.items[id] ?? newItemProgress(id)
 }
 
-export function levelStatus(doc: ProgressDoc, n: number, now = Date.now(), track: TrackId = 'voice'): LevelStatus {
+/**
+ * One level's counts. `unlocked` is only a placeholder here: whether a level is open depends on the
+ * level below, and asking for it level by level costs a pass over every level beneath, so the callers
+ * that sweep all the levels (allLevelStatus, stampOpened) work it out as they go.
+ */
+function levelCounts(doc: ProgressDoc, n: number, now: number, track: TrackId): LevelStatus {
   const entries = entriesForLevel(n, track)
   let seen = 0
   let passed = 0
@@ -44,7 +49,6 @@ export function levelStatus(doc: ProgressDoc, n: number, now = Date.now(), track
     if (isDue(p, now)) due++
   }
   const complete = entries.length > 0 && mastered === entries.length
-  const unlocked = n === 0 || scriptLevelOpened(levelStatus(doc, n - 1, now, track), track)
   return {
     n,
     total: entries.length,
@@ -52,10 +56,16 @@ export function levelStatus(doc: ProgressDoc, n: number, now = Date.now(), track
     passed,
     mastered,
     due,
-    unlocked,
+    unlocked: n === 0,
     complete,
     progress: entries.length ? seen / entries.length : 0,
   }
+}
+
+export function levelStatus(doc: ProgressDoc, n: number, now = Date.now(), track: TrackId = 'voice'): LevelStatus {
+  const s = levelCounts(doc, n, now, track)
+  s.unlocked = n === 0 || scriptLevelOpened(levelStatus(doc, n - 1, now, track), track)
+  return s
 }
 
 export function openedFloor(doc: ProgressDoc, track: TrackId): number {
@@ -76,7 +86,7 @@ export function stampOpened(doc: ProgressDoc, now = Date.now()): ProgressDoc {
   let next = doc
   for (const track of ['voice', 'script'] as const) {
     for (const lvl of levelsFor(track)) {
-      const s = levelStatus(doc, lvl.n, now, track)
+      const s = levelCounts(doc, lvl.n, now, track)
       if (scriptLevelOpened(s, track)) next = withOpened(next, track, lvl.n + 1)
     }
   }
@@ -88,7 +98,7 @@ export function allLevelStatus(doc: ProgressDoc, now = Date.now(), track: TrackI
   let prevComplete = true
   const floor = openedFloor(doc, track)
   for (const lvl of levelsFor(track)) {
-    const s = levelStatus(doc, lvl.n, now, track)
+    const s = levelCounts(doc, lvl.n, now, track)
     s.unlocked = lvl.n === 0 || lvl.n <= floor || prevComplete
     out.push(s)
     prevComplete = scriptLevelOpened(s, track)

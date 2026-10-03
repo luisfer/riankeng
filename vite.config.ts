@@ -6,6 +6,7 @@ import { fileURLToPath, URL } from 'node:url'
 import { accountMayPass } from './src/gate-account'
 import { GATE_COOKIE, gateToken, readCookie } from './src/gate-token'
 import { handleWaitlist, type WaitlistEnv } from './src/waitlist-join'
+import { handleEvent } from './src/event-log'
 
 function readBody(req: Connect.IncomingMessage): Promise<string> {
   return new Promise((resolve) => {
@@ -18,12 +19,17 @@ function readBody(req: Connect.IncomingMessage): Promise<string> {
 }
 
 /**
- * The gate and the waitlist, served locally. On Vercel these are api/gate.ts,
- * api/session.ts, api/logout.ts and api/waitlist.ts. Here the same routes run
+ * The gate, the waitlist and the event count, served locally. On Vercel these are api/gate.ts,
+ * api/session.ts, api/logout.ts, api/waitlist.ts and api/event.ts. Here the same routes run
  * inside Vite, dev and preview. With SITE_PASSWORD empty, /learn/ is open
  * and the session is always in. /api/gate opens only for a signed-in account.
  */
-function gateDev(secret: string, waitlist: WaitlistEnv, account: { url: string; anon: string }): Plugin {
+function gateDev(
+  secret: string,
+  waitlist: WaitlistEnv,
+  account: { url: string; anon: string },
+  eventsOn: boolean,
+): Plugin {
   const handle: Connect.NextHandleFunction = (req, res, next) => {
     const url = new URL(req.url ?? '/', 'http://local')
     if (url.pathname === '/learn') {
@@ -54,7 +60,15 @@ function gateDev(secret: string, waitlist: WaitlistEnv, account: { url: string; 
         const token = await gateToken(secret || 'open')
         return json(200, { ok: true }, `${GATE_COOKIE}=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=2592000`)
       }
-      if (url.pathname === '/api/waitlist' && req.method === 'POST') {
+      // Local clicks would land in the live count. They are dropped unless EVENTS_DEV=1.
+      if (url.pathname === '/api/event' && req.method === 'POST' && !eventsOn) {
+        res.statusCode = 204
+        res.end()
+        return
+      }
+      const handler =
+        url.pathname === '/api/waitlist' ? handleWaitlist : url.pathname === '/api/event' ? handleEvent : null
+      if (handler && req.method === 'POST') {
         const raw = await readBody(req)
         // The browser's own headers, so the check that refuses other sites runs here as on Vercel.
         const passed: Record<string, string> = {}
@@ -63,8 +77,8 @@ function gateDev(secret: string, waitlist: WaitlistEnv, account: { url: string; 
           if (typeof value === 'string') passed[name] = value
         }
         if (req.headers.host) passed['x-forwarded-host'] = req.headers.host
-        const response = await handleWaitlist(
-          new Request('http://local/api/waitlist', { method: 'POST', headers: passed, body: raw }),
+        const response = await handler(
+          new Request(`http://local${url.pathname}`, { method: 'POST', headers: passed, body: raw }),
           waitlist,
         )
         res.statusCode = response.status
@@ -197,6 +211,7 @@ export default defineConfig(({ mode }) => {
           url: env.VITE_SUPABASE_URL || env.SUPABASE_URL || '',
           anon: env.VITE_SUPABASE_ANON_KEY ?? '',
         },
+        env.EVENTS_DEV === '1',
       ),
     ],
     resolve: {

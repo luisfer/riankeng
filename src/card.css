@@ -382,3 +382,33 @@ p:has(.tone-rom) { padding-top: 0.4em; }
   }
 }
 @keyframes tone-draw { to { stroke-dashoffset: 0; } }
+
+/* The one question about counting (src/landing/consent-banner.ts). A note at the foot of the
+   screen, never a wall: the page stays usable, and both answers are the same kind of button. */
+.consent {
+  position: fixed;
+  z-index: 20;
+  left: 16px;
+  right: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  max-width: 440px;
+  margin: 0;
+  padding: 16px;
+  background: var(--paper);
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  border-radius: 2px;
+  box-shadow: 0 8px 28px rgba(28, 23, 16, 0.18);
+  font-family: var(--ui);
+  font-size: 15px;
+  line-height: 1.45;
+}
+.consent-text { margin: 0 0 12px; text-wrap: pretty; }
+.consent-act { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; }
+.consent-act a { color: var(--ink-2); font-size: 14px; text-underline-offset: 3px; }
+.consent-act a:hover { color: var(--ink); }
+/* While a phone keyboard is up, the writing line needs the room. */
+html[data-keyboard="open"] .consent { display: none; }
+@media (min-width: 721px) {
+  .consent { right: auto; }
+}

@@ -1,9 +1,9 @@
 import { landing } from './copy'
-import { currentRef } from './ref'
+import { currentRef, currentTouch } from './ref'
 import { normalizeEmail } from '../waitlist-join'
 
-/** The field opens, then a saved address says it was sent. */
-export function bindWaitlist(form: HTMLFormElement, onOpen?: () => void): void {
+/** The field opens, then a saved address says it was sent. onSaved hears of it, never the address. */
+export function bindWaitlist(form: HTMLFormElement, onOpen?: () => void, onSaved?: () => void): void {
   const open = form.querySelector<HTMLButtonElement>('[data-waitlist-open]')
   const field = form.querySelector<HTMLInputElement>('input[name="email"]')
   const commit = form.querySelector<HTMLButtonElement>('button[type="submit"]')
@@ -54,7 +54,7 @@ export function bindWaitlist(form: HTMLFormElement, onOpen?: () => void): void {
     void fetch('/api/waitlist', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, website: trap?.value ?? '', source: currentRef() }),
+      body: JSON.stringify({ email, website: trap?.value ?? '', source: currentRef(), touch: currentTouch() }),
     })
       .then(async (res) => {
         // One network, many sign-ups: a café's Wi-Fi reaches the limit first. The address stays typed.
@@ -63,6 +63,7 @@ export function bindWaitlist(form: HTMLFormElement, onOpen?: () => void): void {
         if (!res.ok || !data?.ok) return fail(landing.waitlistFail)
         form.dataset.sent = ''
         say(landing.waitlistThanks, false)
+        onSaved?.()
         if (commit) {
           commit.textContent = landing.waitlistJoined
           commit.disabled = true

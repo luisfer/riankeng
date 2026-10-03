@@ -29,4 +29,12 @@ export const landing = {
   slower: 'Slower',
   continue: 'Continue',
   next: 'Next card',
+  consentLabel: 'Counting visits',
+  consentText:
+    'This browser can keep a random number for 13 months, so the site can count a return visit and the post that led here. It names no one.',
+  consentYes: 'Allow',
+  consentNo: "Don't allow",
+  consentNowYes: 'Allowed now.',
+  consentNowNo: 'Not allowed now.',
+  consentPrivacy: 'Privacy',
 }

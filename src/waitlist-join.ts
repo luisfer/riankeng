@@ -1,5 +1,9 @@
 /** One address on the waitlist. The service role stays on the server. */
 
+import { NO_TOUCH, UTM_KEYS, cleanTouch, normalizeSource, type Touch } from './attribution.js'
+
+export { normalizeSource }
+
 export type WaitlistEnv = {
   url?: string
   key?: string
@@ -18,13 +22,6 @@ export function normalizeEmail(raw: string): string | null {
   return email
 }
 
-/** The short tag on the link a visit came from, ?ref=x. Anything else is dropped. */
-export function normalizeSource(raw: unknown): string | null {
-  if (typeof raw !== 'string') return null
-  const source = raw.trim().toLowerCase()
-  return /^[a-z0-9_-]{1,32}$/.test(source) ? source : null
-}
-
 /** Why a save failed, for the function log. Never the address. */
 function logFailure(reason: string, status?: number, code?: string): void {
   console.error(`waitlist: ${reason}`, ...(status === undefined ? [] : [status]), ...(code ? [code] : []))
@@ -41,6 +38,7 @@ export async function insertWaitlistEmail(
   env: WaitlistEnv,
   fetchImpl: typeof fetch = fetch,
   source: string | null = null,
+  touch: Touch = NO_TOUCH,
 ): Promise<'saved' | 'save'> {
   const url = env.url?.trim().replace(/\/$/, '')
   const key = env.key?.trim()
@@ -60,12 +58,22 @@ export async function insertWaitlistEmail(
       },
       body: JSON.stringify(row),
     })
+  // The row with every mark the link carried, then with the tag alone, then the address alone.
+  const full: Record<string, string> = source ? { email, source } : { email }
+  for (const k of [...UTM_KEYS, 'referrer', 'landing'] as const) {
+    const value = touch[k]
+    if (value) full[k] = value
+  }
+  const rows = [full, source ? { email, source } : { email }, { email }].filter(
+    (row, i, all) => all.findIndex((other) => JSON.stringify(other) === JSON.stringify(row)) === i,
+  )
   try {
-    let res = await post(source ? { email, source } : { email })
-    // A table without the source column refuses the row with PGRST204. The address matters more than the tag.
-    if (res.status === 400 && source && (await errorCode(res)) === 'PGRST204') {
-      logFailure('the source column is missing, saved without the tag', res.status, 'PGRST204')
-      res = await post({ email })
+    let res = await post(rows[0]!)
+    // A table without one of the columns refuses the row with PGRST204. The address matters more than the marks.
+    for (const row of rows.slice(1)) {
+      if (res.status !== 400 || (await errorCode(res)) !== 'PGRST204') break
+      logFailure('a column is missing, saved with fewer marks', res.status, 'PGRST204')
+      res = await post(row)
     }
     if (res.ok || res.status === 409) return 'saved'
     logFailure('the insert was refused', res.status, await errorCode(res))
@@ -103,7 +111,7 @@ function ownHost(request: Request, origin: string): boolean {
   return own.includes(host)
 }
 
-type WaitlistBody = { email?: unknown; website?: unknown; source?: unknown }
+type WaitlistBody = { email?: unknown; website?: unknown; source?: unknown; touch?: unknown }
 
 /** POST /api/waitlist. A filled honeypot looks saved and is not stored. */
 export async function handleWaitlist(
@@ -124,7 +132,7 @@ export async function handleWaitlist(
   if (website) return Response.json({ ok: true }, { headers })
   const email = normalizeEmail(typeof body.email === 'string' ? body.email : '')
   if (!email) return Response.json({ ok: false, error: 'email' }, { status: 400, headers })
-  const saved = await insertWaitlistEmail(email, env, fetchImpl, normalizeSource(body.source))
+  const saved = await insertWaitlistEmail(email, env, fetchImpl, normalizeSource(body.source), cleanTouch(body.touch))
   if (saved !== 'saved') return Response.json({ ok: false, error: 'save' }, { status: 502, headers })
   return Response.json({ ok: true }, { headers })
 }

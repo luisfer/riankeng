@@ -1,7 +1,9 @@
 import { Window } from 'happy-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { bindWaitlist, openWaitlistAt } from '../src/landing/waitlist'
-import { currentRef, rememberRef } from '../src/landing/ref'
+import { currentRef, currentTouch, rememberRef, resetVisit, withTouch } from '../src/landing/ref'
+import { NO_TOUCH } from '../src/attribution'
+import { saveConsent } from '../src/consent'
 import { handleWaitlist, insertWaitlistEmail, normalizeEmail, normalizeSource } from '../src/waitlist-join'
 
 const thanks = 'Thanks. One email goes to this address when the course opens.'
@@ -39,6 +41,9 @@ function jsonResponse(status: number, body: unknown) {
 
 afterEach(() => {
   vi.unstubAllGlobals()
+  resetVisit()
+  localStorage.clear()
+  sessionStorage.clear()
 })
 
 describe('waitlist form', () => {
@@ -58,7 +63,7 @@ describe('waitlist form', () => {
     expect(el.querySelector('[data-waitlist-note]')?.textContent).toBe(thanks)
     expect(fetchMock).toHaveBeenCalledOnce()
     const [, init] = fetchMock.mock.calls[0] ?? []
-    expect(JSON.parse(String(init?.body))).toEqual({ email: 'ada@example.com', website: '', source: null })
+    expect(JSON.parse(String(init?.body))).toEqual({ email: 'ada@example.com', website: '', source: null, touch: NO_TOUCH })
     close()
   })
 
@@ -192,17 +197,101 @@ describe('waitlist source tag', () => {
     expect(JSON.parse(String(fetchMock.mock.calls[1]?.[1]?.body))).toEqual({ email: 'ada@example.com' })
   })
 
-  it('keeps the tag for the tab, so it survives a trip through the preview', () => {
-    sessionStorage.clear()
-    localStorage.clear()
+  it('keeps the tag for the tab with permission, so it survives a trip through the preview', () => {
+    saveConsent(true)
     rememberRef('?ref=LINE')
+    resetVisit()
     expect(currentRef('')).toBe('line')
     expect(currentRef('?ref=fb')).toBe('fb')
     rememberRef('?ref=%3Cscript%3E')
     expect(currentRef('')).toBe('line')
     sessionStorage.clear()
     localStorage.clear()
+    resetVisit()
     expect(currentRef('')).toBeNull()
+  })
+
+  it('keeps nothing without permission, clears what an earlier version kept, and still knows the tag on this page', () => {
+    localStorage.setItem('rk-ref-first', JSON.stringify({ ref: 'old', at: Date.now() }))
+    sessionStorage.setItem('rk-ref', 'old')
+    rememberRef('?ref=line')
+    expect(localStorage.getItem('rk-ref-first')).toBeNull()
+    expect(sessionStorage.getItem('rk-ref')).toBeNull()
+    expect(localStorage.getItem('rk-touch-first')).toBeNull()
+    expect(sessionStorage.getItem('rk-touch')).toBeNull()
+    expect(currentRef('')).toBe('line')
+    resetVisit()
+    expect(currentRef('')).toBeNull()
+  })
+
+  it('reads utm tags and the site that linked here, and gives the waitlist one short source', () => {
+    rememberRef('?utm_source=Reddit&utm_medium=social&utm_campaign=launch%20week&utm_term=%3Cb%3E', Date.now(), {
+      referrer: 'https://www.reddit.com/r/learnthai/',
+      host: 'riangeng.com',
+      path: '/',
+    })
+    expect(currentTouch('')).toEqual({
+      ref: null,
+      utm_source: 'reddit',
+      utm_medium: 'social',
+      utm_campaign: 'launch-week',
+      utm_content: null,
+      utm_term: null,
+      referrer: 'reddit.com',
+      landing: '/',
+    })
+    expect(currentRef('')).toBe('reddit')
+    // A ref names the post better than a utm_source, so it wins the source column.
+    expect(currentRef('?ref=rd-learnthai&utm_source=reddit')).toBe('rd-learnthai')
+  })
+
+  it('does not count this site as the site that linked here', () => {
+    rememberRef('', Date.now(), { referrer: 'https://riangeng.com/preview/', host: 'riangeng.com', path: '/' })
+    expect(currentTouch('').referrer).toBeNull()
+    rememberRef('', Date.now(), { referrer: 'android-app://com.reddit.frontpage/', host: 'riangeng.com', path: '/' })
+    expect(currentTouch('').referrer).toBe('com.reddit.frontpage')
+  })
+
+  it('carries the marks across pages in the address when nothing may keep them', () => {
+    rememberRef('?ref=fb-iwanttolearnthai&utm_medium=social')
+    expect(withTouch('/preview/')).toBe('/preview/?ref=fb-iwanttolearnthai&utm_medium=social')
+    expect(`${withTouch('/')}#close`).toBe('/?ref=fb-iwanttolearnthai&utm_medium=social#close')
+    // With permission the tab keeps them, so the address stays clean.
+    saveConsent(true)
+    expect(withTouch('/preview/')).toBe('/preview/')
+    resetVisit()
+    localStorage.clear()
+    expect(withTouch('/preview/')).toBe('/preview/')
+  })
+
+  it('stores every mark the link carried with the address', async () => {
+    const fetchMock = vi.fn<typeof fetch>(async () => new Response(null, { status: 201 }))
+    const touch = { ...NO_TOUCH, ref: 'rd-learnthai', utm_source: 'reddit', utm_campaign: 'launch', referrer: 'reddit.com', landing: '/' }
+    const res = await handleWaitlist(post({ email: 'ada@example.com', source: 'rd-learnthai', touch: { ...touch, utm_term: '<b>' } }), env, fetchMock)
+    expect(res.status).toBe(200)
+    expect(JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body))).toEqual({
+      email: 'ada@example.com',
+      source: 'rd-learnthai',
+      utm_source: 'reddit',
+      utm_campaign: 'launch',
+      referrer: 'reddit.com',
+      landing: '/',
+    })
+  })
+
+  it('saves with fewer marks, then the address alone, while the table lacks the new columns', async () => {
+    const fetchMock = vi.fn<typeof fetch>()
+      .mockResolvedValueOnce(jsonResponse(400, { code: 'PGRST204' }))
+      .mockResolvedValueOnce(jsonResponse(400, { code: 'PGRST204' }))
+      .mockResolvedValueOnce(new Response(null, { status: 201 }))
+    const touch = { ...NO_TOUCH, utm_source: 'reddit' }
+    const res = await handleWaitlist(post({ email: 'ada@example.com', source: 'x', touch }), env, fetchMock)
+    expect(res.status).toBe(200)
+    expect(fetchMock.mock.calls.map((c) => JSON.parse(String(c[1]?.body)))).toEqual([
+      { email: 'ada@example.com', source: 'x', utm_source: 'reddit' },
+      { email: 'ada@example.com', source: 'x' },
+      { email: 'ada@example.com' },
+    ])
   })
 })
 
@@ -310,16 +399,16 @@ describe('waitlist insert, leaving a trace', () => {
 })
 
 describe('waitlist source tag, across tabs', () => {
-  it('keeps the first tag this browser arrived with for 30 days', () => {
-    sessionStorage.clear()
-    localStorage.clear()
+  it('keeps the first tag this browser arrived with for 30 days, with permission', () => {
     const t0 = 1_700_000_000_000
+    saveConsent(true, t0)
     rememberRef('?ref=line', t0)
+    resetVisit()
     rememberRef('?ref=fb', t0 + 1000)
     sessionStorage.clear()
+    resetVisit()
     expect(currentRef('', t0 + 2000)).toBe('line')
     expect(currentRef('?ref=x', t0 + 2000)).toBe('x')
     expect(currentRef('', t0 + 31 * 86_400_000)).toBeNull()
-    localStorage.clear()
   })
 })

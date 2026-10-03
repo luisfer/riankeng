@@ -17,6 +17,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "validate": "tsx scripts/validate-content.ts",
     "copy": "tsx scripts/dump-learner-copy.ts && slopless content/.learner-copy.md",
+    "numbers": "tsx scripts/numbers.ts",
     "ground": "python3 scripts/gen-ground.py",
     "audio": "python3 scripts/gen-audio.py",
     "scenes": "python3 scripts/gen-scenes.py",

@@ -11,7 +11,7 @@ export default phrases(23, [
   ['rian paa-sǎa glaang', 'เรียนภาษากลาง', ['study central Thai']],
   ['kam níi yâak', 'คำนี้ยาก', ['this word is hard']],
   ['bɔ̀ɔk bpen bprà-yòok', 'บอกเป็นประโยค', ['say it as a sentence']],
-  ['pûut reo pǒm mâi than', 'พูดเร็วผมไม่ทัน', ['you speak fast I cannot keep up']],
+  ['pûut reo pǒm mâi tan', 'พูดเร็วผมไม่ทัน', ['you speak fast, I cannot keep up']],
   ['dâi yin kam níi', 'ได้ยินคำนี้', ['I have heard this word']],
   ['kít bpen paa-sǎa tai', 'คิดเป็นภาษาไทย', ['think in Thai']],
   ['mâi dtɔ̂ng pûut yâak', 'ไม่ต้องพูดยาก', ['no need to say it the hard way', 'no need for hard words']],

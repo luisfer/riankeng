@@ -6,7 +6,7 @@ export default scriptWords(5, [
   ['kon', 'คน', ['person', 'people'], 'n', ['bridge', 'voice:w:kon', 'parts:ค+น'], 'No vowel written between two consonants. A short o is understood.'],
   ['kɔ̌ɔ', 'ข', ['high-class k', 'the letter k (kɔ̌ɔ kài)'], 'n', ['letter'], 'The letter in ไข่. Same k to the ear, another shape.'],
   ['kài', 'ไข่', ['egg'], 'n', ['bridge', 'voice:w:kài', 'parts:ไ+ข+่']],
-  ['e#1', 'เ', ['e', 'e to the left'], 'n', ['letter', 'vowel'], 'Sits to the left. Alone it is long ee. With า after the consonant it is ao. เขา, เข้า.'],
+  ['ee', 'เ', ['long ee', 'e to the left'], 'n', ['letter', 'vowel'], 'Sits to the left. Alone it is long ee. With า after the consonant it is ao. เขา, เข้า.'],
   ['kǎo', 'เขา', ['he', 'she', 'they'], 'pron', ['bridge', 'voice:w:kǎo', 'parts:เ+ข+า']],
   ['kâo', 'เข้า', ['enter', 'to enter'], 'v', ['bridge', 'voice:w:kâo', 'parts:เ+ข+้+า']],
 ])

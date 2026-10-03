@@ -22,7 +22,7 @@ export const SCRIPT_LEVELS: LevelMeta[] = [
   {
     n: 2,
     title: 'A mark for tone',
-    rom: 'mâi too',
+    rom: 'mái too',
     thai: 'ม้า',
     blurb: 'The wiggle lives on ม้า, the horse you already know. No mark on มา is the mid tone you already say. Learn the mark on the word, not as a card of its own.',
     focus: ['ม้า. ม plus ้ plus า. máa, horse.', 'มา. No mark. The mid tone you already say.'],

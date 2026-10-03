@@ -3,7 +3,7 @@ import { words } from '../build'
 export default words(14, [
   // when something goes wrong
   ['hǎai', 'หาย', ['lost', 'missing', 'disappear', 'gone'], 'v', ['trouble'], 'Also what an illness does when it goes.'],
-  ['kà-mooi', 'ขโมย', ['thief', 'steal'], 'n', ['trouble']],
+  ['kà-mǒoi', 'ขโมย', ['thief', 'steal'], 'n', ['trouble']],
   ['dtam-rùat', 'ตำรวจ', ['police', 'policeman'], 'n', ['trouble']],
   ['roong-pák', 'โรงพัก', ['police station'], 'n', ['trouble']],
   ['jε̂εng kwaam', 'แจ้งความ', ['file a police report', 'report it'], 'v', ['trouble']],

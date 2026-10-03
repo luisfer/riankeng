@@ -2,7 +2,7 @@ import { phrases } from '../build'
 
 export default phrases(14, [
   ['grà-bpǎo pǒm hǎai', 'กระเป๋าผมหาย', ['my bag is missing', 'I lost my bag']],
-  ['mii kà-mooi', 'มีขโมย', ['there is a thief', 'we have been robbed']],
+  ['mii kà-mǒoi', 'มีขโมย', ['there is a thief']],
   ['chûai rîak dtam-rùat', 'ช่วยเรียกตำรวจ', ['please call the police']],
   ['bpai roong-pák', 'ไปโรงพัก', ['go to the police station']],
   ['pǒm yàak jε̂εng kwaam', 'ผมอยากแจ้งความ', ['I want to file a report']],

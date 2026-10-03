@@ -17,11 +17,18 @@ describe('an English prompt with two right answers', () => {
   })
 
   it('does not take a twin the learner has not reached', () => {
-    const wat = entry('w:wàt')
-    const naao = entry('w:nǎao')
-    expect(naao.level).toBeGreaterThan(wat.level)
-    expect(twinAnswer(wat, 'nǎao', never)).toBeNull()
-    expect(twinAnswer(wat, 'nǎao', (id) => id === 'w:nǎao')?.id).toBe('w:nǎao')
+    // "time" is tii and wee-laa alike.
+    const tii = entry('w:tii')
+    const weelaa = entry('w:wee-laa')
+    expect(weelaa.level).toBeGreaterThan(tii.level)
+    expect(twinAnswer(tii, 'wee-laa', never)).toBeNull()
+    expect(twinAnswer(tii, 'wee-laa', (id) => id === 'w:wee-laa')?.id).toBe('w:wee-laa')
+  })
+
+  it('keeps an illness apart from the weather', () => {
+    // A cold is wàt. The cold of the weather is nǎao, so it is not a twin.
+    expect(twinAnswer(entry('w:wàt'), 'nǎao', () => true)).toBeNull()
+    expect(twinAnswer(entry('w:nǎao'), 'wàt', () => true)).toBeNull()
   })
 
   it('still marks a wrong answer wrong', () => {

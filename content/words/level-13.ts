@@ -32,7 +32,7 @@ export default words(13, [
   ['bpàak', 'ปาก', ['mouth'], 'n', ['feel']],
   ['fan', 'ฟัน', ['tooth', 'teeth'], 'n', ['feel']],
   ['kâi', 'ไข้', ['fever'], 'n', ['feel']],
-  ['wàt', 'หวัด', ['cold', 'a cold'], 'n', ['feel']],
+  ['wàt', 'หวัด', ['a cold', 'common cold'], 'n', ['feel']],
   ['ai', 'ไอ', ['cough', 'to cough'], 'v', ['feel']],
   ['táng', 'ทั้ง', ['all', 'whole', 'both'], 'adv', ['feel']],
   ['nûat', 'นวด', ['massage', 'to massage'], 'v', ['body']],

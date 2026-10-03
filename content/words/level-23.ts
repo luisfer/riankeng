@@ -17,6 +17,6 @@ export default words(23, [
   ['bprà-yòok', 'ประโยค', ['sentence'], 'n', ['fluency']],
   ['kwaam mǎai', 'ความหมาย', ['meaning'], 'n', ['fluency']],
   ['yâak', 'ยาก', ['difficult', 'hard'], 'adj', ['fluency']],
-  ['than', 'ทัน', ['in time', 'keep up'], 'v', ['fluency']],
+  ['tan', 'ทัน', ['in time', 'keep up'], 'v', ['fluency']],
   ['yin', 'ยิน', ['hear[, as in dâi yin]'], 'v', ['fluency']],
 ])

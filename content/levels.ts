@@ -202,7 +202,7 @@ export const LEVELS: LevelMeta[] = [
     thai: 'ช่วยด้วย',
     blurb: 'What to say when something goes wrong, and how to be decent while you say it.',
     focus: [
-      'hǎai, kà-mooi, dtam-rùat. Lost, stolen, the police.',
+      'hǎai, kà-mǒoi, dtam-rùat. Lost, stolen, the police.',
       'tɔ́ɔng sǐa, ûak, jèp kɔɔ. What happens to a body abroad.',
       'rá-wang, an-dtà-raai, chùk-chə̌ən. Careful, dangerous, emergency.',
       'wâi. Hands together. The younger one starts it.',

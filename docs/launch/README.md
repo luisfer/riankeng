@@ -12,6 +12,8 @@ Written Sat 3 Oct 2026 from the seven pre-flight reports in this folder. Each re
 | [06-drills-points.md](06-drills-points.md) | The drill engine, and points that cut the price, after product-market fit |
 | [07-ideas.md](07-ideas.md) | Positioning, concierge, other ideas, the voice licence |
 | [08-thai-review.md](08-thai-review.md) | The whole course's Thai, the fixes made, and Athita's list |
+| [09-learner-simulation.md](09-learner-simulation.md) | A learner through the whole course, the migrations, and three problems found and fixed |
+| [10-progress-storage.md](10-progress-storage.md) | Why progress is on the device, what it costs, the sync fix, and the plan for one record per card |
 
 ## Verdict
 
@@ -30,25 +32,27 @@ Written Sat 3 Oct 2026 from the seven pre-flight reports in this folder. Each re
 - **Money:** Stripe on Pristine Mekong's own account, with Managed Payments on. Link, a Stripe company, becomes the seller of record and files VAT and GST from the first sale. Prices include tax, and no registrations are needed for now (02).
 - **Ads:** none in the fortnight. At $10 and $20 they very likely cost more per payer than the payer pays. The earliest test is Mon 19 Oct, and only if the brief's trigger fires: Reddit, $100 over 7 days, no pixel (03 §4).
 
-## Status, Sat 3 Oct (evening)
+## Status, Sat 3 Oct (night)
 
-Built on branch `luis/validation-launch`, not committed yet. Typecheck, 502 tests, content validation, the copy lint and the build pass.
+Branch `luis/validation-launch`: four commits, plus the work since, which is not committed yet. Typecheck, the tests, content validation and the build pass.
 
 **Done:**
-- **Analytics.** `api/event.ts` and an `events` table (migration `20261003120000_events.sql`) count views, checks, plays, the ways on, waitlist joins and finished previews. A missed card keeps what was typed, romanization only. `npm run numbers` prints the scoreboard.
+- **Analytics.** `api/event.ts` and an `events` table count views, checks, plays, the ways on, waitlist joins and finished previews. A missed card keeps what was typed, romanization only. `npm run numbers` prints the scoreboard.
 - **Consent, the same in every country.** One banner, Allow and Don't allow alike, nothing kept for counting before a yes. Global Privacy Control counts as a no. Privacy choices in the footers asks again. Without a yes, visits and tries are still counted, but not returns.
-- **Campaign attribution.** `?ref=`, the five `utm_` tags, the referring site and the landing page go to the waitlist (migration `20261003120100_waitlist_attribution.sql`) and to every event. Without consent they ride on the links between the site's own pages.
-- **Demo fixes.** Slower at 0.7, the five-tones line, the clip on Continue, and Join the waitlist beside Next card and on every preview word.
-- **Pages.** The headline shows after 2 s even if the script stalls. Privacy rewritten with a Counting section. Terms say synthetic voice clips.
-- **Thai.** The whole course reviewed ([08-thai-review.md](08-thai-review.md)). Four wrong sounds or tones fixed, with aliases so saved progress follows: kà-mǒoi, tan, mái too, and the Script ee, εε, oo. The หวัด grading bug is fixed. Athita's list is in 08.
+- **Campaign attribution.** `?ref=`, the five `utm_` tags, the referring site and the landing page go to the waitlist and to every event. Without consent they ride on the links between the site's own pages.
+- **Both migrations are applied to the real Supabase project and checked.** The events table and the seven waitlist columns exist, the public key cannot read or write events, a real event and a real sign-up round-tripped and were deleted, and the waitlist is still 13.
+- **A learner through the whole course** ([09-learner-simulation.md](09-learner-simulation.md)). Every lesson, logout, login, a new device, two devices at once, expired tokens, a second account. Progress comes back exactly, on an in-memory project and on the real one. It found three problems, all fixed: settings reset on a new device (and overwrote the account's copy), every answer costing 14 ms, and every answer moving the whole progress document.
+- **Sync is 15.8 times lighter** ([10-progress-storage.md](10-progress-storage.md)). A sync per sitting, 48 bytes when nothing changed, nothing re-sent that the account already holds. The plan for one record per card, which would make it about 100 times lighter again by the end of a course, is written and waiting on a decision.
+- **Demo fixes, pages, plans.** Slower at 0.7, the five-tones line, the clip on Continue, the waitlist beside every card, both plans on the page, the terms and the contact email.
+- **Thai.** The whole course reviewed ([08-thai-review.md](08-thai-review.md)). Four wrong sounds or tones fixed, with aliases so saved progress follows. Athita's list is in 08.
 - **SITE_PASSWORD rotated** in Vercel Production and Preview.
 
 **Waiting on Luis:**
-1. Redeploy production. The new SITE_PASSWORD only takes effect on the next production deploy, and the old one is live until then.
-2. Run the two migrations on Supabase (`supabase db push`, or paste the SQL). Until then, events are refused, and the waitlist saves without the new columns.
-3. Hosting. Vercel stays on Hobby, so no prices and no checkout on this site: Hobby's terms count advertising a sale as commercial use. Choose Pro, a host that allows commercial use on its free plan, or a fortnight without prices.
-4. Athita's first eight questions in 08, before the first post.
-5. Review the branch and commit it.
+1. Upgrade Vercel to Pro, then push, merge and deploy. The plans are on the page, and Hobby forbids that. The deploy also puts the new SITE_PASSWORD live, and the old one stays live until then.
+2. Athita's first eight questions in 08, before the first post.
+3. Review and commit the work since the four commits.
+
+**Open, not blocking the fortnight:** each sitting still sends the whole progress document, up to 1.7 MB late in the course. One record per card fixes that on the account and on the device (10). Recommended within the first month, before the account has real learners in it.
 
 ## The answer on exams and money back
 
@@ -195,10 +199,10 @@ r/ThaiLanguage and Digital Nomads Thailand get replies only, under a fitting que
 Each carries the reports' recommendation.
 
 **This weekend (they shape the P0 code):**
-1. Vercel Pro now. **Luis: no, Vercel stays free.** So no prices or checkout on this site until the hosting is decided (Status, item 3).
+1. Vercel Pro now. **Luis: yes, Pro**, chosen after the first answer. Upgrade before deploying, because the plans are on the page.
 2. Rotate `SITE_PASSWORD` now. **Done**, but production must be redeployed.
 3. The event logger. **Built**, with one consent question for every country. The browser id is kept only after a yes.
-4. Post before checkout is live, with prices as text. **Open.** Recommended: post from Wed 7 for tries and returns, prices or not, once the hosting is settled.
+4. Post before checkout is live, with prices as text. **Luis: yes, from Wed 7 Oct.** Checkout and the email to the 13 follow when Stripe clears.
 5. Ship the five demo fixes and the terms wording. **Done.**
 6. The tag list in 03 §2. **Accepted, and attribution is built**: ref, utm_ tags, referrer and landing page.
 7. The native check. **Athita, Luis's partner, who is Thai**, takes the list in 08. The whole vocabulary has been reviewed.

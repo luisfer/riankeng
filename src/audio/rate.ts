@@ -1,3 +1,6 @@
+/** Slower, on the landing card and the preview, as the course plays it at the default rate. */
+export const SLOWER = 0.7
+
 /**
  * Chrome resets playbackRate when a clip has not loaded yet, so a rate set
  * before play() comes out at full speed. Put the rate back until it holds.

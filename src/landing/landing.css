@@ -219,6 +219,10 @@ html[data-stuck] .nav .nav-wait[data-open] .waitlist-row {
    title and the largest drawing take a 2×2 when that row still fills.
    Hidden until painted, so the first paint is the page of the day. */
 html:not([data-comic]) .comic { visibility: hidden; }
+/* A slow phone in a post's in-app browser may hold the script back. The headline and the
+   waitlist come out after two seconds anyway; the drawings wait for the script that paints them. */
+html:not([data-comic]) .comic .cell.title { animation: title-late 0s linear 2s forwards; }
+@keyframes title-late { to { visibility: visible; } }
 .wrap:has(> .comic) {
   container-type: inline-size;
   container-name: comic;
@@ -585,6 +589,10 @@ html[data-session="in"] .signin-row { grid-template-columns: auto; justify-conte
 .try .slip-line { margin: 0; font-size: 28px; line-height: 1.2; }
 /* Right: the square on the column's edge, as in the course, and Next card on the same line. */
 .try-act:has(.try-next) { grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; }
+/* Too narrow for Right., the waitlist and Next card on one line: Right. first, then the two ways on. */
+@media (max-width: 720px) {
+  .try-act:has(.try-wait) { grid-template-columns: minmax(0, 1fr); }
+}
 .try-pair { display: grid; gap: 4px; padding: 8px 0 4px; }
 .try-pair .pair-line { font-size: 30px; }
 .try-pair .pair-line.rom {
@@ -599,7 +607,35 @@ html[data-session="in"] .signin-row { grid-template-columns: auto; justify-conte
   font-size-adjust: none;
 }
 .try-pair .pair-line.thai { font-size: 34px; }
-.try-next { display: flex; }
+.try-next { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 10px 22px; }
+/* The way on from a card, as type beside the commit, so Next card stays the one button. */
+.try-wait { font-size: 16px; white-space: nowrap; }
+
+/* Two plans, as rows of a contents page: the price in Brygada, the plan, what it means. Not cards. */
+.plans .section-head { margin-bottom: 20px; }
+.plans-list { list-style: none; margin: 0; padding: 0; max-width: 680px; border-top: 1px solid var(--hair); }
+.plan-row {
+  display: grid;
+  grid-template-columns: 64px auto minmax(0, 1fr);
+  align-items: baseline;
+  gap: 4px 18px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--hair);
+}
+.plan-price {
+  font-family: var(--display);
+  font-size: 34px;
+  font-variant-numeric: tabular-nums lining-nums;
+  text-align: right;
+}
+.plan-name { font-size: 18px; }
+.plan-note { color: var(--ink-2); font-size: 16px; }
+.plans-foot { margin: 16px 0 0; color: var(--ink-2); font-size: 15px; max-width: 40em; }
+.plans-foot a { color: var(--ink); text-underline-offset: 3px; }
+@media (max-width: 599px) {
+  .plan-row { grid-template-columns: 64px minmax(0, 1fr); }
+  .plan-note { grid-column: 2; }
+}
 
 /* Close. The page ends in ink, with the night panel and the way in. */
 .close {
@@ -648,6 +684,10 @@ html[data-session="in"] .signin-row { grid-template-columns: auto; justify-conte
 .footer a:hover { text-decoration-thickness: 2px; }
 .footer .wordmark { --th: 22px; }
 .footer-note { flex-basis: 100%; color: var(--ink-2); font-size: 14px; }
+.footer-choices { flex-basis: 100%; margin: -4px 0 0; font-size: 14px; }
+.footer-contact { flex-basis: 100%; margin: -4px 0 0; color: var(--ink-2); font-size: 14px; }
+.footer-choices .text-btn { color: var(--ink-2); }
+.footer-choices .text-btn:hover { color: var(--ink); }
 .footer-legal {
   flex-basis: 100%;
   display: flex;

@@ -312,6 +312,8 @@ body::before {
   font-size: 16px;
 }
 .preview-count { color: var(--ink-2); font-variant-numeric: tabular-nums; }
+/* The waitlist, one step away from any word, as type under the words' own row. */
+.preview-wait { margin: 0; font-size: 16px; }
 .preview-finish { width: min(720px, 100%); }
 .preview-finish-h { margin: 0 0 28px; font-size: clamp(30px, 4vw, 44px); line-height: 1.15; text-wrap: balance; }
 .preview-finish-lede { margin: 28px 0 16px; color: var(--ink-2); max-width: 34em; }
@@ -1117,6 +1119,7 @@ li.quiet-row { cursor: default; }
     gap: 10px;
   }
   html[data-keyboard="open"] .preview-nav,
+  html[data-keyboard="open"] .preview-wait,
   html[data-keyboard="open"] .preview-learned { display: none; }
   html[data-keyboard="open"] .app.in-session .page.session { padding-top: 12px; }
   html[data-keyboard="open"] .app.in-session {

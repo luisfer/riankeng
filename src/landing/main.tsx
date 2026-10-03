@@ -5,10 +5,12 @@ import { parseAuthLink, saveAccount, sendPasswordReset, signInResult, updatePass
 import { COMIC_SLOTS, fillClose, fillScene, mountComic, pickComic, pickLayout, pickPhone, placeComic, swapComicStem } from './comic'
 import { landing } from './copy'
 import { bindWaitlist, openWaitlistAt } from './waitlist'
-import { DEMO, QUIET, TRY_ORDER } from './demo'
+import { DEMO, QUIET, TRY_ORDER, demoByStem } from './demo'
 import { TRY_EVENT, TryCard } from './TryCard'
 import { landingRedirect } from './redirect'
-import { rememberRef } from './ref'
+import { rememberRef, withTouch } from './ref'
+import { setEventPage, track } from './events'
+import { mountConsent } from './consent-banner'
 import { bindKeyboardInset } from '../ui/keyboard-inset'
 import './bar'
 
@@ -17,6 +19,14 @@ bindKeyboardInset()
 const away = landingRedirect(location.hash, location.search, matchMedia('(display-mode: standalone)').matches)
 if (away) location.replace(away)
 rememberRef()
+setEventPage('landing')
+// A sign-in or reset link carries a session in its hash, so it is never counted as a visit.
+if (!location.hash.includes('access_token')) track('view')
+mountConsent((yes) => {
+  // With a yes, the marks this visit came with are kept from now on.
+  if (yes) rememberRef()
+  track('consent', { detail: yes ? 'yes' : 'no' })
+})
 
 // A reset or invite email lands here with a session in the hash (a link to /learn/ is bounced here
 // with its hash kept). Read it once and take it out of the address bar.
@@ -191,10 +201,28 @@ navSign?.addEventListener('click', (e) => {
 })
 
 for (const form of document.querySelectorAll<HTMLFormElement>('form[data-waitlist]')) {
-  bindWaitlist(form, () => {
-    delete html.dataset.gate
-    navSign?.setAttribute('aria-expanded', 'false')
-  })
+  // Which of the three forms: the nav, the title cell, or the close.
+  const where = form.closest('.nav') ? 'nav' : form.closest('.close') ? 'close' : 'title'
+  bindWaitlist(
+    form,
+    () => {
+      delete html.dataset.gate
+      navSign?.setAttribute('aria-expanded', 'false')
+      track('cta', { detail: `waitlist-${where}` })
+    },
+    () => track('join', { detail: where }),
+  )
+}
+// A second tap on a link to #close changes no hash, so open the form here too.
+document.addEventListener('click', (e) => {
+  const to = (e.target as Element | null)?.closest?.('a[href="#close"]')
+  if (to && location.hash === '#close') openWaitlistAt('#close')
+})
+document.querySelector('.plans-foot a')?.addEventListener('click', () => track('cta', { detail: 'waitlist-plans' }))
+// The preview link carries this visit's marks when nothing else can.
+for (const link of document.querySelectorAll<HTMLAnchorElement>('a[href="/preview/"]')) {
+  link.href = withTouch('/preview/')
+  link.addEventListener('click', () => track('cta', { detail: 'preview' }))
 }
 if (openWaitlistAt(location.hash)) {
   // Landing on /#close, the browser's own jump to the fragment moves focus to the page once it
@@ -240,6 +268,7 @@ document.documentElement.dataset.comic = 'in'
 for (const panel of document.querySelectorAll<HTMLAnchorElement>('a.panel[data-scene]')) {
   panel.addEventListener('click', () => {
     window.dispatchEvent(new CustomEvent(TRY_EVENT, { detail: panel.dataset.scene }))
+    track('cta', { detail: 'panel', card: demoByStem(panel.dataset.scene ?? '')?.id })
   })
 }
 
@@ -253,7 +282,7 @@ if (host) {
   createRoot(host).render(
     <StrictMode>
       <Analytics />
-      <TryCard deck={deck} />
+      <TryCard deck={deck} track={track} />
     </StrictMode>,
   )
 }

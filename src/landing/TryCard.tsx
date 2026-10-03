@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useRef, useState } from 'react'
 import { clipUrl } from '@/audio/clip-url'
-import { stickPlaybackRate } from '@/audio/rate'
+import { SLOWER, stickPlaybackRate } from '@/audio/rate'
 import { gradeThai, type ThaiGrade } from '@/engine/grader-thai'
 import { RomanInput } from '@/input/RomanInput'
 import { Commit, HearBtn } from '@/ui/bits'
@@ -9,6 +9,7 @@ import { ToneRom } from '@/ui/ToneRom'
 import { announceClip } from '@/audio/voice-clock'
 import { landing } from './copy'
 import { sceneSrc, sceneSrcSet, type DemoCard } from './demo'
+import type { Track } from './events'
 
 /** A panel on the page was clicked. detail is its stem. */
 export const TRY_EVENT = 'riankeng:try'
@@ -16,8 +17,9 @@ export const TRY_EVENT = 'riankeng:try'
 /**
  * One real card from Voice. Unseen cards on the course open on Look; this
  * does the same, then the write. The grader and the clips are the course's.
+ * track, when given, counts each play and each Check (src/landing/events.ts).
  */
-export function TryCard(props: { deck: DemoCard[] }) {
+export function TryCard(props: { deck: DemoCard[]; track?: Track }) {
   const [at, setAt] = useState(0)
   const [phase, setPhase] = useState<'look' | 'write'>('look')
   const [value, setValue] = useState('')
@@ -50,19 +52,22 @@ export function TryCard(props: { deck: DemoCard[] }) {
     return () => window.removeEventListener(TRY_EVENT, onTry)
   }, [props.deck])
 
-  const play = (rate: number) => {
+  const play = (rate: number, how: 'normal' | 'slow' | 'auto') => {
     setDrawn((d) => d + 1)
     audio.current?.pause()
     const a = new Audio(clipUrl(card.id))
     stickPlaybackRate(a, rate)
     audio.current = a
     announceClip(card.id, a)
-    void a.play().catch(() => undefined)
+    void a.play()?.catch(() => undefined)
+    props.track?.('hear', { card: card.id, detail: how })
   }
 
   const goWrite = () => {
     setPhase('write')
     setFocusField(true)
+    // Continue is a tap, so the browser lets the clip play: nobody writes a card unheard.
+    play(1, 'auto')
     // The panel shrinks on a phone in the write phase; bring that frame to the top so the
     // picture and the field share the first screen.
     requestAnimationFrame(() => {
@@ -76,7 +81,9 @@ export function TryCard(props: { deck: DemoCard[] }) {
   }
 
   const check = () => {
-    setGrade(gradeThai(card.rom, value))
+    const g = gradeThai(card.rom, value)
+    setGrade(g)
+    props.track?.('check', { card: card.id, detail: g.verdict, typed: g.correct ? undefined : value })
   }
 
   const next = () => {
@@ -126,8 +133,8 @@ export function TryCard(props: { deck: DemoCard[] }) {
             <p className="prompt">
               {look ? null : chrome.writeRom}
               <span className="prompt-tools">
-                <HearBtn onClick={() => play(1)}>{landing.hear}</HearBtn>
-                <HearBtn onClick={() => play(0.6)}>{landing.slower}</HearBtn>
+                <HearBtn onClick={() => play(1, 'normal')}>{landing.hear}</HearBtn>
+                <HearBtn onClick={() => play(SLOWER, 'slow')}>{landing.slower}</HearBtn>
               </span>
             </p>
           )}
@@ -145,8 +152,8 @@ export function TryCard(props: { deck: DemoCard[] }) {
                     <ToneRom rom={card.rom} draw={drawn} voice={card.id} />
                   </span>
                   <span className="prompt-tools">
-                    <HearBtn onClick={() => play(1)}>{landing.hear}</HearBtn>
-                    <HearBtn onClick={() => play(0.6)}>{landing.slower}</HearBtn>
+                    <HearBtn onClick={() => play(1, 'normal')}>{landing.hear}</HearBtn>
+                    <HearBtn onClick={() => play(SLOWER, 'slow')}>{landing.slower}</HearBtn>
                   </span>
                 </p>
                 <p className="pair-line thai" lang="th">
@@ -196,6 +203,10 @@ export function TryCard(props: { deck: DemoCard[] }) {
             )}
             {right && (
               <div className="try-next">
+                {/* The next step after a card, beside the next card. The page opens the form at #close. */}
+                <a className="text-btn try-wait" href="#close" onClick={() => props.track?.('cta', { detail: 'waitlist-card' })}>
+                  {landing.waitlist}
+                </a>
                 <Commit onClick={next}>{landing.next}</Commit>
               </div>
             )}

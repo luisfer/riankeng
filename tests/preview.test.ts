@@ -86,9 +86,12 @@ describe('public sitting', () => {
       'Previous word',
       'Next word',
       'Learned',
+      'Join the waitlist',
     ]
     for (const line of copy) expect(main).toContain(line)
-    expect(main).toContain('href="/#close"')
+    // The waitlist at the landing's close, with the visit's marks, from every word and from the end.
+    expect(main).toContain("`${withTouch('/')}#close`")
+    expect(main.match(/href=\{waitlistHref\(\)\}/g)).toHaveLength(2)
     expect(copy.filter((line) => /[!?;:]/.test(line))).toEqual([])
     expect(slopHits(copy)).toEqual([])
   })

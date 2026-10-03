@@ -95,11 +95,24 @@ describe('the landing page', () => {
     expect(html).not.toMatch(/[—·]/)
   })
 
-  it('names the extra vowels on the try card, and the keys that type them, a sentence to a line', () => {
+  it('names the five tones on the try card, mid with no mark, and the keys that type them, a sentence to a line', () => {
     expect(text(doc.querySelector('#try .lede'))).toBe(
-      'Thai has more vowels than English, and five tones. Keys 5 to 8 type ε, ɔ, ə and ʉ. Keys 1 to 4 mark the tone.',
+      'Thai has five tones. à is low, â falling, á high, ǎ rising, and mid has no mark. Keys 1 to 4 write the marks. Keys 5 to 8 type ε, ɔ, ə and ʉ.',
     )
     expect(doc.querySelectorAll('#try .lede br:not(.narrow)')).toHaveLength(1)
+  })
+
+  it('names both plans in US dollars, with no way to pay until checkout is built', () => {
+    const plans = doc.querySelector('#plans')
+    expect([...doc.querySelectorAll('#plans .plan-price')].map(text)).toEqual(['$10', '$20'])
+    expect([...doc.querySelectorAll('#plans .plan-name')].map(text)).toEqual(['a year', 'forever'])
+    expect(plans?.querySelector('button, form, a[href*="checkout"]')).toBeNull()
+    expect(text(plans?.querySelector('.plans-foot') ?? null)).toContain('US dollars, tax included. Payments are not open yet.')
+    expect(plans?.querySelector('.plans-foot a')?.getAttribute('href')).toBe('#close')
+    // The plans come after the preview and before the close.
+    const order = [...doc.querySelectorAll('main > section')].map((s) => s.id).filter(Boolean)
+    expect(order.indexOf('plans')).toBe(order.indexOf('preview') + 1)
+    expect(order.indexOf('close')).toBe(order.indexOf('plans') + 1)
   })
 
   it('offers a reset link under Log in, and names the password field so a link can make it New password', () => {

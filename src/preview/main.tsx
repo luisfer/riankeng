@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { Analytics } from '@vercel/analytics/react'
 import { clipUrl } from '@/audio/clip-url'
-import { stickPlaybackRate } from '@/audio/rate'
+import { SLOWER, stickPlaybackRate } from '@/audio/rate'
 import { cleanGloss } from '@/engine/grader-en'
 import { gradeThai } from '@/engine/grader-thai'
 import { RomanInput } from '@/input/RomanInput'
@@ -11,7 +11,9 @@ import { ToneRom } from '@/ui/ToneRom'
 import { announceClip } from '@/audio/voice-clock'
 import { PREVIEW_IDS, PREVIEW_VOICE } from './catalog'
 import { clearProgress, loadProgress, saveProgress } from './progress'
-import { rememberRef } from '@/landing/ref'
+import { rememberRef, withTouch } from '@/landing/ref'
+import { setEventPage, track } from '@/landing/events'
+import { mountConsent } from '@/landing/consent-banner'
 import { bindKeyboardInset } from '@/ui/keyboard-inset'
 import '@/styles.css'
 
@@ -19,13 +21,19 @@ bindKeyboardInset()
 
 type PlaySlot = { audio: HTMLAudioElement | null }
 
-function play(id: string, rate: number, slot: PlaySlot) {
+function play(id: string, rate: number, slot: PlaySlot, how: 'normal' | 'slow' | 'auto' = rate < 1 ? 'slow' : 'normal') {
   slot.audio?.pause()
   const audio = new Audio(clipUrl(id))
   stickPlaybackRate(audio, rate)
   slot.audio = audio
   announceClip(id, audio)
-  void audio.play()
+  void audio.play()?.catch(() => undefined)
+  track('hear', { card: id, detail: how })
+}
+
+/** The waitlist sits at the foot of the landing page, with this visit's marks carried along. */
+function waitlistHref(): string {
+  return `${withTouch('/')}#close`
 }
 
 const TOTAL = PREVIEW_VOICE.length
@@ -52,7 +60,7 @@ function Finish(props: { slot: PlaySlot; onAgain: () => void }) {
       </ul>
       <p className="preview-finish-lede">The course carries on from these words. It opens to the waitlist first.</p>
       <div className="preview-finish-act">
-        <a className="btn commit" href="/#close">
+        <a className="btn commit" href={waitlistHref()} onClick={() => track('cta', { detail: 'waitlist-done' })}>
           Join the waitlist
         </a>
         <TextBtn onClick={props.onAgain}>Start over</TextBtn>
@@ -83,6 +91,7 @@ function Preview() {
 
   const check = () => {
     const g = gradeThai(card.rom, answer)
+    track('check', { card: card.id, detail: g.verdict, typed: g.correct ? undefined : answer })
     const close = g.verdict === 'tone' || g.verdict === 'length'
     setNote(g.correct ? 'Right.' : close ? 'Almost right.' : g.message)
     setHint(close ? g.message : null)
@@ -102,7 +111,10 @@ function Preview() {
 
   /** After a right answer: the next card, after the last the first one still to learn, and once all are learned the close. */
   const next = () => {
-    if (learned.size === TOTAL) return setFinished(true)
+    if (learned.size === TOTAL) {
+      track('done')
+      return setFinished(true)
+    }
     if (i + 1 < TOTAL) return goTo(i + 1)
     const open = PREVIEW_VOICE.findIndex((w) => !learned.has(w.id))
     if (open >= 0) goTo(open)
@@ -115,9 +127,16 @@ function Preview() {
     goTo(0)
   }
 
+  /** Continue from Look plays the word, since a tap lets it: nobody writes a word unheard. */
+  const toWrite = () => {
+    setPhase('write')
+    setDrawn((d) => d + 1)
+    play(card.id, 1, heard.current, 'auto')
+  }
+
   const canContinue = !finished && (phase === 'look' || note === 'Right.')
   const goOn = useRef<() => void>(next)
-  goOn.current = phase === 'look' ? () => setPhase('write') : next
+  goOn.current = phase === 'look' ? toWrite : next
 
   useEffect(() => {
     if (!canContinue) return
@@ -142,7 +161,7 @@ function Preview() {
       <div className="shell">
         <Trail
           onHome={() => {
-            location.assign('/')
+            location.assign(withTouch('/'))
           }}
           place="Preview"
           lessonDone={learned.size}
@@ -180,7 +199,7 @@ function Preview() {
                   <HearBtn
                     onClick={() => {
                       setDrawn((d) => d + 1)
-                      play(card.id, 0.7, heard.current)
+                      play(card.id, SLOWER, heard.current)
                     }}
                   >
                     Slower
@@ -190,7 +209,7 @@ function Preview() {
               <div className="preview-desk">
                 {learned.has(card.id) && note !== 'Right.' && <p className="preview-learned">Learned</p>}
                 {phase === 'look' ? (
-                  <Commit onClick={() => setPhase('write')}>Continue</Commit>
+                  <Commit onClick={toWrite}>Continue</Commit>
                 ) : note === 'Right.' ? (
                   <>
                     <p className="feedback session-feedback ok" role="status">
@@ -235,6 +254,12 @@ function Preview() {
                     Next word
                   </TextBtn>
                 </p>
+                {/* The waitlist is always one step away, not only after the last word. */}
+                <p className="preview-wait">
+                  <a className="text-btn" href={waitlistHref()} onClick={() => track('cta', { detail: 'waitlist-preview' })}>
+                    Join the waitlist
+                  </a>
+                </p>
               </div>
             </div>
           )}
@@ -244,8 +269,14 @@ function Preview() {
   )
 }
 
-// A link straight to the preview keeps its tag for the waitlist it leads to.
+// A link straight to the preview keeps its marks for the waitlist it leads to.
 rememberRef()
+setEventPage('preview')
+track('view')
+mountConsent((yes) => {
+  if (yes) rememberRef()
+  track('consent', { detail: yes ? 'yes' : 'no' })
+})
 createRoot(document.getElementById('root')!).render(
   <>
     <Analytics />

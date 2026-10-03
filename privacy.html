@@ -36,25 +36,35 @@
 
       <h2>Data</h2>
       <ul>
-        <li>Waitlist. The email entered in the form, and the short tag on the link that led to the page, when the link has one, such as x for a post on X. The form stores nothing else.</li>
+        <li>Waitlist. The email entered in the form. With it, the marks on the link that led to the page, when the link has them: the short tag, such as x for a post on X, the utm tags that link builders add, the site that linked here, and the page the visit arrived on. The form stores nothing else.</li>
         <li>Account. The email, and a hash of the password held by Supabase. The company does not keep the password.</li>
         <li>Name. The display name on the account, and the name saved in the course settings, when one is entered.</li>
         <li>Progress. Cards, answers, sittings, and settings, stored as one document.</li>
-        <li>This browser. The progress document in the browser's storage. On a browser two accounts share, each account's cards are kept apart there, and erasing the device erases them all. The sign-in session, including the email and the access tokens, in the browser's storage. The link's tag, for the open tab, and the first tag this browser arrived with, for 30 days, so it reaches the waitlist form from a new tab too.</li>
+        <li>Demo use. On the demo card and the preview: the page, the day, the card, whether it was heard, checked, right or missed, which links and buttons led on, and the marks on the link that led here. For a missed card, what was typed, when it is romanization and nothing else. Each page load carries a random number that is never stored, so one visit's checks count together. Demo use holds no email and no IP address.</li>
+        <li>Counting, with permission. When the visitor allows it, this browser keeps a random number for 13 months, and the marks on the link that first brought it, for 30 days. A later visit then counts as a return, credited to the post that led here. Without permission, nothing is kept for counting.</li>
+        <li>Page views. Vercel Web Analytics counts page views without cookies: the page, the referring site, the country, and the browser, system and device type. It keeps nothing in the browser.</li>
+        <li>This browser. The progress document in the browser's storage. On a browser two accounts share, each account's cards are kept apart there, and erasing the device erases them all. The sign-in session, including the email and the access tokens, in the browser's storage. The preview's place, so it opens where it was left. The counting choice, so the question is not asked on every page.</li>
         <li>Cookie. <code>rk_gate</code>, HttpOnly, for 30 days after sign-in. It lets the course open. It does not contain the email or the password, and it is not used to count visits.</li>
         <li>Logs. The host may record an IP address and the request, for security and operation.</li>
       </ul>
-      <p>The company does not sell personal data. The site does not use analytics or advertising cookies.</p>
+      <p>The company does not sell personal data. The site uses no advertising cookies and no cookies for counting visits.</p>
+
+      <h2 id="counting">Counting</h2>
+      <p>The same rule holds in every country. The site asks once whether this browser may keep the random number for counting. Allow and Don't allow are offered alike, the page works the same either way, and nothing is kept for counting before a yes. A browser that sends Global Privacy Control is treated as a no and is not asked.</p>
+      <p>A yes holds for 13 months and a no for 6, then the question comes back once. Privacy choices, at the foot of the front page and here, changes the answer at any time. A no removes the random number and the kept link marks from this browser.</p>
+      <p><button class="text-btn" type="button" data-consent-open>Privacy choices</button></p>
 
       <h2>Purposes</h2>
-      <p>A waitlist email is collected to send a message when the course is ready for that address. Sending the form is consent for that message. The form itself sends no mail. The link's tag counts which posts brought people to the list.</p>
+      <p>A waitlist email is collected to send a message when the course is ready for that address. Sending the form is consent for that message. The form itself sends no mail. The link's marks count which posts brought people to the list.</p>
       <p>The account, the progress, the browser copy, and the cookie are collected to provide the course the person asked for, including a copy that opens without a network.</p>
+      <p>Demo use and page views are collected to learn how many people try a card, how many come back on a later day, which posts brought them, and which cards and tones are missed, to fix the grader and the words. They are not joined to a waitlist email or to an account.</p>
 
       <h2>Processors</h2>
-      <p>Vercel hosts the site and may keep the logs. Supabase stores the account, the progress document, and the waitlist. The company uses them under their data-processing terms. Their servers may be outside Singapore.</p>
+      <p>Vercel hosts the site, counts page views, and may keep the logs. Supabase stores the account, the progress document, the waitlist, and demo use. The company uses them under their data-processing terms. Their servers may be outside Singapore.</p>
 
       <h2>Retention</h2>
       <p>A waitlist email is kept until the company deletes it, or until the person asks for it to be removed. Account data and progress are kept while the account exists. After a deletion request, the company deletes what it holds for that person.</p>
+      <p>Demo use is deleted after 13 months. The random number in the browser lasts 13 months, or until permission is withdrawn or the browser is cleared.</p>
       <p>The cookie expires after 30 days, or sooner if the person logs out. The browser copy remains until the person erases the device or clears the browser.</p>
       <p>The company does not set a published period for host logs. Those logs follow the host's own retention.</p>
 
@@ -62,7 +72,7 @@
       <p>A person may ask what personal data the company holds, ask for a correction, withdraw consent, or ask for deletion. The company replies as soon as it reasonably can. If a reply takes longer than 30 days, the company writes to say when it will answer.</p>
       <p>Withdrawing waitlist consent means the address is removed and no course message is sent to it. Deleting account data closes the account. The browser may still hold a local copy until it is cleared.</p>
       <p>The course is for adults. The company does not knowingly collect personal data from a child.</p>
-      <p class="meta">24 September 2026. <a href="/terms">Terms</a>.</p>
+      <p class="meta">3 October 2026. <a href="/terms">Terms</a>.</p>
     </main>
     <footer class="footer wrap legal-foot">
       <span class="wordmark" role="img" aria-label="rian gèng, เรียนเก่ง">
@@ -75,7 +85,9 @@
       <span>Made by <a href="https://lfrc.me">Luisfer Romero Calero</a>.</span>
       <p class="footer-note">Romanization is the <a href="https://paiboonlanguageacademy.com/product/thai-for-beginners/">Paiboon system</a> of Benjawan Poomsan Becker.</p>
       <p class="footer-legal"><a href="/privacy" aria-current="page">Privacy</a><a href="/terms">Terms</a></p>
+      <p class="footer-choices"><button class="text-btn" type="button" data-consent-open>Privacy choices</button></p>
+      <p class="footer-contact"><a href="mailto:pristinemekong@gmail.com">pristinemekong@gmail.com</a></p>
     </footer>
-    <script type="module" src="/src/landing/bar.ts"></script>
+    <script type="module" src="/src/landing/legal-page.ts"></script>
   </body>
 </html>

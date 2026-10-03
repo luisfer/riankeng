@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { act } from 'react'
 import { createRoot } from 'react-dom/client'
 import { DEMO } from '../src/landing/demo'
@@ -10,11 +10,11 @@ const jasmine = DEMO.find((d) => d.stem === 'jasmine')!
 const passenger = DEMO.find((d) => d.stem === 'passenger')!
 const tea = DEMO.find((d) => d.stem === 'tea')!
 
-function render(deck = [tea, jasmine, passenger]) {
+function render(deck = [tea, jasmine, passenger], track?: Parameters<typeof TryCard>[0]['track']) {
   const host = document.createElement('div')
   document.body.appendChild(host)
   act(() => {
-    createRoot(host).render(<TryCard deck={deck} />)
+    createRoot(host).render(<TryCard deck={deck} track={track} />)
   })
   return host
 }
@@ -129,6 +129,38 @@ describe('the live card', () => {
     type(host, 'abc')
     check(host)
     expect(host.querySelector('.feedback')?.textContent).toMatch(/It is/)
+  })
+
+  it('plays the card on Continue, so nobody writes it unheard, and counts each play and each Check', () => {
+    const track = vi.fn()
+    const host = render([tea], track)
+    clickNamed(host, 'Continue')
+    expect(track).toHaveBeenCalledWith('hear', { card: tea.id, detail: 'auto' })
+    clickNamed(host, 'Slower')
+    expect(track).toHaveBeenCalledWith('hear', { card: tea.id, detail: 'slow' })
+    type(host, 'chaa yén')
+    check(host)
+    // A miss keeps what was typed, so the grader and the words can be fixed from it.
+    expect(track).toHaveBeenCalledWith('check', { card: tea.id, detail: 'tone', typed: 'chaa yén' })
+    type(host, tea.rom)
+    check(host)
+    expect(track).toHaveBeenLastCalledWith('check', { card: tea.id, detail: 'exact', typed: undefined })
+  })
+
+  it('offers the waitlist beside Next card once a card is right', () => {
+    const track = vi.fn()
+    const host = render([tea], track)
+    clickNamed(host, 'Continue')
+    type(host, tea.rom)
+    check(host)
+    const link = host.querySelector<HTMLAnchorElement>('.try-next a.try-wait')
+    expect(link?.textContent).toBe('Join the waitlist')
+    expect(link?.getAttribute('href')).toBe('#close')
+    act(() => {
+      link!.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
+    })
+    expect(track).toHaveBeenCalledWith('cta', { detail: 'waitlist-card' })
+    expect([...host.querySelectorAll('.try-next button')].map((b) => b.textContent)).toEqual(['Next card'])
   })
 })
 

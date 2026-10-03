@@ -36,6 +36,21 @@ describe('privacy and terms', () => {
     expect(privacy.body.innerHTML).toContain('mailto:pristinemekong@gmail.com')
     expect(text(terms.querySelector('h1'))).toBe('Terms')
   })
+
+  it('states both plans, what forever means, and where to write, in the terms', () => {
+    const body = text(terms.body)
+    expect(body).toContain('Yearly costs $10 a year and renews each year until it is cancelled. Forever costs $20 once.')
+    expect(body).toContain('Forever means for as long as the company offers rian gèng.')
+    expect(terms.querySelector('main a[href="mailto:pristinemekong@gmail.com"]')).not.toBeNull()
+    expect(body).not.toMatch(/recording/i)
+  })
+
+  it('puts the contact address in every footer, beside Privacy choices', () => {
+    for (const doc of [landing, privacy, terms]) {
+      expect(doc.querySelector('.footer-contact a')?.getAttribute('href')).toBe('mailto:pristinemekong@gmail.com')
+      expect(text(doc.querySelector('.footer-choices button'))).toBe('Privacy choices')
+    }
+  })
 })
 
 describe('footer links resolve on Vercel', () => {
